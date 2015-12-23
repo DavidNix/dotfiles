@@ -1,0 +1,88 @@
+[user]
+	name = David Nix
+	email = davidnix81@gmail.com
+[core]
+	excludesfile = /Users/david/.gitignore_global
+[core]
+	pager = less -MFRSX
+	excludesfile = /Users/david/.gitignore_global
+	editor = vim
+	# You may need to reset your tree: http://help.github.com/line-endings/
+	autocrlf = false
+	safecrlf = true
+	quotepath = false
+
+[alias]
+	preview = fetch ; git diff HEAD...origin
+	sh = show --name-only --pretty="format:"
+	st = status
+	ci = commit
+	co = checkout
+	cp = cherry-pick
+	br = branch
+	di = diff
+	sta = stash
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+	wc = whatchanged
+
+# Helpers provided by http://kennethreitz.com/legit-the-sexy-git-cli.html
+#  switch = !legit switch \"$@\"
+#  branches = !legit branches
+#  sprout = !legit sprout \"$@\"
+#  unpublish = !legit unpublish \"$@\"
+#  harvest = !legit harvest \"$@\"
+#  sync = !legit sync \"$@\"
+#  publish = !legit publish \"$@\"
+#  graft = !legit graft \"$@\"
+
+[color]
+	# This is not a black and white world.
+	branch = auto
+	diff = auto
+	interactive = auto
+	status = auto
+	ui = auto
+
+[push]
+ # Only push the current branch when exec’ing “git push”
+	default = tracking
+	followTags = true
+
+# Optional merge tool, http://sourcegear.com/diffmerge/ rocks.
+# When you have to merge, “git mergetool”
+[merge]
+	tool = Kaleidoscope
+[mergetool "diffmerge"]
+	cmd = diffmerge --merge --result=$MERGED $LOCAL $BASE $REMOTE
+	trustExitCode = false
+
+[rerere]
+ # Remember merge solutions so that they are autoplayed in the future.
+	enabled = 1
+
+[apply]
+	whitespace = nowarn
+
+[branch]
+ # You should always rebase when pulling to keep the history in the correct order.
+	autosetuprebase = always
+
+[diff]
+ # use (index, work tree, commit, object) instead of the standard a and b notation
+	mnemonicprefix = true
+ # basic rename and copy detection
+	tool = Kaleidoscope
+	
+[heroku]
+	account = gospot
+
+[mergetool "Kaleidoscope"]
+	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+	trustexitcode = true
+
+[difftool "Kaleidoscope"]
+	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+[difftool]
+	prompt = false
+[mergetool]
+	prompt = false
