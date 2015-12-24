@@ -15,6 +15,7 @@ alias tmux="TERM=screen-256color-bce tmux"
 # Go Env Vars
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
+export GO15VENDOREXPERIMENT=1
 
 VISUAL=vim; export VISUAL
 EDITOR=vim; export EDITOR
