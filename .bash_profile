@@ -18,6 +18,9 @@ export GOROOT="/usr/local/go"
 export PATH=$PATH:$GOPATH/bin
 export GO15VENDOREXPERIMENT=1
 
+#Docker
+eval "$(docker-machine env default)"
+
 VISUAL=vim; export VISUAL
 EDITOR=vim; export EDITOR
 
