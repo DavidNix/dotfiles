@@ -1,15 +1,16 @@
-nnoremap ; ;
+source ~/.vimrc
 
-set number
+" nnoremap ; ;
+" set number
 
-" get back to normal mode quickly
-inoremap jk <Esc> 
+" " get back to normal mode quickly
+" inoremap jk <Esc> 
 
-" window navigation
-map <C-j> <C-w>j<CR>
-map <C-k> <C-w>k<CR>
-map <C-h> <C-w>h<CR>
-map <C-l> <C-w>l<CR>
+" " window navigation
+" map <C-j> <C-w>j<CR>
+" map <C-k> <C-w>k<CR>
+" map <C-h> <C-w>h<CR>
+" map <C-l> <C-w>l<CR>
 
-" Use system pasteboard
-set clipboard=unnamed
+" " Use system pasteboard
+" set clipboard=unnamed
