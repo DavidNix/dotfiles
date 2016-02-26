@@ -1,16 +1,26 @@
 source ~/.vimrc
 
+" :actionlist <command name> in IDE will search for available actions
+
+:map <leader>s :action SplitVertically<CR>
+:map <leader>h :action SplitHorizontally<CR>
+:map <leader>u :action Unsplit<CR>
+:map <leader>U :action UnsplitAll<CR>
+:map <leader>r :action ReformatCode<CR>
+:map H :action Back<CR>
+:map L :action Forward<CR>
+
+" Use system pasteboard
+set clipboard=unnamed
+
+" window navigation
+map <C-j> <C-w>j<CR>
+map <C-k> <C-w>k<CR>
+map <C-h> <C-w>h<CR>
+map <C-l> <C-w>l<CR>
+
 " nnoremap ; ;
 " set number
 
 " " get back to normal mode quickly
 " inoremap jk <Esc> 
-
-" " window navigation
-" map <C-j> <C-w>j<CR>
-" map <C-k> <C-w>k<CR>
-" map <C-h> <C-w>h<CR>
-" map <C-l> <C-w>l<CR>
-
-" " Use system pasteboard
-" set clipboard=unnamed
