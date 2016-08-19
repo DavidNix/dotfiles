@@ -182,6 +182,9 @@ map <Leader>= <C-w>=
 " ======
 autocmd FileType ruby,yml setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
 
+" Fastlane
+au BufRead,BufNewFile Fastfile set filetype=ruby
+
 " Go Language
 " =============
 " godef
