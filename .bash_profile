@@ -25,6 +25,7 @@ EDITOR=vim; export EDITOR
 alias cirrus="cd ~/src/cirrusmd-web-app"
 alias cirrusi="cd ~/src/cirrusmd-ios"
 alias cirruspub="cd ~/src/cirrusmd-pubsub"
+alias cirrusws="cd ~/go/src/github.com/CirrusMD/cirrusmd-ws/"
 alias cirrusa="cd ~/src/cirrusmd-android"
 
 export PUBSUB_PATH=$HOME/src/cirrusmd-pubsub
@@ -104,3 +105,11 @@ export PS2="\[\033[35m\]→ \[\033[0m\]"
 
 eval "$(rbenv init -)"
 
+
+# Setting PATH for Python 3.6
+# The original version is saved in .bash_profile.pysave
+PATH="/Library/Frameworks/Python.framework/Versions/3.6/bin:${PATH}"
+export PATH
+
+# added by Anaconda3 4.2.0 installer
+export PATH="/Users/david/anaconda/bin:$PATH"
