@@ -12,6 +12,8 @@ man -t "${1}" | open -f -a /Applications/Preview.app/
 # get correct colorscheme on tmux
 alias tmux="TERM=screen-256color-bce tmux"
 
+export PATH=$PATH:/usr/local/sbin
+
 # Go Env Vars
 export GOPATH=$HOME/go
 export GOROOT="/usr/local/go"
@@ -25,17 +27,15 @@ EDITOR=vim; export EDITOR
 alias cirrus="cd ~/src/cirrusmd-web-app"
 alias cirrusi="cd ~/src/cirrusmd-ios"
 alias cirruspub="cd ~/src/cirrusmd-pubsub"
-alias cirrusws="cd ~/go/src/github.com/CirrusMD/cirrusmd-ws/"
+alias cirrusws="cd ~/go/src/github.com/CirrusMD/websocket-server/"
 alias cirrusa="cd ~/src/cirrusmd-android"
-
-export PUBSUB_PATH=$HOME/src/cirrusmd-pubsub
 
 # Make SSL work with charles
 alias sslcharles="~/.scripts/install-charles-ca-cert-for-iphone-simulator.command"
 
 # Postgres
-alias pg-start="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/logfile start"
-alias pg-stop="pg_ctl -D /usr/local/var/postgres stop -s -m fast"
+alias pg-start="pg_ctl -D /usr/local/var/postgresql@9.4 -l /usr/local/var/postgresql@9.4/logfile start"
+alias pg-stop="pg_ctl -D /usr/local/var/postgresql@9.4 stop -s -m fast"
 
 export AWS_CONFIG_FILE='~/.awscli-config'
 
