@@ -9,6 +9,10 @@ man -t "${1}" | open -f -a /Applications/Preview.app/
 # homebrew wants this first.
 # export PATH="/usr/local/bin:$PATH"
 
+# automatically add keys to ssh-agent
+# note: for new keys run ssh-add -K <path to key> first
+{ eval `ssh-agent`; ssh-add -A; } &>/dev/null
+
 # get correct colorscheme on tmux
 alias tmux="TERM=screen-256color-bce tmux"
 
