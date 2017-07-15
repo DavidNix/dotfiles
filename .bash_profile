@@ -6,22 +6,17 @@ psman()
 man -t "${1}" | open -f -a /Applications/Preview.app/
 }
 
-# homebrew wants this first.
-# export PATH="/usr/local/bin:$PATH"
-
 # automatically add keys to ssh-agent
-# note: for new keys run ssh-add -K <path to key> first
+#
 { eval `ssh-agent`; ssh-add -A; } &>/dev/null
 
 # get correct colorscheme on tmux
 alias tmux="TERM=screen-256color-bce tmux"
 
-export PATH=$PATH:/usr/local/sbin
 
 # Go Env Vars
 export GOPATH=$HOME/go
 export GOROOT="/usr/local/go"
-export PATH=$PATH:$GOPATH/bin
 export GO15VENDOREXPERIMENT=1
 
 VISUAL=vim; export VISUAL
@@ -107,13 +102,16 @@ export PS1="\[\033[35m\][\h\[\033[00m\]\[\033[35m\]] \[\033[34m\]\W\[\033[32m\]\
 # export PS1="\[\033[35m\][\h\[\033[00m\]\[\033[35m\]] \[\033[34m\]\W\[\033[32m\]\$(parse_ruby_version)\[\033[31m\]\$(parse_git_branch)\[\033[00m\] \[\033[0m\]"
 export PS2="\[\033[35m\]→ \[\033[0m\]"
 
-eval "$(rbenv init -)"
 
+# PATH modifications
 
-# Setting PATH for Python 3.6
-# The original version is saved in .bash_profile.pysave
-PATH="/Library/Frameworks/Python.framework/Versions/3.6/bin:${PATH}"
+PATH=$PATH:/usr/local/sbin
+PATH="/Users/david/anaconda/bin:/Library/Frameworks/Python.framework/Versions/3.6/bin:${PATH}"
+# Go specific
+PATH=$PATH:$GOPATH/bin
+# homebrew wants this first.
+PATH="/usr/local/bin:$PATH"
+
+eval "$(rbenv init -)" # this also moifies PATH
+
 export PATH
-
-# added by Anaconda3 4.2.0 installer
-export PATH="/Users/david/anaconda/bin:$PATH"
