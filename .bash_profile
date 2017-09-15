@@ -27,6 +27,7 @@ alias cirrus="cd ~/src/cirrusmd-web-app"
 alias cirrusi="cd ~/src/cirrusmd-ios"
 alias cirruspub="cd ~/src/cirrusmd-pubsub"
 alias cirrusws="cd ~/go/src/github.com/CirrusMD/websocket-server/"
+alias cirruswl="cd ~/go/src/github.com/CirrusMD/whitelb/"
 alias cirrusa="cd ~/src/cirrusmd-android"
 
 # Make SSL work with charles
