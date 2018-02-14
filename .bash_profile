@@ -13,22 +13,21 @@ man -t "${1}" | open -f -a /Applications/Preview.app/
 # get correct colorscheme on tmux
 alias tmux="TERM=screen-256color-bce tmux"
 
-
-# Go Env Vars
-export GOPATH=$HOME/go
-export GOROOT="/usr/local/go"
-export GO15VENDOREXPERIMENT=1
-
 VISUAL=vim; export VISUAL
 EDITOR=vim; export EDITOR
 
+export GOPATH="/Users/david/go"
+export GOBIN="/Users/david/go/bin"
+
 # cirrus shortcuts
-alias cirrus="cd ~/src/cirrusmd-web-app"
-alias cirrusi="cd ~/src/cirrusmd-ios"
-alias cirruspub="cd ~/src/cirrusmd-pubsub"
+alias cirrus="cd ~/src/cirrusmd/cirrusmd-web-app"
+alias cirrusi="cd ~/src/cirrusmd/cirrusmd-ios"
+alias cirruspub="cd ~/src/cirrusmd/cirrusmd-pubsub"
+alias cirrusa="cd ~/src/cirrusmd/cirrusmd-android"
+
 alias cirrusws="cd ~/go/src/github.com/CirrusMD/websocket-server/"
 alias cirruswl="cd ~/go/src/github.com/CirrusMD/whitelb/"
-alias cirrusa="cd ~/src/cirrusmd-android"
+alias cirrusetl="cd ~/go/src/github.com/CirrusMD/etl-server/"
 
 # Make SSL work with charles
 alias sslcharles="~/.scripts/install-charles-ca-cert-for-iphone-simulator.command"
@@ -109,10 +108,11 @@ export PS2="\[\033[35m\]→ \[\033[0m\]"
 PATH=$PATH:/usr/local/sbin
 PATH="/Users/david/anaconda/bin:/Library/Frameworks/Python.framework/Versions/3.6/bin:${PATH}"
 # Go specific
-PATH=$PATH:$GOPATH/bin
+PATH=$PATH:$GOBIN
 # homebrew wants this first.
 PATH="/usr/local/bin:$PATH"
 
 eval "$(rbenv init -)" # this also moifies PATH
 
 export PATH
+
