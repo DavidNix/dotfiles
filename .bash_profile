@@ -27,14 +27,14 @@ alias cirrusa="cd ~/src/cirrusmd/cirrusmd-android"
 
 alias cirrusws="cd ~/go/src/github.com/CirrusMD/websocket-server/"
 alias cirruswl="cd ~/go/src/github.com/CirrusMD/whitelb/"
-alias cirrusetl="cd ~/go/src/github.com/CirrusMD/etl-server/"
+alias cirrusetl="cd ~/go/src/github.com/CirrusMD/etl-platform/"
 
 # Make SSL work with charles
 alias sslcharles="~/.scripts/install-charles-ca-cert-for-iphone-simulator.command"
 
 # Postgres
-alias pg-start="pg_ctl -D /usr/local/var/postgresql@9.4 -l /usr/local/var/postgresql@9.4/logfile start"
-alias pg-stop="pg_ctl -D /usr/local/var/postgresql@9.4 stop -s -m fast"
+alias pg-start="pg_ctl -D /usr/local/var/postgres start"
+alias pg-stop="pg_ctl -D /usr/local/var/postgres stop"
 
 export AWS_CONFIG_FILE='~/.awscli-config'
 
@@ -99,20 +99,18 @@ settitle() {
  
 export GIT_PS1_SHOWDIRTYSTATE='true'
 export PS1="\[\033[35m\][\h\[\033[00m\]\[\033[35m\]] \[\033[34m\]\W\[\033[32m\]\[\033[31m\]\$(parse_git_branch)\[\033[00m\] \[\033[0m\]"
-# export PS1="\[\033[35m\][\h\[\033[00m\]\[\033[35m\]] \[\033[34m\]\W\[\033[32m\]\$(parse_ruby_version)\[\033[31m\]\$(parse_git_branch)\[\033[00m\] \[\033[0m\]"
 export PS2="\[\033[35m\]→ \[\033[0m\]"
 
 
 # PATH modifications
 
 PATH=$PATH:/usr/local/sbin
-PATH="/Users/david/anaconda/bin:/Library/Frameworks/Python.framework/Versions/3.6/bin:${PATH}"
-# Go specific
-PATH=$PATH:$GOBIN
+PATH=$PATH:$GOBIN # Go specific
 # homebrew wants this first.
 PATH="/usr/local/bin:$PATH"
+export PATH
 
 eval "$(rbenv init -)" # this also moifies PATH
+eval "$(pipenv --completion)"
 
-export PATH
 
