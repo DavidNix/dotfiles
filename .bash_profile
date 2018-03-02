@@ -104,6 +104,7 @@ PATH=$PATH:/usr/local/sbin
 PATH=$PATH:$GOBIN # Go specific
 # homebrew wants this first.
 PATH="/usr/local/bin:$PATH"
+export PATH="/usr/local/heroku/bin:$PATH"
 export PATH
 
 eval "$(rbenv init -)" # this also moifies PATH
