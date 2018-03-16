@@ -33,8 +33,8 @@ alias cirrusetl="cd ~/go/src/github.com/CirrusMD/etl-platform/"
 alias sslcharles="~/.scripts/install-charles-ca-cert-for-iphone-simulator.command"
 
 # Postgres
-alias pg-start="pg_ctl -D /usr/local/var/postgres start"
-alias pg-stop="pg_ctl -D /usr/local/var/postgres stop"
+alias pg-start="brew services start postgresql@9.6"
+alias pg-stop="brew services stop postgresql@9.6"
 
 export AWS_CONFIG_FILE='~/.awscli-config'
 
@@ -111,3 +111,6 @@ eval "$(rbenv init -)" # this also moifies PATH
 eval "$(pipenv --completion)"
 
 
+
+# added by Anaconda3 5.1.0 installer
+export PATH="/Users/david/anaconda3/bin:$PATH"
