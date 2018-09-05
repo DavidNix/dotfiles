@@ -18,9 +18,7 @@ Plugin 'tpope/vim-rails'
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'godlygeek/tabular'
 Plugin 'plasticboy/vim-markdown'
-
-" May eventually delete, only used for Cirrus
-Plugin 'kchmck/vim-coffee-script'
+Plugin 'elixir-editors/vim-elixir'
 
 call vundle#end()
 
@@ -210,6 +208,9 @@ let g:go_fmt_command = "goimports"
 
 " Disable markdown folding
 let g:vim_markdown_folding_disabled=1
+
+" YAML
+autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 
 " FUNCTIONS
 " ===========

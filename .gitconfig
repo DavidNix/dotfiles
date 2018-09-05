@@ -24,6 +24,7 @@
 	sta = stash
 	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
 	wc = whatchanged
+	ksreview = "!f() { local SHA=${1:-HEAD}; local BRANCH=${2:-master}; if [ $SHA == $BRANCH ]; then SHA=HEAD; fi; git difftool -y -t Kaleidoscope $BRANCH...$SHA; }; f"
 
 # Helpers provided by http://kennethreitz.com/legit-the-sexy-git-cli.html
 #  switch = !legit switch \"$@\"

@@ -27,7 +27,7 @@ alias cirrusa="cd ~/src/cirrusmd/cirrusmd-android"
 
 alias cirrusws="cd ~/go/src/github.com/CirrusMD/websocket-server/"
 alias cirruswl="cd ~/go/src/github.com/CirrusMD/whitelb/"
-alias cirrusetl="cd ~/go/src/github.com/CirrusMD/etl-platform/"
+alias cirrusetl="cd ~/src/cirrusmd/etl-platform/"
 
 # Make SSL work with charles
 alias sslcharles="~/.scripts/install-charles-ca-cert-for-iphone-simulator.command"
