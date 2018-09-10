@@ -3,5 +3,5 @@ set editing-mode vi
 set bell-style none
 $if mode=vi
     set keymap vi-insert
-    "jk": vi-movement-mode
+    # "jk": vi-movement-mode
 $endif
