@@ -16,18 +16,19 @@ alias tmux="TERM=screen-256color-bce tmux"
 VISUAL=vim; export VISUAL
 EDITOR=vim; export EDITOR
 
-export GOPATH="/Users/david/go"
-export GOBIN="/Users/david/go/bin"
+export GOBIN="/Users/davidnix/go/bin"
+
+alias kl="kubectl"
 
 # cirrus shortcuts
-alias cirrus="cd ~/src/cirrusmd/cirrusmd-web-app"
-alias cirrusi="cd ~/src/cirrusmd/cirrusmd-ios"
-alias cirruspub="cd ~/src/cirrusmd/cirrusmd-pubsub"
+alias cirrusweb="cd ~/src/cirrusmd/cirrusmd-web-app"
 alias cirrusa="cd ~/src/cirrusmd/cirrusmd-android"
 
-alias cirrusws="cd ~/go/src/github.com/CirrusMD/websocket-server/"
+alias cirrusws="cd ~/src/cirrusmd/websocket-server/"
 alias cirruswl="cd ~/go/src/github.com/CirrusMD/whitelb/"
 alias cirrusetl="cd ~/src/cirrusmd/etl-platform/"
+
+alias splitcsv="~/src/cirrusmd/etl-platform/script/splitcsv"
 
 # Make SSL work with charles
 alias sslcharles="~/.scripts/install-charles-ca-cert-for-iphone-simulator.command"
@@ -88,7 +89,7 @@ export LSCOLORS=excxgxfxbxdxbxbxbxexex
 # Bright Cyan    | \033[1;36m | G
 # Bright Grey    | \033[0;37m | h
 # White          | \033[1;37m | H
- 
+
 parse_git_branch() {
   __git_ps1 " [%s]"
 }
@@ -97,20 +98,15 @@ export GIT_PS1_SHOWDIRTYSTATE='true'
 export PS1="\[\033[35m\][\h\[\033[00m\]\[\033[35m\]] \[\033[34m\]\W\[\033[32m\]\[\033[31m\]\$(__git_ps1 \" [%s]\")\[\033[00m\] \[\033[0m\]"
 export PS2="\[\033[35m\]→ \[\033[0m\]"
 
-
 # PATH modifications
+export PATH="/usr/local/bin:/usr/local/sbin:$GOBIN:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin/flutter/bin"
 
-PATH=$PATH:/usr/local/sbin
-PATH=$PATH:$GOBIN # Go specific
-# homebrew wants this first.
-PATH="/usr/local/bin:$PATH"
-export PATH="/usr/local/heroku/bin:$PATH"
-export PATH
+# ASDF
+. $HOME/.asdf/asdf.sh
+. $HOME/.asdf/completions/asdf.bash
 
-eval "$(rbenv init -)" # this also moifies PATH
-eval "$(pipenv --completion)"
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/davidnix/Downloads/google-cloud-sdk/path.bash.inc' ]; then . '/Users/davidnix/Downloads/google-cloud-sdk/path.bash.inc'; fi
 
-
-
-# added by Anaconda3 5.1.0 installer
-export PATH="/Users/david/anaconda3/bin:$PATH"
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/davidnix/Downloads/google-cloud-sdk/completion.bash.inc' ]; then . '/Users/davidnix/Downloads/google-cloud-sdk/completion.bash.inc'; fi
