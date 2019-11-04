@@ -1,7 +1,6 @@
 # Resources
 #   - https://scriptingosx.com/2019/06/moving-to-zsh-part-3-shell-options/
 
-
 export ZSH="/Users/davidnix/.oh-my-zsh"
 ZSH_THEME="crunch"
 
@@ -35,7 +34,7 @@ setopt CORRECT
 setopt CORRECT_ALL
 
 # Order of operations important! Plugins must come before sourcing the script
-plugins=(git osx)
+plugins=(git osx vi-mode)
 source $ZSH/oh-my-zsh.sh
 
 # advanced completions
