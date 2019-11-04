@@ -1,11 +1,5 @@
 source ~/.bash_completions
 
-# Opens man pages in preview
-psman()
-{
-man -t "${1}" | open -f -a /Applications/Preview.app/
-}
-
 # automatically add keys to ssh-agent
 #
 { eval `ssh-agent`; ssh-add -A; } &>/dev/null
@@ -18,24 +12,13 @@ EDITOR=vim; export EDITOR
 
 export GOBIN="/Users/davidnix/go/bin"
 
-alias kl="kubectl"
+alias k="kubectl"
 
 # cirrus shortcuts
 alias cirrusweb="cd ~/src/cirrusmd/cirrusmd-web-app"
-alias cirrusa="cd ~/src/cirrusmd/cirrusmd-android"
-
 alias cirrusws="cd ~/src/cirrusmd/websocket-server/"
-alias cirruswl="cd ~/go/src/github.com/CirrusMD/whitelb/"
 alias cirrusetl="cd ~/src/cirrusmd/etl-platform/"
-
 alias splitcsv="~/src/cirrusmd/etl-platform/script/splitcsv"
-
-# Make SSL work with charles
-alias sslcharles="~/.scripts/install-charles-ca-cert-for-iphone-simulator.command"
-
-# Postgres
-alias pg-start="brew services start postgresql@9.6"
-alias pg-stop="brew services stop postgresql@9.6"
 
 export AWS_CONFIG_FILE='~/.awscli-config'
 
