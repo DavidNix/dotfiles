@@ -216,7 +216,7 @@ autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 " Terraform
 " https://github.com/hashivim/vim-terraform
 let g:terraform_align=1
-let g:terraform_fold_sections=1
+let g:terraform_fold_sections=0
 let g:terraform_fmt_on_save=1
 
 
