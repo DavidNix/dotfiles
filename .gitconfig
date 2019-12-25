@@ -47,7 +47,7 @@
 
 [push]
  # Only push the current branch when exec’ing “git push”
-	default = tracking
+	default = current
 	followTags = true
 
 # Optional merge tool, http://sourcegear.com/diffmerge/ rocks.
@@ -95,3 +95,5 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[fetch]
+	prune = true

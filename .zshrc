@@ -49,6 +49,7 @@ export GOPATH=$HOME/go
 
 # Useful Aliases
 alias k="kubectl"
+alias c="clear"
 
 # Work related aliases
 alias cirrusweb="cd ~/src/cirrusmd/cirrusmd-web-app"
