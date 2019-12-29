@@ -45,6 +45,8 @@ brew install mackup
 brew install asdf
 brew install go
 brew install gpg
+brew install rg
+brew install xsv
 
 #@TODO install our custom fonts and stuff
 
