@@ -248,4 +248,5 @@ killall Finder
 
 echo "Done!"
 echo "\tReminder: Run mackup restore. You may need to relink dotfile"
+echo "\tDownload Superhuman at https://mail.superhuman.com"
 
