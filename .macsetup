@@ -26,8 +26,11 @@ echo "Git config"
 
 git config --global user.name "David Nix"
 git config --global user.email hello@davidnix.io
+git config --global push.default current
+git config --global fetch.prune true
 # https://help.github.com/en/github/using-git/caching-your-github-password-in-git
 git config --global credential.helper osxkeychain
+
 
 echo "Installing brew git utilities..."
 brew install git-extras
