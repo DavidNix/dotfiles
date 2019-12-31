@@ -5,6 +5,7 @@ export ZSH="/Users/davidnix/.oh-my-zsh"
 ZSH_THEME="crunch"
 
 # ZSH Options
+# http://zsh.sourceforge.net/Doc/Release/Options.html
 # auto cd into directories
 setopt AUTO_CD
 # case insensitive globbing
@@ -30,11 +31,44 @@ setopt HIST_FIND_NO_DUPS
 # removes blank lines from history
 setopt HIST_REDUCE_BLANKS
 # Autocorrection
-setopt CORRECT
-setopt CORRECT_ALL
+# Try to correct spelling of commands
+# setopt CORRECT
+# Try to correct spelling of all arguments
+# setopt CORRECT_ALL
+setopt ALWAYS_TO_END
+# Append a trailing ‘/’ to all directory names resulting from filename generation (globbing).
+setopt MARK_DIRS
+# If a pattern for filename generation has no matches, print an error, instead of leaving it unchanged in the argument list
+setopt NOMATCH
+
+# Turn off _approximate autocompletion
+# https://stackoverflow.com/questions/27012295/really-turn-off-zsh-autocorrect#27018690
+zstyle ':completion*' completer _expand _complete
 
 # Order of operations important! Plugins must come before sourcing the script
-plugins=(git osx vi-mode)
+# https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins#extract
+plugins=(
+    ansible
+    asdf
+    aws
+    git 
+    jsontools
+    kubectl
+    osx 
+    perms 
+    pip
+    python
+    redis-cli
+    ssh-agent
+    sublime
+    sudo
+    tmux
+    urltools
+    vi-mode
+    web-search
+    z
+    zsh-autosuggestions
+)
 source $ZSH/oh-my-zsh.sh
 
 # advanced completions
