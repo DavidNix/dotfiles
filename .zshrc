@@ -48,17 +48,10 @@ zstyle ':completion*' completer _expand _complete
 # Order of operations important! Plugins must come before sourcing the script
 # https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins#extract
 plugins=(
-    ansible
     asdf
-    aws
     git 
     jsontools
-    kubectl
     osx 
-    perms 
-    pip
-    python
-    redis-cli
     ssh-agent
     sublime
     sudo
@@ -68,6 +61,7 @@ plugins=(
     web-search
     z
     zsh-autosuggestions
+    zsh-completions
 )
 source $ZSH/oh-my-zsh.sh
 
