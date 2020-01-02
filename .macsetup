@@ -33,14 +33,15 @@ echo "Installing other brew stuff..."
 brew install asdf
 brew install go
 brew install gpg
+brew install jq
 brew install mackup
 brew install rg
+brew install tldr
 brew install tmux
 brew install trash
 brew install tree
 brew install wget
 brew install xsv
-brew install tldr
 
 echo "Cleaning up brew"
 brew cleanup
