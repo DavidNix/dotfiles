@@ -60,8 +60,8 @@ plugins=(
     vi-mode
     web-search
     z
-    zsh-autosuggestions
-    zsh-completions
+    # zsh-autosuggestions
+    # zsh-completions
 )
 source $ZSH/oh-my-zsh.sh
 
