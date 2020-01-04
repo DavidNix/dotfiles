@@ -56,7 +56,6 @@ plugins=(
     sublime
     sudo
     tmux
-    urltools
     vi-mode
     web-search
     z
