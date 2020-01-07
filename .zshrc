@@ -54,7 +54,6 @@ plugins=(
     osx 
     ssh-agent
     sublime
-    sudo
     tmux
     vi-mode
     web-search
