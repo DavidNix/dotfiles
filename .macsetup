@@ -31,7 +31,6 @@ brew install git-flow
 
 echo "Installing other brew stuff..."
 brew install asdf
-brew install go
 brew install gpg
 brew install jq
 brew install mackup
@@ -45,6 +44,11 @@ brew install xsv
 
 echo "Cleaning up brew"
 brew cleanup
+
+echo "Installing asdf plugins"
+cat .tool-versions | awk '{print $1}' | xargs -n 1 asdf plugin add 
+mv .tool-version ~
+asdf install
 
 echo "Installing tmux plugin manager"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
