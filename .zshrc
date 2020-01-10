@@ -51,6 +51,7 @@ plugins=(
     asdf
     git 
     jsontools
+    kubectl
     osx 
     ssh-agent
     sublime
