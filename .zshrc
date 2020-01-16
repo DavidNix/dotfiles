@@ -92,6 +92,16 @@ export PATH="/usr/local/heroku/bin:$PATH"
 . $HOME/.asdf/asdf.sh
 . $HOME/.asdf/completions/asdf.bash
 
+# Kubernetes
+alias kctx="kubectx"
+alias kns="kubens"
+
+# zsh plugin creates the k alias for kubectl
+complete -F __start_kubectl k
+source <(kubectl completion zsh)
+# stern is a k8s log helper
+source <(stern --completion=zsh)
+
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/davidnix/src/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidnix/src/google-cloud-sdk/path.zsh.inc'; fi
 
