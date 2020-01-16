@@ -37,6 +37,7 @@ brew install jq
 brew install kubectl
 brew install kubectx
 brew install mackup
+brew install neovim
 brew install rg
 brew install stern # k8s log helper
 brew install tldr
