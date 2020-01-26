@@ -175,6 +175,19 @@ defaults:
 	# Don’t display the annoying prompt when quitting iTerm
 	defaults write com.googlecode.iterm2 PromptOnQuit -bool false
 
+	# Set Help Viewer windows to non-floating mode
+	defaults write com.apple.helpviewer DevMode -bool true
+
+	# Reveal IP address, hostname, OS version, etc. when clicking the clock
+	# in the login window
+	sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
+
+	# Use scroll gesture with the Ctrl (^) modifier key to zoom
+	defaults write com.apple.universalaccess closeViewScrollWheelToggle -bool true
+	defaults write com.apple.universalaccess HIDScrollZoomModifierMask -int 262144
+	# Follow the keyboard focus while zoomed in
+	defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
+
 	###############################################################################
 	# Energy saving                                                               #
 	###############################################################################
@@ -236,6 +249,39 @@ defaults:
 	# Disable continuous spell checking
 	# defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool
 
+	###############################################################################
+	# Mac App Store                                                               #
+	###############################################################################
+
+	# Enable the WebKit Developer Tools in the Mac App Store
+	defaults write com.apple.appstore WebKitDeveloperExtras -bool true
+
+	# Enable Debug Menu in the Mac App Store
+	defaults write com.apple.appstore ShowDebugMenu -bool true
+
+	###############################################################################
+	# Google Chrome & Google Chrome Canary                                        #
+	###############################################################################
+
+	# Allow installing user scripts via GitHub Gist or Userscripts.org
+	# defaults write com.google.Chrome ExtensionInstallSources -array "https://gist.githubusercontent.com/" "http://userscripts.org/*"
+	# defaults write com.google.Chrome.canary ExtensionInstallSources -array "https://gist.githubusercontent.com/" "http://userscripts.org/*"
+
+	# Disable the all too sensitive backswipe on trackpads
+	# defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool false
+	# defaults write com.google.Chrome.canary AppleEnableSwipeNavigateWithScrolls -bool false
+
+	# Disable the all too sensitive backswipe on Magic Mouse
+	# defaults write com.google.Chrome AppleEnableMouseSwipeNavigateWithScrolls -bool false
+	# defaults write com.google.Chrome.canary AppleEnableMouseSwipeNavigateWithScrolls -bool false
+
+	# Use the system-native print preview dialog
+	defaults write com.google.Chrome DisablePrintPreview -bool true
+	defaults write com.google.Chrome.canary DisablePrintPreview -bool true
+
+	# Expand the print dialog by default
+	defaults write com.google.Chrome PMPrintingExpandedStateForPrint2 -bool true
+	defaults write com.google.Chrome.canary PMPrintingExpandedStateForPrint2 -bool true
 
 	###############################################################################
 	# Activity Monitor                                                            #
@@ -257,6 +303,6 @@ defaults:
 	killall Finder
 
 	@echo "✅ Complete!"
-	@echo "\tReminder: Run mackup restore. You may need to relink dotfiles"
+	@echo "Note that some of these changes require a logout/restart to take effect."
 	@echo "\tDownload Superhuman at https://mail.superhuman.com"
 
