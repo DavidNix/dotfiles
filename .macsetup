@@ -54,6 +54,18 @@ brew install kpoof
 echo "Cleaning up brew"
 brew cleanup
 
+echo "Installing vim plugins"
+VIM_PLUGIN_PATH="$HOME/.vim/pack/bundle/start"
+
+mkdir -p "$VIM_PLUGIN_PATH"
+git clone https://github.com/preservim/nerdtree "$VIM_PLUGIN_PATH/nerdtree"
+git clone https://github.com/vim-airline/vim-airline "$VIM_PLUGIN_PATH/vim-airline" 
+git clone https://github.com/tpope/vim-commentary "$VIM_PLUGIN_PATH/vim-commentary" 
+git clone https://github.com/godlygeek/tabular "$VIM_PLUGIN_PATH/tabular" 
+git clone https://github.com/hashivim/vim-terraform.git "$VIM_PLUGIN_PATH/vim-terraform"
+git clone https://github.com/junegunn/fzf "$VIM_PLUGIN_PATH/fzf"
+~/.vim/pack/bundle/start/fzf/install --bin
+
 echo "Installing asdf plugins"
 cat .tool-versions | awk '{print $1}' | xargs -n 1 asdf plugin add 
 mv .tool-version ~
@@ -62,7 +74,7 @@ asdf install
 echo "Installing tmux plugin manager"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
-echo "Installing ZSH"
+echo "Installing ohmyzsh"
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-completions ~/.oh-my-zsh/custom/plugins/zsh-completions 

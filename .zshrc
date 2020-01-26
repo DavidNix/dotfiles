@@ -77,6 +77,8 @@ export GOPATH=$HOME/go
 # Useful Aliases
 alias k="kubectl"
 alias c="clear"
+alias vim="nvim"
+alias vi="nvim"
 
 # Work related aliases
 alias cirrusweb="cd ~/src/cirrusmd/cirrusmd-web-app"
@@ -103,8 +105,10 @@ source <(kubectl completion zsh)
 source <(stern --completion=zsh)
 
 # awscli wants this
-
 export PATH="$PATH:$HOME/.local/bin"
+
+# vim fzf needs this
+export PATH="$PATH:$HOME/.vim/pack/bundle/start/fzf/bin"
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/davidnix/src/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidnix/src/google-cloud-sdk/path.zsh.inc'; fi

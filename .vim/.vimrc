@@ -1,28 +1,6 @@
 set nocompatible "gets rid of all the crap that Vim does to be vi compatible
 filetype off
 
-" Vundle
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-
-Plugin 'gmarik/Vundle.vim'
-Plugin 'fatih/vim-go'
-Plugin 'scrooloose/nerdtree'
-Plugin 'kien/ctrlp.vim'
-Plugin 'tpope/vim-commentary'
-Plugin 'mileszs/ack.vim'
-Plugin 'tpope/vim-surround'
-Plugin 'bling/vim-airline'
-" Plugin 'YankRing.vim'
-Plugin 'tpope/vim-rails'
-Plugin 'vim-ruby/vim-ruby'
-Plugin 'godlygeek/tabular'
-Plugin 'plasticboy/vim-markdown'
-Plugin 'elixir-editors/vim-elixir'
-Plugin 'hashivim/vim-terraform'
-
-call vundle#end()
-
 syntax enable  
 filetype plugin indent on
 
@@ -153,16 +131,11 @@ nnoremap <leader>1 yypVr=
 " save when losing focus
 au FocusLost * :wa
 
-" ack shortcut
-nnoremap <leader>a :Ack 
-
 " get back to normal mode quickly
 inoremap jk <Esc>
 
-" remap ctlp plugin settings
-let g:ctrlp_map = ''
-nnoremap <leader>f :CtrlP<CR>
-nnoremap <leader>b :CtrlPBuffer<CR>
+" fzf 
+nnoremap <leader>f :FZF<CR>
 
 " Find merge conflict markers
 map <leader>fc /\v^[<\|=>]{7}( .*\|$)<CR>
