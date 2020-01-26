@@ -102,6 +102,10 @@ source <(kubectl completion zsh)
 # stern is a k8s log helper
 source <(stern --completion=zsh)
 
+# awscli wants this
+
+export PATH="$PATH:$HOME/.local/bin"
+
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/davidnix/src/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidnix/src/google-cloud-sdk/path.zsh.inc'; fi
 
