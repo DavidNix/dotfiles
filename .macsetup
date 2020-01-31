@@ -31,6 +31,7 @@ brew install git-flow
 
 echo "Installing other brew stuff..."
 brew install asdf
+brew install dive
 brew install gpg
 brew install helm
 brew install jq
