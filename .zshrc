@@ -69,7 +69,9 @@ autoload -Uz compinit && compinit
 # load bashcompinit for some old bash completions
 autoload bashcompinit && bashcompinit
 
-export EDITOR='vim'
+# Make neovim default editor
+export VISUAL=nvim
+export EDITOR="$VISUAL"
 
 # Go specific
 export GOPATH=$HOME/go
