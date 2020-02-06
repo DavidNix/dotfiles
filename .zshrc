@@ -81,6 +81,7 @@ alias k="kubectl"
 alias c="clear"
 alias vim="nvim"
 alias vi="nvim"
+alias ag="agrind" # angle-grinder
 
 # Work related aliases
 alias cirrusweb="cd ~/src/cirrusmd/cirrusmd-web-app"

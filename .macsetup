@@ -30,6 +30,7 @@ brew install legit
 brew install git-flow
 
 echo "Installing other brew stuff..."
+brew install angle-grinder
 brew install asdf
 brew install dive
 brew install gpg
