@@ -30,16 +30,17 @@ brew install legit
 brew install git-flow
 
 echo "Installing other brew stuff..."
-brew install angle-grinder
+brew install angle-grinder # log parser
 brew install asdf
-brew install dive
+brew install dive # docker container inspection
 brew install gpg
 brew install helm
 brew install jq
 brew install kubectl
 brew install kubectx
-brew install mackup
+brew install mkcert # self signed certs
 brew install neovim
+brew install nss # for mkcert becuase I use Firefox
 brew install rg
 brew install stern # k8s log helper
 brew install tldr
@@ -47,7 +48,7 @@ brew install tmux
 brew install trash
 brew install tree
 brew install wget
-brew install xsv
+brew install xsv # csv parser
 
 # k8s port forwarding
 brew tap farmotive/k8s
