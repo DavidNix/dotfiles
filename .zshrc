@@ -77,11 +77,12 @@ export EDITOR="$VISUAL"
 export GOPATH=$HOME/go
 
 # Useful Aliases
-alias k="kubectl"
-alias c="clear"
-alias vim="nvim"
-alias vi="nvim"
 alias ag="agrind" # angle-grinder
+alias c="clear"
+alias cat="bat"
+alias k="kubectl"
+alias vi="nvim"
+alias vim="nvim"
 
 # Work related aliases
 alias cirrusweb="cd ~/src/cirrusmd/cirrusmd-web-app"
