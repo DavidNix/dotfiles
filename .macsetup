@@ -30,6 +30,7 @@ brew install legit
 brew install git-flow
 
 echo "Installing other brew stuff..."
+brew install core
 brew install angle-grinder # log parser
 brew install asdf
 brew install dive # docker container inspection
