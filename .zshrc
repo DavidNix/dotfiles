@@ -81,6 +81,7 @@ alias ag="agrind" # angle-grinder
 alias c="clear"
 alias cat="bat"
 alias k="kubectl"
+alias top="ytop"
 alias vi="nvim"
 alias vim="nvim"
 

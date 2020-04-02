@@ -56,6 +56,10 @@ brew install xsv # csv parser
 brew tap farmotive/k8s
 brew install kpoof
 
+# better top
+brew tap cjbassi/ytop
+brew install ytop
+
 echo "Cleaning up brew"
 brew cleanup
 
