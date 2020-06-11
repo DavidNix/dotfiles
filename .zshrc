@@ -92,8 +92,8 @@ alias cirrusetl="cd ~/src/cirrusmd/etl-platform/"
 alias splitcsv="~/src/cirrusmd/etl-platform/script/splitcsv"
 
 # PATH modifications
-export PATH="/usr/local/bin:/usr/local/sbin:$GOPATH/bin:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin/flutter/bin"
-export PATH="/usr/local/heroku/bin:$PATH"
+export PATH="$GOPATH/bin:/usr/local/bin:/usr/local/sbin:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin/flutter/bin"
+export PATH="$PATH:/usr/local/heroku/bin"
 
 # ASDF https://asdf-vm.com/#/core-manage-asdf-vm
 . $HOME/.asdf/asdf.sh
@@ -120,3 +120,7 @@ if [ -f '/Users/davidnix/src/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/da
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/davidnix/src/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/davidnix/src/google-cloud-sdk/completion.zsh.inc'; fi
+
+if which direnv &> /dev/null; then
+  eval "$(direnv hook $SHELL)"
+fi
