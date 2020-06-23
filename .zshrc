@@ -76,28 +76,6 @@ export EDITOR="$VISUAL"
 # Go specific
 export GOPATH=$HOME/go
 
-# Useful Aliases
-alias ag="agrind" # angle-grinder
-alias c="clear"
-alias cat="bat"
-alias cloc="tokei"
-alias du="dust"
-alias find="fd"
-alias k="kubectl"
-alias ls="exa"
-alias ps="procs"
-alias sed="sd"
-alias time="hyperfine"
-alias top="ytop"
-alias vi="nvim"
-alias vim="nvim"
-
-# Work related aliases
-alias cirrusweb="cd ~/src/cirrusmd/cirrusmd-web-app"
-alias cirrusws="cd ~/src/cirrusmd/websocket-server/"
-alias cirrusetl="cd ~/src/cirrusmd/etl-platform/"
-alias splitcsv="~/src/cirrusmd/etl-platform/script/splitcsv"
-
 # PATH modifications
 export PATH="$GOPATH/bin:/usr/local/bin:/usr/local/sbin:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin/flutter/bin"
 export PATH="$PATH:/usr/local/heroku/bin"
@@ -105,10 +83,6 @@ export PATH="$PATH:/usr/local/heroku/bin"
 # ASDF https://asdf-vm.com/#/core-manage-asdf-vm
 . $HOME/.asdf/asdf.sh
 . $HOME/.asdf/completions/asdf.bash
-
-# Kubernetes
-alias kctx="kubectx"
-alias kns="kubens"
 
 # zsh plugin creates the k alias for kubectl
 complete -F __start_kubectl k
@@ -131,3 +105,22 @@ if [ -f '/Users/davidnix/src/google-cloud-sdk/completion.zsh.inc' ]; then . '/Us
 if which direnv &> /dev/null; then
   eval "$(direnv hook $SHELL)"
 fi
+
+# Useful Aliases
+alias ag="agrind" # angle-grinder
+alias c="clear"
+alias cat="bat"
+alias cloc="tokei"
+alias du="dust"
+alias find="fd"
+alias k="kubectl"
+alias kctx="kubectx"
+alias kns="kubens"
+alias ls="exa"
+alias ps="procs"
+alias sed="sd"
+alias time="hyperfine"
+alias top="ytop"
+alias vi="nvim"
+alias vim="nvim"
+

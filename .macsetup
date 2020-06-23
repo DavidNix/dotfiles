@@ -53,11 +53,12 @@ brew install sd
 brew install stern # k8s log helper
 brew install tldr
 brew install tmux
+brew install tokei
 brew install trash
 brew install tree
 brew install wget
-brew install ytop
 brew install xsv # csv parser
+brew install ytop
 
 echo "Cleaning up brew"
 brew cleanup
