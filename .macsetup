@@ -36,8 +36,12 @@ brew install bat
 brew install core
 brew install direnv
 brew install dive # docker container inspection
+brew install dust
+brew install exa
+brew install fd
 brew install gpg
 brew install helm
+brew install hyperfine
 brew install jq
 brew install kubectl
 brew install kubectx
@@ -45,17 +49,15 @@ brew install mkcert # self signed certs
 brew install neovim
 brew install nss # for mkcert because I use Firefox
 brew install rg
+brew install sd
 brew install stern # k8s log helper
 brew install tldr
 brew install tmux
 brew install trash
 brew install tree
 brew install wget
-brew install xsv # csv parser
-
-# better top
-brew tap cjbassi/ytop
 brew install ytop
+brew install xsv # csv parser
 
 echo "Cleaning up brew"
 brew cleanup
