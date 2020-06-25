@@ -30,6 +30,7 @@ brew install legit
 brew install git-flow
 
 echo "Installing other brew stuff..."
+brew install coreutils
 brew install angle-grinder # log parser
 brew install asdf
 brew install bat
@@ -76,6 +77,10 @@ git clone https://github.com/junegunn/fzf "$VIM_PLUGIN_PATH/fzf"
 ~/.vim/pack/bundle/start/fzf/install --bin
 
 echo "Installing asdf plugins"
+# nodejs needs this:
+# https://github.com/asdf-vm/asdf-nodejs
+echo "Installing keys for nodejs, see https://github.com/asdf-vm/asdf-nodejs"
+${ASDF_DATA_DIR:=$HOME/.asdf}/plugins/nodejs/bin/import-release-team-keyring
 cat .tool-versions | awk '{print $1}' | xargs -n 1 asdf plugin add 
 mv .tool-version ~
 asdf install
