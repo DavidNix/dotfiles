@@ -84,6 +84,7 @@ ${ASDF_DATA_DIR:=$HOME/.asdf}/plugins/nodejs/bin/import-release-team-keyring
 cat .tool-versions | awk '{print $1}' | xargs -n 1 asdf plugin add 
 mv .tool-version ~
 asdf install
+asdf reshim
 
 echo "Installing tmux plugin manager"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
