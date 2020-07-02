@@ -1,13 +1,23 @@
 # Sources
 # https://github.com/mathiasbynens/dotfiles/blob/master/.macos#L143
-#
 
-.PHONY: initialize
-initialize:
-	./.macsetup
+default: defaults
+
+.PHONY: relink
+relink: ## Create new symbolic links for dotfiles in this dir to your home dir.
+	@echo "Generating links.."
+	find $$PWD -name ".[^.]*" -type f -print0 | xargs -0tJ % ln -sf %  ~
+	@mkdir -p ~/.vim
+	@ln -sf $$PWD/.vim/.vimrc ~/.vim/.vimrc
+	@mkdir -p ~/.config/nvim
+	@ln -sf $$PWD/.config/nvim/init.vim ~/.config/nvim/init.vim
+
+.PHONY: help
+help: ## Print this help message
+	@echo "Available make commands:"; grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: defaults
-defaults:
+defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.
 	# Close any open System Preferences panes, to prevent them from overriding
 	# settings we’re about to change
 	osascript -e 'tell application "System Preferences" to quit'
@@ -65,7 +75,7 @@ defaults:
 
 	#"Enabling snap-to-grid for icons on the desktop and in other icon views"
 	/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+	#/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
 	/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
 
 	#"Setting the icon size of Dock items to 36 pixels for optimal size/screen-realestate"
@@ -305,4 +315,126 @@ defaults:
 	@echo "✅ Complete!"
 	@echo "Note that some of these changes require a logout/restart to take effect."
 	@echo "\tDownload Superhuman at https://mail.superhuman.com"
+
+.PHONY: setup
+setup: relink xcode homebrew git cli-apps vim asdf tmux ohmyzsh ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+	@echo "✅ Complete!"
+
+.PHONY: xcode
+xcode: 
+	@echo "Installing Xcode command line tools and such"
+	xcode-select --install
+
+.PHONY: homebrew
+homebrew: ## Install and update homebrew
+	@echo "Installing homebrew..."
+	/bin/sh -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+	brew update
+
+.PHONY: git
+git: 
+	@echo "Installing Git..."
+	brew install git
+	git config --global user.name "David Nix"
+	git config --global user.email hello@davidnix.io
+	git config --global push.default current
+	git config --global fetch.prune true
+	# https://help.github.com/en/github/using-git/caching-your-github-password-in-git
+	git config --global credential.helper osxkeychain
+	@echo "Installing brew git utilities..."
+	brew install git-extras
+	brew install legit
+	brew install git-flow
+
+.PHONY: cli-apps
+cli-apps: ## installs command line tools
+	@echo "Installing command line tools"
+	# brew install asdf; purposefully installing asdf differently because of
+	# bash completion
+	brew install coreutils
+	brew install angle-grinder # log parser
+	brew install bat
+	brew install core
+	brew install direnv
+	brew install dive # docker container inspection
+	brew install dust
+	brew install exa
+	brew install fd
+	brew install gpg
+	brew install helm
+	brew install hyperfine
+	brew install jq
+	brew install kubectl
+	brew install kubectx
+	brew install mkcert # self signed certs
+	brew install neovim
+	brew install nss # for mkcert because I use Firefox
+	brew install rg
+	brew install sd
+	brew install stern # k8s log helper
+	brew install tldr
+	brew install tmux
+	brew install tokei
+	brew install trash
+	brew install tree
+	brew install wget
+	brew install xsv # csv parser
+	brew install ytop
+	@echo "Cleaning up brew"
+	brew cleanup
+
+.PHONY: vim
+vim: vim-colors vim-plugins ## Setups up vim
+
+vim-color-path=$${HOME}/.vim/colors
+.PHONY: vim-colors
+vim-colors:
+	@echo "Installing vim colors"
+	mkdir -p $(vim-color-path)
+	curl -s https://raw.githubusercontent.com/nanotech/jellybeans.vim/master/colors/jellybeans.vim > $(vim-color-path)/jellybeans.vim
+
+VIM_PLUGIN_PATH:="$${HOME}/.vim/pack/bundle/start"
+.PHONY: vim-plugins
+vim-plugins:
+	@echo "Installing vim plugins"
+
+	mkdir -p "$(VIM_PLUGIN_PATH)"
+	git clone https://github.com/preservim/nerdtree "$(VIM_PLUGIN_PATH)/nerdtree"
+	git clone https://github.com/vim-airline/vim-airline "$(VIM_PLUGIN_PATH)/vim-airline" 
+	git clone https://github.com/tpope/vim-commentary "$(VIM_PLUGIN_PATH)/vim-commentary" 
+	git clone https://github.com/godlygeek/tabular "$(VIM_PLUGIN_PATH)/tabular" 
+	git clone https://github.com/hashivim/vim-terraform.git "$(VIM_PLUGIN_PATH)/vim-terraform"
+	git clone https://github.com/junegunn/fzf "$(VIM_PLUGIN_PATH)/fzf"
+	~/.vim/pack/bundle/start/fzf/install --bin
+
+ASDF_INSTALL:=~/.asdf
+$(ASDF_INSTALL):
+	git clone https://github.com/asdf-vm/asdf.git $(ASDF_INSTALL)
+
+.PHONY: asdf
+asdf: $(ASDF_INSTALL) ## Configure asdf version manager
+	@echo "Installing asdf plugins"
+# nodejs needs this:
+# https://github.com/asdf-vm/asdf-nodejs
+ 	# TODO asdf is not found, 
+	which asdf
+	cat .tool-versions | awk '{print $$1}' | xargs -n 1 asdf plugin add
+	echo "Installing keys for nodejs, see https://github.com/asdf-vm/asdf-nodejs"
+	/bin/sh -c '$${ASDF_DATA_DIR:=$$HOME/.asdf}/plugins/nodejs/bin/import-release-team-keyring'
+	cp .tool-versions ~
+	asdf install
+	asdf reshim
+
+.PHONY: tmux
+tmux: 
+	@echo "Installing tmux plugin manager"
+	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+.PHONY: omyzsh
+ohmyzsh: 
+	@echo "Installing ohmyzsh"
+	sh -c "$$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+	git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+	git clone https://github.com/zsh-users/zsh-completions ~/.oh-my-zsh/custom/plugins/zsh-completions 
+
 
