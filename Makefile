@@ -314,10 +314,9 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 
 	@echo "✅ Complete!"
 	@echo "Note that some of these changes require a logout/restart to take effect."
-	@echo "\tDownload Superhuman at https://mail.superhuman.com"
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git cli-apps vim asdf $(TMUX) ohmyzsh ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git cli-apps vim asdf $(TMUX) ohmyzsh superhuman ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -419,7 +418,7 @@ asdf: $(ASDF_INSTALL) ## Configure asdf version manager
 	@echo "Installing asdf plugins"
 	/bin/sh -c ". $$HOME/.asdf/asdf.sh"
 	cat .tool-versions | awk '{print $$1}' | xargs -n 1 asdf plugin add
-	echo "Installing keys for nodejs, see https://github.com/asdf-vm/asdf-nodejs"
+	@echo "Installing keys for nodejs, see https://github.com/asdf-vm/asdf-nodejs"
 	/bin/sh -c '$${ASDF_DATA_DIR:=$$HOME/.asdf}/plugins/nodejs/bin/import-release-team-keyring'
 	cp .tool-versions ~
 	asdf install
@@ -436,4 +435,8 @@ ohmyzsh:
 	git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 	git clone https://github.com/zsh-users/zsh-completions ~/.oh-my-zsh/custom/plugins/zsh-completions 
 
+.PHONY: superhuman
+superhuman: 
+	@echo "Download Superhuman at https://mail.superhuman.com"
+	@echo "Send yourself a test email to get Superhuman to register with macOS notification settings."
 
