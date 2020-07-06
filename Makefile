@@ -357,6 +357,7 @@ cli-apps: ## Installs command line tools
 	brew install bat
 	brew install core
 	brew install coreutils
+	brew install derailed/k9s/k9s # kubernetes dashboard
 	brew install direnv
 	brew install dive # docker container inspection
 	brew install dust
