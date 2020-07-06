@@ -316,7 +316,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	@echo "Note that some of these changes require a logout/restart to take effect."
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git cli-apps vim asdf $(TMUX) ohmyzsh superhuman ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git cli-apps vim asdf rust $(TMUX) ohmyzsh superhuman ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -437,6 +437,16 @@ ohmyzsh:
 	sh -c "$$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 	git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 	git clone https://github.com/zsh-users/zsh-completions ~/.oh-my-zsh/custom/plugins/zsh-completions 
+
+.PHONY: rust
+rust: $(CARGO) ~/.cargo/bin/ytop
+
+CARGO:=~/.cargo/bin
+$(CARGO):
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+$(CARGO)/%:
+	cargo install "$(notdir $@)"
 
 .PHONY: superhuman
 superhuman: 

@@ -93,3 +93,5 @@ if [ -f '/Users/davidnix/Downloads/google-cloud-sdk/path.bash.inc' ]; then . '/U
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/davidnix/Downloads/google-cloud-sdk/completion.bash.inc' ]; then . '/Users/davidnix/Downloads/google-cloud-sdk/completion.bash.inc'; fi
+
+export PATH="$HOME/.cargo/bin:$PATH"
