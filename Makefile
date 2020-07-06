@@ -353,15 +353,16 @@ git:
 cli-apps: ## Installs command line tools
 	@echo "Installing command line tools"
 	# brew install asdf; purposefully installing asdf differently because of bash completion
-	brew install coreutils
 	brew install angle-grinder # log parser
 	brew install bat
 	brew install core
+	brew install coreutils
 	brew install direnv
 	brew install dive # docker container inspection
 	brew install dust
 	brew install exa
 	brew install fd
+	brew install go
 	brew install gpg
 	brew install helm
 	brew install hyperfine
@@ -382,6 +383,7 @@ cli-apps: ## Installs command line tools
 	brew install wget
 	brew install xsv # csv parser
 	brew install ytop
+
 	@echo "Cleaning up brew"
 	brew cleanup
 
