@@ -96,12 +96,6 @@ export PATH="$PATH:$HOME/.local/bin"
 # vim fzf needs this
 export PATH="$PATH:$HOME/.vim/pack/bundle/start/fzf/bin"
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/davidnix/src/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidnix/src/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/davidnix/src/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/davidnix/src/google-cloud-sdk/completion.zsh.inc'; fi
-
 if which direnv &> /dev/null; then
   eval "$(direnv hook $SHELL)"
 fi
@@ -124,3 +118,9 @@ alias top="ytop"
 alias vi="nvim"
 alias vim="nvim"
 
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/davidnix/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/davidnix/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/completion.zsh.inc'; fi
