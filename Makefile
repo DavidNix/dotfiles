@@ -1,7 +1,11 @@
 # Sources
 # https://github.com/mathiasbynens/dotfiles/blob/master/.macos#L143
 
-default: defaults
+default: help
+
+.PHONY: help
+help: ## Print this help message
+	@echo "Available make commands:"; grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: relink
 relink: ## Create new symbolic links for dotfiles in this dir to your home dir.
@@ -11,10 +15,6 @@ relink: ## Create new symbolic links for dotfiles in this dir to your home dir.
 	@ln -sf $$PWD/.vim/.vimrc ~/.vim/.vimrc
 	@mkdir -p ~/.config/nvim
 	@ln -sf $$PWD/.config/nvim/init.vim ~/.config/nvim/init.vim
-
-.PHONY: help
-help: ## Print this help message
-	@echo "Available make commands:"; grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: defaults
 defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.
@@ -329,7 +329,7 @@ xcode:
 	xcode-select --install
 
 .PHONY: homebrew
-homebrew: ## Install and update homebrew
+homebrew:
 	@echo "Installing homebrew..."
 	/bin/sh -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 	brew update
@@ -389,7 +389,7 @@ cli-apps: ## Installs command line tools
 	brew cleanup
 
 .PHONY: vim
-vim: vim-colors vim-plugins ## Setups up vim
+vim: vim-colors vim-plugins
 
 vim-color-path=$${HOME}/.vim/colors
 .PHONY: vim-colors
@@ -417,7 +417,7 @@ $(ASDF_INSTALL):
 	git clone https://github.com/asdf-vm/asdf.git $(ASDF_INSTALL)
 
 .PHONY: asdf
-asdf: $(ASDF_INSTALL) ## Configure asdf version manager
+asdf: $(ASDF_INSTALL)
 	@echo "Installing asdf plugins"
 	/bin/sh -c ". $$HOME/.asdf/asdf.sh"
 	cat .tool-versions | awk '{print $$1}' | xargs -n 1 asdf plugin add
