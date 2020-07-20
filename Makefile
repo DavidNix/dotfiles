@@ -1,5 +1,8 @@
 # Sources
 # https://github.com/mathiasbynens/dotfiles/blob/master/.macos#L143
+# https://github.com/manilarome/the-glorious-dotfiles
+
+SHELL := /bin/zsh
 
 default: help
 
@@ -316,7 +319,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	@echo "Note that some of these changes require a logout/restart to take effect."
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git cli-apps vim asdf rust $(TMUX) ohmyzsh superhuman ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git cli-apps vim asdf rust $(TMUX) zsh superhuman ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -331,7 +334,7 @@ xcode:
 .PHONY: homebrew
 homebrew:
 	@echo "Installing homebrew..."
-	/bin/sh -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+	@$(SHELL) -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 	brew update
 
 .PHONY: git
@@ -419,10 +422,10 @@ $(ASDF_INSTALL):
 .PHONY: asdf
 asdf: $(ASDF_INSTALL)
 	@echo "Installing asdf plugins"
-	/bin/sh -c ". $$HOME/.asdf/asdf.sh"
+	@$(SHELL) -c ". $$HOME/.asdf/asdf.sh"
 	cat .tool-versions | awk '{print $$1}' | xargs -n 1 asdf plugin add
 	@echo "Installing keys for nodejs, see https://github.com/asdf-vm/asdf-nodejs"
-	/bin/sh -c '$${ASDF_DATA_DIR:=$$HOME/.asdf}/plugins/nodejs/bin/import-release-team-keyring'
+	@$(SHELL) -c '$${ASDF_DATA_DIR:=$$HOME/.asdf}/plugins/nodejs/bin/import-release-team-keyring'
 	cp .tool-versions ~
 	asdf install
 	asdf reshim
@@ -432,11 +435,13 @@ $(TMUX):
 	@echo "Installing tmux plugin manager"
 	git clone https://github.com/tmux-plugins/tpm $(TMUX)
 
-ohmyzsh: 
+~/.oh-my-zsh:
 	@echo "Installing ohmyzsh"
-	sh -c "$$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-	git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-	git clone https://github.com/zsh-users/zsh-completions ~/.oh-my-zsh/custom/plugins/zsh-completions 
+	@$(SHELL) -c "$$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+.PHONY: zsh
+zsh:  ~/.oh-my-zsh 
+	 @$(SHELL) -c "source ~/.zshrc && zplug install"
 
 .PHONY: rust
 rust: $(CARGO) ~/.cargo/bin/ytop
