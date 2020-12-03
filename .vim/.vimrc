@@ -152,7 +152,7 @@ map <Leader>= <C-w>=
 "
 " Ruby
 " ======
-autocmd FileType ruby,yml setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
+autocmd FileType ruby setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
 
 " Fastlane
 au BufRead,BufNewFile Fastfile set filetype=ruby
@@ -185,6 +185,8 @@ let g:vim_markdown_folding_disabled=1
 
 " YAML
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+" fixes YAML slowness
+au BufNewFile,BufRead *.yaml,*.yml so ~/.vim/yaml.vim
 
 " Terraform
 " https://github.com/hashivim/vim-terraform
