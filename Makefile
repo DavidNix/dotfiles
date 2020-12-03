@@ -16,8 +16,8 @@ relink: ## Create new symbolic links for dotfiles in this dir to your home dir.
 	find $$PWD -name ".[^.]*" -type f -print0 | xargs -0tJ % ln -sf %  ~
 	@mkdir -p ~/.vim
 	@ln -sf $$PWD/.vim/* ~/.vim
-	@mkdir -p ~/.config/nvim
-	@ln -sf $$PWD/.config/nvim/init.vim ~/.config/nvim/init.vim
+	@mkdir -p ~/.config
+	@ln -sf $$PWD/.config/*/ ~/.config
 
 .PHONY: defaults
 defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.
@@ -358,6 +358,7 @@ cli-apps: ## Installs command line tools
 	# brew install asdf; purposefully installing asdf differently because of bash completion
 	brew install angle-grinder # log parser
 	brew install bat
+	brew install alacritty
 	brew install core
 	brew install coreutils
 	brew install derailed/k9s/k9s # kubernetes dashboard
