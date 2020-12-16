@@ -42,6 +42,10 @@ set history=1000
 set showcmd  " show incomplete commands
 " set spell
 
+" Improve scrolling and editing especially with YAML files
+set synmaxcol=128
+syntax sync minlines=256
+
 " sane searching
 set ignorecase "ignore case when searching
 set smartcase "ignore case if search string all lowercase
