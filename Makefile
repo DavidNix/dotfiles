@@ -356,9 +356,9 @@ git:
 cli-apps: ## Installs command line tools
 	@echo "Installing command line tools"
 	# brew install asdf; purposefully installing asdf differently because of bash completion
+	brew install alacritty
 	brew install angle-grinder # log parser
 	brew install bat
-	brew install alacritty
 	brew install core
 	brew install coreutils
 	brew install derailed/k9s/k9s # kubernetes dashboard
@@ -374,6 +374,7 @@ cli-apps: ## Installs command line tools
 	brew install jq
 	brew install kubectl
 	brew install kubectx
+	brew install make
 	brew install mkcert # self signed certs
 	brew install neovim
 	brew install nss # for mkcert because I use Firefox

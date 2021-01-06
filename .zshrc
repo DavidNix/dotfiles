@@ -78,7 +78,8 @@ export GOPATH=$HOME/go
 
 # PATH modifications
 export PATH="$GOPATH/bin:/usr/local/bin:/usr/local/sbin:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin/flutter/bin"
-export PATH="$PATH:/usr/local/heroku/bin"
+# makes homebrew gmake to just make
+export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
 
 # ASDF https://asdf-vm.com/#/core-manage-asdf-vm
 . $HOME/.asdf/asdf.sh
