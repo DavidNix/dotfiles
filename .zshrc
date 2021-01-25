@@ -91,9 +91,6 @@ source <(kubectl completion zsh)
 # stern is a k8s log helper
 source <(stern --completion=zsh)
 
-# awscli wants this
-export PATH="$PATH:$HOME/.local/bin"
-
 # vim fzf needs this
 export PATH="$PATH:$HOME/.vim/pack/bundle/start/fzf/bin"
 
