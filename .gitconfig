@@ -54,9 +54,9 @@
 # When you have to merge, “git mergetool”
 [merge]
 	tool = Kaleidoscope
-[mergetool "diffmerge"]
-	cmd = diffmerge --merge --result=$MERGED $LOCAL $BASE $REMOTE
-	trustExitCode = false
+[mergetool "Kaleidoscope"]
+	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+	trustexitcode = true
 
 [rerere]
  # Remember merge solutions so that they are autoplayed in the future.
@@ -75,15 +75,9 @@
  # basic rename and copy detection
 	tool = Kaleidoscope
 	
-[heroku]
-	account = gospot
-
-[mergetool "Kaleidoscope"]
-	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
-	trustexitcode = true
-
 [difftool "Kaleidoscope"]
 	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+
 [difftool]
 	prompt = false
 [mergetool]
