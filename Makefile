@@ -374,6 +374,7 @@ cli-apps: ## Installs command line tools
 	brew install jq
 	brew install kubectl
 	brew install kubectx
+	brew install lsd
 	brew install make
 	brew install mkcert # self signed certs
 	brew install neovim

@@ -117,7 +117,7 @@ alias time="hyperfine"
 alias top="ytop"
 alias vi="nvim"
 alias vim="nvim"
-
+alias ls="lsd"
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/davidnix/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/path.zsh.inc'; fi
