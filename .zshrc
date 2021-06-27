@@ -80,6 +80,8 @@ export GOPATH=$HOME/go
 export PATH="$GOPATH/bin:/usr/local/bin:/usr/local/sbin:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin/flutter/bin"
 # makes homebrew gmake to just make
 export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+# krew kubectl plugin manager
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 # ASDF https://asdf-vm.com/#/core-manage-asdf-vm
 . $HOME/.asdf/asdf.sh
