@@ -389,6 +389,7 @@ cli-apps: ## Installs command line tools
 	brew install wget
 	brew install xsv # csv parser
 	brew install ytop
+	brew tap cantino/mcfly && brew install mcfly
 
 	@echo "Cleaning up brew"
 	brew cleanup
