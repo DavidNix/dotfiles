@@ -364,10 +364,9 @@ cli-apps: ## Installs command line tools
 	brew install derailed/k9s/k9s # kubernetes dashboard
 	brew install direnv
 	brew install dive # docker container inspection
+	brew install dog # better dig
 	brew install dust
-	brew install exa
 	brew install fd
-	brew install go
 	brew install gpg
 	brew install helm
 	brew install hyperfine
