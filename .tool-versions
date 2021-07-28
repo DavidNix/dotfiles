@@ -1,6 +1,5 @@
 golang 1.15.6
 helm 3.2.3
-julia 1.5.4
 nodejs 14.4.0
 python 3.8.1
 terraform 0.14.7
