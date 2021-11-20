@@ -1,5 +1,5 @@
-golang 1.15.6
+golang 1.17.3
 helm 3.2.3
 nodejs 14.4.0
-python 3.9.7
-terraform 0.14.7
+python anaconda3-5.3.1
+terraform 1.0.11
