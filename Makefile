@@ -335,12 +335,11 @@ xcode:
 homebrew:
 	@echo "Installing homebrew..."
 	@$(SHELL) -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-	brew update
+	@brew update
 
 .PHONY: git
 git: 
 	@echo "Installing Git..."
-	brew install git
 	git config --global user.name "David Nix"
 	git config --global user.email hello@davidnix.io
 	git config --global push.default current
@@ -348,51 +347,14 @@ git:
 	# https://help.github.com/en/github/using-git/caching-your-github-password-in-git
 	git config --global credential.helper osxkeychain
 	@echo "Installing brew git utilities..."
-	brew install git-extras
-	brew install legit
-	brew install git-flow
 
 .PHONY: cli-apps
 cli-apps: ## Installs command line tools
 	@echo "Installing command line tools"
-	# brew install asdf; purposefully installing asdf differently because of bash completion
-	brew install alacritty
-	brew install angle-grinder # log parser
-	brew install bat
-	brew install core
-	brew install coreutils
-	brew install derailed/k9s/k9s # kubernetes dashboard
-	brew install direnv
-	brew install dive # docker container inspection
-	brew install dog # better dig
-	brew install dust
-	brew install fd
-	brew install gpg
-	brew install helm
-	brew install hyperfine
-	brew install jq
-	brew install kubectl
-	brew install kubectx
-	brew install lsd
-	brew install make
-	brew install mkcert # self signed certs
-	brew install neovim
-	brew install nss # for mkcert because I use Firefox
-	brew install rg
-	brew install sd
-	brew install stern # k8s log helper
-	brew install tldr
-	brew install tmux
-	brew install tokei
-	brew install trash
-	brew install tree
-	brew install wget
-	brew install xsv # csv parser
-	brew install ytop
-	brew tap cantino/mcfly && brew install mcfly
-
+	@arch -arm64 brew bundle
 	@echo "Cleaning up brew"
-	brew cleanup
+	@brew cleanup
+	@ln -s /opt/homebrew/bin/mcfly /usr/local/bin/mcfly
 
 .PHONY: vim
 vim: vim-colors vim-plugins
