@@ -201,6 +201,9 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	# Follow the keyboard focus while zoomed in
 	defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
 
+	# Disables bouncing icon
+	defaults write com.apple.dock no-bouncing -bool TRUE
+
 	###############################################################################
 	# Energy saving                                                               #
 	###############################################################################
@@ -314,6 +317,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	defaults write com.apple.ActivityMonitor SortDirection -int 0
 
 	killall Finder
+	killall Dock
 
 	@echo "✅ Complete!"
 	@echo "Note that some of these changes require a logout/restart to take effect."
