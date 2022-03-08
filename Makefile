@@ -323,12 +323,17 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	@echo "Note that some of these changes require a logout/restart to take effect."
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git cli-apps vim asdf rust $(TMUX) zsh superhuman ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git cli-apps vim asdf rust $(TMUX) zsh superhuman terminal ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
 ~/.ssh: 
 	mkdir -p ~/.ssh
+
+terminal: 
+	echo "Terminal Preferences: Shell -> Use Settings as Default"
+	echo "Additional themes at https://github.com/lysyi3m/macos-terminal-themes"
+	open MaterialDark.terminal
 
 .PHONY: xcode
 xcode: 
@@ -383,8 +388,6 @@ vim-plugins:
 	git clone https://github.com/hashivim/vim-terraform.git "$(VIM_PLUGIN_PATH)/vim-terraform"
 	git clone https://github.com/junegunn/fzf "$(VIM_PLUGIN_PATH)/fzf"
 	~/.vim/pack/bundle/start/fzf/install --bin
-
-ASDF_INSTALL:=~/.asdf
 $(ASDF_INSTALL):
 	git clone https://github.com/asdf-vm/asdf.git $(ASDF_INSTALL)
 
