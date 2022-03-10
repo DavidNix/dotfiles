@@ -124,6 +124,10 @@ alias vi="nvim"
 alias vim="nvim"
 alias ls="lsd"
 
+# M1 Terminal Helpers
+alias arm="env /usr/bin/arch -arm64 /bin/zsh --login"
+alias intel="env /usr/bin/arch -x86_64 /bin/zsh --login"
+
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/davidnix/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/path.zsh.inc'; fi
 
