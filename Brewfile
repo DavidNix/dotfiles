@@ -10,13 +10,13 @@ tap "derailed/k9s"
 tap "heroku/brew"
 tap "snyk/tap"
 
+
 brew "cantino/mcfly/mcfly"
 brew "cjbassi/ytop/ytop"
 brew "derailed/k9s/k9s"
 brew "farmotive/k8s/kpoof"
 brew "heroku/brew/heroku"
 brew "snyk/tap/snyk"
-
 
 
 brew "angle-grinder"
@@ -51,6 +51,7 @@ brew "rename"
 brew "ripgrep"
 brew "sd"
 brew "snappy"
+brew "starship"
 brew "stern"
 brew "tldr"
 brew "tmux"
