@@ -1,5 +1,9 @@
 [aws]
+disabled = true
 format = '\[[$symbol($profile)(\($region\))(\[$duration\])]($style)\]'
+
+[azure]
+disabled = true
 
 [cmake]
 format = '\[[$symbol($version)]($style)\]'
@@ -38,6 +42,7 @@ format = '\[[$symbol($version)]($style)\]'
 format = '\[[$symbol($version)]($style)\]'
 
 [gcloud]
+disabled = true
 format = '\[[$symbol$account(@$domain)(\($region\))]($style)\]'
 
 [git_branch]
