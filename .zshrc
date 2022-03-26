@@ -3,7 +3,8 @@
 #   - https://github.com/manilarome/the-glorious-dotfiles
 
 export ZSH="/Users/davidnix/.oh-my-zsh"
-ZSH_THEME="crunch"
+# Using starship for command prompt instead 
+# ZSH_THEME="crunch" 
 
 # Standard Plugins
 plugins=(git)
@@ -137,4 +138,8 @@ if [ -f '/Users/davidnix/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/
 # Mcfly advanced shell history https://github.com/cantino/mcfly
 # export MCFLY_KEY_SCHEME=vim
 export MCFLY_FUZZY=true
-eval "$(mcfly init zsh)"
+if command -v mcfly &> /dev/null; then eval "$(mcfly init zsh)"; fi
+
+# starship.rs
+if command -v starship &> /dev/null; then eval "$(starship init zsh)"; fi
+

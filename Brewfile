@@ -2,7 +2,9 @@ tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/core"
 tap "homebrew/services"
+tap "homebrew/cask-fonts"
 
+cask "font-fira-code-nerd-font"
 
 tap "cantino/mcfly"
 tap "cjbassi/ytop"

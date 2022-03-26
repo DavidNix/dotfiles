@@ -18,6 +18,7 @@ relink: ## Create new symbolic links for dotfiles in this dir to your home dir.
 	@ln -sf $$PWD/.vim/* ~/.vim
 	@mkdir -p ~/.config
 	@ln -sf $$PWD/.config/*/ ~/.config
+	@ln -sf $$PWD/.config/* ~/.config
 
 .PHONY: defaults
 defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.
