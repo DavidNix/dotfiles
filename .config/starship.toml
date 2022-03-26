@@ -5,6 +5,9 @@ format = '\[[$symbol($profile)(\($region\))(\[$duration\])]($style)\]'
 [azure]
 disabled = true
 
+[buf]
+disabled = true
+
 [cmake]
 format = '\[[$symbol($version)]($style)\]'
 
