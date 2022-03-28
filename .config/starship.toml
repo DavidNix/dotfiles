@@ -1,3 +1,6 @@
+# Inserts a blank line between shell prompts
+add_newline = false
+
 [aws]
 disabled = true
 format = '\[[$symbol($profile)(\($region\))(\[$duration\])]($style)\]'
