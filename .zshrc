@@ -124,6 +124,7 @@ alias top="ytop"
 alias vi="nvim"
 alias vim="nvim"
 alias ls="lsd"
+alias zel="zellij" # alternative to tmux
 
 # M1 Terminal Helpers
 alias arm="env /usr/bin/arch -arm64 /bin/zsh --login"
