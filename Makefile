@@ -322,6 +322,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 
 	@echo "✅ Complete!"
 	@echo "Note that some of these changes require a logout/restart to take effect."
+	@echo "Turn on alt key in Terminal. Terminal > Preferences > Settings > Keyboard"
 
 .PHONY: setup
 setup: relink ~/.ssh xcode homebrew git cli-apps vim asdf rust $(TMUX) zsh superhuman terminal ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
