@@ -3,10 +3,10 @@
 	email = hello@davidnix.io
 	signingkey = A410043BEBF42A5E
 [core]
-	excludesfile = /Users/david/.gitignore_global
+	excludesfile = /Users/davidnix/.gitignore_global
 [core]
 	pager = less -MFRSX
-	excludesfile = /Users/david/.gitignore_global
+	excludesfile = /Users/davidnix/.gitignore_global
 	editor = vim
 	# You may need to reset your tree: http://help.github.com/line-endings/
 	autocrlf = false
