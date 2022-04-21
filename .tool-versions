@@ -2,4 +2,4 @@ golang 1.18
 helm 3.2.3
 nodejs 16.13.2
 python 3.9.9
-terraform 1.0.11
+terraform 1.1.7
