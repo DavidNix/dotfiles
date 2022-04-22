@@ -5,6 +5,7 @@ tap "homebrew/services"
 tap "homebrew/cask-fonts"
 
 cask "font-fira-code-nerd-font"
+cask "docker"
 
 tap "cantino/mcfly"
 tap "cjbassi/ytop"
