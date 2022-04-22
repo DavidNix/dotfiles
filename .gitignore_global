@@ -6,11 +6,14 @@ Session.vim
 .netrwhist
 *~
 
+# direnv https://direnv.net
+.envrc
+
 # IDE
 # jetbrains
 /.idea
 
-# ASDF
+# asdf https://asdf-vm.com
 .tool-versions
 
 # Mac
