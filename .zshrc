@@ -70,6 +70,9 @@ autoload -Uz compinit && compinit
 # load bashcompinit for some old bash completions
 autoload bashcompinit && bashcompinit
 
+# Be explicit about docker host. Some tools change it.
+export DOCKER_HOST=unix:///var/run/docker.sock
+
 # Make neovim default editor
 export VISUAL=nvim
 export EDITOR="$VISUAL"
