@@ -133,6 +133,9 @@ alias zel="zellij" # alternative to tmux
 alias arm="env /usr/bin/arch -arm64 /bin/zsh --login"
 alias intel="env /usr/bin/arch -x86_64 /bin/zsh --login"
 
+# find the current public ip address
+alias myip="curl ifconfig.me"
+
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/davidnix/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/path.zsh.inc'; fi
 
