@@ -13,14 +13,12 @@ tap "derailed/k9s"
 tap "heroku/brew"
 tap "snyk/tap"
 
-
 brew "cantino/mcfly/mcfly"
 brew "cjbassi/ytop/ytop"
 brew "derailed/k9s/k9s"
 brew "farmotive/k8s/kpoof"
 brew "heroku/brew/heroku"
 brew "snyk/tap/snyk"
-
 
 brew "angle-grinder"
 brew "asdf"
@@ -40,6 +38,7 @@ brew "gitui"
 brew "glib"
 brew "gnupg"
 brew "graphviz"
+brew "grpcurl"
 brew "hyperfine"
 brew "imagemagick"
 brew "jq"
