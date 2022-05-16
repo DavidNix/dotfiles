@@ -127,8 +127,6 @@ alias top="ytop"
 alias vi="nvim"
 alias vim="nvim"
 alias ls="lsd"
-# create new tmux session
-alias newtmux="tmux new -s $(pwd | xargs basename)"
 
 # M1 Terminal Helpers
 alias arm="env /usr/bin/arch -arm64 /bin/zsh --login"
