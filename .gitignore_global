@@ -38,3 +38,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# In projects, I like to have a poc directory for proof of concepts.
+# Basically, a scratch pad for experimentation.
+/poc
