@@ -41,3 +41,6 @@ Temporary Items
 # In projects, I like to have a poc directory for proof of concepts.
 # Basically, a scratch pad for experimentation.
 /poc
+
+# VSCode
+__debug_bin
