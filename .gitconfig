@@ -53,8 +53,8 @@
 # Optional merge tool, http://sourcegear.com/diffmerge/ rocks.
 # When you have to merge, “git mergetool”
 [merge]
-	tool = Kaleidoscope
-[mergetool "Kaleidoscope"]
+	tool = ksdiff
+[mergetool "ksdiff"]
 	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
 	trustexitcode = true
 
@@ -73,9 +73,9 @@
  # use (index, work tree, commit, object) instead of the standard a and b notation
 	mnemonicprefix = true
  # basic rename and copy detection
-	tool = Kaleidoscope
+	tool = vimdiff
 	
-[difftool "Kaleidoscope"]
+[difftool "ksdiff"]
 	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
 
 [difftool]
