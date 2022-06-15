@@ -44,3 +44,6 @@ Temporary Items
 
 # VSCode
 __debug_bin
+
+# Canonical place for git worktrees
+.worktree
