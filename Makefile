@@ -325,7 +325,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	@echo "Turn on alt key in Terminal. Terminal > Preferences > Settings > Keyboard"
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git cli-apps vim asdf rust $(TMUX) zsh superhuman terminal ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git cli-apps vim asdf rust $(TMUX) zsh superhuman terminal krew ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -366,6 +366,14 @@ cli-apps: ## Installs command line tools
 	@echo "Cleaning up brew"
 	@brew cleanup
 	@ln -s /opt/homebrew/bin/mcfly /usr/local/bin/mcfly
+
+KREW = kubectl krew
+.PHONY: krew
+krew: ## Installs kubectl krew plugins
+	$(KREW) upgrade
+	$(KREW) install ctx
+	$(KREW) install ns
+	$(KREW) install stern
 
 .PHONY: vim
 vim: vim-colors vim-plugins
