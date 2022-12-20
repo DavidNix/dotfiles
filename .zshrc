@@ -99,8 +99,6 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 # zsh plugin creates the k alias for kubectl
 complete -F __start_kubectl k
 source <(kubectl completion zsh)
-# stern is a k8s log helper
-source <(stern --completion=zsh)
 
 # vim fzf needs this
 export PATH="$PATH:$HOME/.vim/pack/bundle/start/fzf/bin"
