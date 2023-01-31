@@ -3,10 +3,12 @@ tap "homebrew/cask"
 tap "homebrew/core"
 tap "homebrew/services"
 tap "homebrew/cask-fonts"
+tap "microsoft/git"
 
 cask "ksdiff"
 cask "docker"
 cask "font-fira-code-nerd-font"
+cask "git-credential-manager-core"
 
 tap "cantino/mcfly"
 tap "cjbassi/ytop"
