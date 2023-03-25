@@ -22,7 +22,8 @@ brew "farmotive/k8s/kpoof"
 brew "heroku/brew/heroku"
 
 brew "angle-grinder"
-brew "asdf"
+# Instead of asdf, trying https://github.com/jdxcode/rtx
+# brew "asdf" 
 brew "bat"
 brew "coreutils"
 brew "direnv"
