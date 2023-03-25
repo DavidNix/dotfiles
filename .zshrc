@@ -20,7 +20,10 @@ zplug "zsh-users/zsh-completions"
 zplug "zsh-users/zsh-autosuggestions"
 zplug "felixr/docker-zsh-completion"
 
-zplug "plugins/asdf",                   from:oh-my-zsh
+
+# Trying https://github.com/jdxcode/rtx in place of asdf
+# zplug "plugins/asdf",                   from:oh-my-zsh 
+
 zplug "plugins/brew",                   from:oh-my-zsh
 zplug "plugins/colored-man-pages",      from:oh-my-zsh
 zplug "plugins/git",                    from:oh-my-zsh
@@ -92,9 +95,13 @@ export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
 # krew kubectl plugin manager
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
+# Trying rtx instead
 # ASDF https://asdf-vm.com/#/core-manage-asdf-vm
-. $HOME/.asdf/asdf.sh
-. $HOME/.asdf/completions/asdf.bash
+# . $HOME/.asdf/asdf.sh
+# . $HOME/.asdf/completions/asdf.bash
+
+# RTX is a different version manager compatible with asdf
+eval "$(/usr/local/bin/rtx activate zsh)"
 
 # zsh plugin creates the k alias for kubectl
 complete -F __start_kubectl k
@@ -149,3 +156,4 @@ if command -v starship &> /dev/null; then eval "$(starship init zsh)"; fi
 
 # See: https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+
