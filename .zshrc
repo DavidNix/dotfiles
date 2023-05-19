@@ -101,7 +101,9 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 # . $HOME/.asdf/completions/asdf.bash
 
 # RTX is a different version manager compatible with asdf
-eval "$(/usr/local/bin/rtx activate zsh)"
+# See: https://github.com/jdxcode/rtx for install instructions.
+# I modified the install command via: 
+eval "$(/opt/homebrew/bin/rtx activate zsh)"
 
 # zsh plugin creates the k alias for kubectl
 complete -F __start_kubectl k
