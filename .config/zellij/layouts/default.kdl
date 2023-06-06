@@ -1,0 +1,35 @@
+layout {
+    tab_template name="tab-ui" {
+        pane size=1 borderless=true {
+            plugin location="zellij:tab-bar"
+        }
+        children
+        pane size=2 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    tab-ui name="infra" cwd="/Users/davidnix/src/strangelove/infra" {
+        pane split_direction="vertical" {
+            pane {
+                pane
+                pane
+            }
+            pane
+        }
+    }
+
+    tab-ui name="operator" cwd="/Users/davidnix/src/strangelove/cosmos-operator" {
+        pane split_direction="vertical" {
+            pane
+            pane
+        }
+    }
+
+    tab-ui name="chainreg" cwd="/Users/davidnix/src/chain-registry-api" {
+        pane split_direction="vertical" {
+            pane
+            pane
+        }
+    }
+}
