@@ -1,5 +1,5 @@
 layout {
-    tab_template name="tab-ui" {
+    default_tab_template {
         pane size=1 borderless=true {
             plugin location="zellij:tab-bar"
         }
@@ -9,7 +9,7 @@ layout {
         }
     }
 
-    tab-ui name="infra" cwd="/Users/davidnix/src/strangelove/infra" {
+    tab name="infra" cwd="/Users/davidnix/src/strangelove/infra" {
         pane split_direction="vertical" {
             pane {
                 pane
@@ -19,14 +19,14 @@ layout {
         }
     }
 
-    tab-ui name="operator" cwd="/Users/davidnix/src/strangelove/cosmos-operator" {
+    tab name="operator" cwd="/Users/davidnix/src/strangelove/cosmos-operator" {
         pane split_direction="vertical" {
             pane
             pane
         }
     }
 
-    tab-ui name="chainreg" cwd="/Users/davidnix/src/chain-registry-api" {
+    tab name="chainreg" cwd="/Users/davidnix/src/chain-registry-api" {
         pane split_direction="vertical" {
             pane
             pane
