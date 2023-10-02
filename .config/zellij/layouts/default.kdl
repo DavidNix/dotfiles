@@ -9,7 +9,7 @@ layout {
         }
     }
 
-    tab name="infra" cwd="/Users/davidnix/src/strangelove/infra" {
+    tab name="roost" cwd="/Users/davidnix/src/metarouter/roost" {
         pane split_direction="vertical" {
             pane {
                 pane
@@ -19,14 +19,7 @@ layout {
         }
     }
 
-    tab name="operator" cwd="/Users/davidnix/src/strangelove/cosmos-operator" {
-        pane split_direction="vertical" {
-            pane
-            pane
-        }
-    }
-
-    tab name="chainreg" cwd="/Users/davidnix/src/chain-registry-api" {
+    tab name="todo" cwd="/Users/davidnix/src" {
         pane split_direction="vertical" {
             pane
             pane
