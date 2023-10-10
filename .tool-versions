@@ -2,5 +2,5 @@
 golang 1.21.0
 helm 3.9.4
 nodejs 16.13.2
-terraform 1.5.3
+terraform 1.5.7
 flux2 0.39.0
