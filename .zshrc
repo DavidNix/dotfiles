@@ -140,6 +140,10 @@ alias intel="env /usr/bin/arch -x86_64 /bin/zsh --login"
 # find the current public ip address
 alias myip="curl ifconfig.me"
 
+# Alias python3 to python
+alias python=$(which python3)
+alias pip=$(which pip3)
+
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/davidnix/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/path.zsh.inc'; fi
 
