@@ -91,7 +91,7 @@ export PATH="/opt/homebrew/bin:$PATH"
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # makes homebrew gmake to just make
-export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
 # krew kubectl plugin manager
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
