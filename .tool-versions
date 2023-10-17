@@ -1,5 +1,5 @@
 # python 3.11.2
-golang 1.21.0
+golang 1.21.3
 helm 3.9.4
 nodejs 16.13.2
 terraform 1.5.7
