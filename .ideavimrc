@@ -2,13 +2,32 @@ source ~/.vimrc
 
 " :actionlist <command name> in IDE will search for available actions
 
-:map <leader>s :action SplitVertically<CR>
-:map <leader>h :action SplitHorizontally<CR>
-:map <leader>u :action Unsplit<CR>
-:map <leader>U :action UnsplitAll<CR>
-:map <leader>r :action ReformatCode<CR>
-:map H :action Back<CR>
-:map L :action Forward<CR>
+nmap <leader>V <Action>(SplitVertically)
+nmap <leader>H <Action>(SplitHorizontally)
+nmap <leader>U <Action>(Unsplit)
+nmap <leader>UU <Action>(UnsplitAll)
+
+" Use ctl+o and ctl+i
+" nmap H :action Back<CR>
+" nmap L :action Forward<CR>
+
+map <leader>b <Action>(ToggleLineBreakpoint)
+map <leader>n <Action>(GotoNextError)
+map <leader>o <Action>(SelectInProjectView)
+map <leader>a <Action>(Annotate)
+
+map <leader>d <Action>(Debug)
+map <leader>r <Action>(RenameElement)
+map <leader>c <Action>(Stop)
+map <leader>z <Action>(ToggleDistractionFreeMode)
+
+nmap <leader>h <Action>(HighlightUsagesInFile)
+nmap <leader>rr <Action>(Refactorings.QuickListPopupAction)
+nmap <leader>s <Action>(ShowUsages)
+nmap <leader>u <Action>(FindUsages)
+
+nmap <leader>t <Action>(ActivateTerminalToolWindow)
+nmap <leader>ai <Action>(ActivateAIAssistantToolWindow)
 
 " Use system pasteboard
 set clipboard=unnamed
@@ -18,6 +37,10 @@ map <C-j> <C-w>j<CR>
 map <C-k> <C-w>k<CR>
 map <C-h> <C-w>h<CR>
 map <C-l> <C-w>l<CR>
+
+
+Plug 'preservim/nerdtree'
+Plug 'tpope/vim-commentary' " TODO Doesn't seem to work
 
 " nnoremap ; ;
 " set number
