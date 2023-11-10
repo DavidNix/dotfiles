@@ -325,7 +325,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	@echo "Turn on alt key in Terminal. Terminal > Preferences > Settings > Keyboard"
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git cli-apps vim asdf rust $(TMUX) zsh superhuman terminal krew ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git cli-apps vim rust $(TMUX) zsh superhuman terminal krew ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -398,19 +398,6 @@ vim-plugins:
 	git clone https://github.com/hashivim/vim-terraform.git "$(VIM_PLUGIN_PATH)/vim-terraform"
 	git clone https://github.com/junegunn/fzf "$(VIM_PLUGIN_PATH)/fzf"
 	~/.vim/pack/bundle/start/fzf/install --bin
-$(ASDF_INSTALL):
-	git clone https://github.com/asdf-vm/asdf.git $(ASDF_INSTALL)
-
-.PHONY: asdf
-asdf: $(ASDF_INSTALL)
-	@echo "Installing asdf plugins"
-	@$(SHELL) -c ". $$HOME/.asdf/asdf.sh"
-	cat .tool-versions | awk '{print $$1}' | xargs -n 1 asdf plugin add
-	@echo "Installing keys for nodejs, see https://github.com/asdf-vm/asdf-nodejs"
-	@$(SHELL) -c '$${ASDF_DATA_DIR:=$$HOME/.asdf}/plugins/nodejs/bin/import-release-team-keyring'
-	cp .tool-versions ~
-	asdf install
-	asdf reshim
 
 TMUX:=~/.tmux/plugins/tpm
 $(TMUX): 
