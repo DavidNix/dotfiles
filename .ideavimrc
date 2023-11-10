@@ -2,14 +2,14 @@ source ~/.vimrc
 
 " :actionlist <command name> in IDE will search for available actions
 
-nmap <leader>V <Action>(SplitVertically)
-nmap <leader>H <Action>(SplitHorizontally)
-nmap <leader>U <Action>(Unsplit)
-nmap <leader>UU <Action>(UnsplitAll)
+map <leader>V <Action>(SplitVertically)
+map <leader>H <Action>(SplitHorizontally)
+map <leader>U <Action>(Unsplit)
+map <leader>UU <Action>(UnsplitAll)
 
 " Use ctl+o and ctl+i
-" nmap H :action Back<CR>
-" nmap L :action Forward<CR>
+" map H :action Back<CR>
+" map L :action Forward<CR>
 
 map <leader>b <Action>(ToggleLineBreakpoint)
 map <leader>n <Action>(GotoNextError)
@@ -19,15 +19,17 @@ map <leader>a <Action>(Annotate)
 map <leader>d <Action>(Debug)
 map <leader>r <Action>(RenameElement)
 map <leader>c <Action>(Stop)
-map <leader>z <Action>(ToggleDistractionFreeMode)
+map <leader>z <Action>(TogglePresentationMode)
 
-nmap <leader>h <Action>(HighlightUsagesInFile)
-nmap <leader>rr <Action>(Refactorings.QuickListPopupAction)
-nmap <leader>s <Action>(ShowUsages)
-nmap <leader>u <Action>(FindUsages)
+map <leader>h <Action>(HighlightUsagesInFile)
+map <leader>rr <Action>(Refactorings.QuickListPopupAction)
+map <leader>s <Action>(ShowUsages)
+map <leader>u <Action>(FindUsages)
 
-nmap <leader>t <Action>(ActivateTerminalToolWindow)
-nmap <leader>ai <Action>(ActivateAIAssistantToolWindow)
+map <leader>t <Action>(ActivateTerminalToolWindow)
+map <leader>ai <Action>(ActivateAIAssistantToolWindow)
+
+map <leader>g <Action>(Vcs.ShowHistoryForRevision)
 
 " Use system pasteboard
 set clipboard=unnamed
