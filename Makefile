@@ -325,7 +325,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	@echo "Turn on alt key in Terminal. Terminal > Preferences > Settings > Keyboard"
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git cli-apps vim rust $(TMUX) zsh superhuman terminal krew ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git cli-apps vim rust zsh superhuman terminal krew ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -398,11 +398,6 @@ vim-plugins:
 	git clone https://github.com/hashivim/vim-terraform.git "$(VIM_PLUGIN_PATH)/vim-terraform"
 	git clone https://github.com/junegunn/fzf "$(VIM_PLUGIN_PATH)/fzf"
 	~/.vim/pack/bundle/start/fzf/install --bin
-
-TMUX:=~/.tmux/plugins/tpm
-$(TMUX): 
-	@echo "Installing tmux plugin manager"
-	git clone https://github.com/tmux-plugins/tpm $(TMUX)
 
 ~/.oh-my-zsh:
 	@echo "Installing ohmyzsh"
