@@ -335,7 +335,7 @@ setup: relink ~/.ssh xcode homebrew git cli-apps vim rust zsh superhuman termina
 terminal: 
 	echo "Terminal Preferences: Shell -> Use Settings as Default"
 	echo "Additional themes at https://github.com/lysyi3m/macos-terminal-themes"
-	open MaterialDark.terminal
+	open Kibble.terminal
 
 .PHONY: xcode
 xcode: 
