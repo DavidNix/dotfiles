@@ -2,18 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>AppleAntiAliasingThreshold</key>
-	<integer>1</integer>
-	<key>ApplePressAndHoldEnabled</key>
-	<false/>
-	<key>AppleScrollAnimationEnabled</key>
-	<integer>0</integer>
-	<key>AppleSmoothFixedFontsSizeThreshold</key>
-	<integer>1</integer>
-	<key>AppleWindowTabbingMode</key>
-	<string>manual</string>
 	<key>Default Bookmark Guid</key>
-	<string>7ED23212-4D2E-460E-960E-510A3D88508B</string>
+	<string>3551B4B6-56A0-4D83-89E4-1C9C84682257</string>
 	<key>HapticFeedbackForEsc</key>
 	<false/>
 	<key>HotkeyMigratedFromSingleToMulti</key>
@@ -243,7 +233,7 @@
 				<real>0.73333334922790527</real>
 			</dict>
 			<key>Guid</key>
-			<string>7ED23212-4D2E-460E-960E-510A3D88508B</string>
+			<string>3551B4B6-56A0-4D83-89E4-1C9C84682257</string>
 			<key>Horizontal Spacing</key>
 			<real>1</real>
 			<key>Idle Code</key>
@@ -616,8 +606,6 @@
 	<false/>
 	<key>TabStyleWithAutomaticOption</key>
 	<integer>5</integer>
-	<key>TabViewType</key>
-	<integer>0</integer>
 	<key>VisualIndicatorForEsc</key>
 	<false/>
 </dict>
