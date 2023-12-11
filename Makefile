@@ -25,7 +25,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	# Close any open System Preferences panes, to prevent them from overriding
 	# settings we’re about to change
 	osascript -e 'tell application "System Preferences" to quit'
-	
+
 	# Ask for the administrator password upfront
 	sudo -v
 
@@ -325,20 +325,20 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	@echo "Turn on alt key in Terminal. Terminal > Preferences > Settings > Keyboard"
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git cli-apps vim rust zsh superhuman terminal krew ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git cli-apps rust zsh superhuman terminal krew ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
-~/.ssh: 
+~/.ssh:
 	mkdir -p ~/.ssh
 
-terminal: 
+terminal:
 	echo "Terminal Preferences: Shell -> Use Settings as Default"
 	echo "Additional themes at https://github.com/lysyi3m/macos-terminal-themes"
 	open Kibble.terminal
 
 .PHONY: xcode
-xcode: 
+xcode:
 	@echo "Installing Xcode command line tools and such"
 	xcode-select --install
 
@@ -349,7 +349,7 @@ homebrew:
 	@brew update
 
 .PHONY: git
-git: 
+git:
 	@echo "Installing Git..."
 	git config --global user.name "David Nix"
 	git config --global user.email hello@davidnix.io
@@ -375,36 +375,13 @@ krew: ## Installs kubectl krew plugins
 	$(KREW) install ns
 	$(KREW) install stern
 
-.PHONY: vim
-vim: vim-colors vim-plugins
-
-vim-color-path=$${HOME}/.vim/colors
-.PHONY: vim-colors
-vim-colors:
-	@echo "Installing vim colors"
-	mkdir -p $(vim-color-path)
-	curl -s https://raw.githubusercontent.com/nanotech/jellybeans.vim/master/colors/jellybeans.vim > $(vim-color-path)/jellybeans.vim
-
-VIM_PLUGIN_PATH:="$${HOME}/.vim/pack/bundle/start"
-.PHONY: vim-plugins
-vim-plugins:
-	@echo "Installing vim plugins"
-
-	mkdir -p "$(VIM_PLUGIN_PATH)"
-	git clone https://github.com/preservim/nerdtree "$(VIM_PLUGIN_PATH)/nerdtree"
-	git clone https://github.com/vim-airline/vim-airline "$(VIM_PLUGIN_PATH)/vim-airline" 
-	git clone https://github.com/tpope/vim-commentary "$(VIM_PLUGIN_PATH)/vim-commentary" 
-	git clone https://github.com/godlygeek/tabular "$(VIM_PLUGIN_PATH)/tabular" 
-	git clone https://github.com/hashivim/vim-terraform.git "$(VIM_PLUGIN_PATH)/vim-terraform"
-	git clone https://github.com/junegunn/fzf "$(VIM_PLUGIN_PATH)/fzf"
-	~/.vim/pack/bundle/start/fzf/install --bin
 
 ~/.oh-my-zsh:
 	@echo "Installing ohmyzsh"
 	@$(SHELL) -c "$$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 .PHONY: zsh
-zsh:  ~/.oh-my-zsh 
+zsh:  ~/.oh-my-zsh
 	 @$(SHELL) -c "source ~/.zshrc && zplug install"
 
 .PHONY: rust
@@ -418,7 +395,7 @@ $(CARGO)/%:
 	cargo install "$(notdir $@)"
 
 .PHONY: superhuman
-superhuman: 
+superhuman:
 	@echo "Download Superhuman at https://mail.superhuman.com"
 	@echo "Send yourself a test email to get Superhuman to register with macOS notification settings."
 
