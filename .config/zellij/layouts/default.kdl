@@ -19,7 +19,7 @@ layout {
         }
     }
 
-    tab name="todo" cwd="/Users/davidnix/src" {
+    tab name="ynd" cwd="/Users/davidnix/src/your-next-domain/" {
         pane split_direction="vertical" {
             pane
             pane
