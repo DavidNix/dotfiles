@@ -3,8 +3,8 @@
 #   - https://github.com/manilarome/the-glorious-dotfiles
 
 export ZSH="/Users/davidnix/.oh-my-zsh"
-# Using starship for command prompt instead 
-# ZSH_THEME="crunch" 
+# Using starship for command prompt instead
+# ZSH_THEME="crunch"
 
 # Standard Plugins
 plugins=(git)
@@ -22,7 +22,7 @@ zplug "felixr/docker-zsh-completion"
 
 
 # Trying https://github.com/jdxcode/rtx in place of asdf
-# zplug "plugins/asdf",                   from:oh-my-zsh 
+# zplug "plugins/asdf",                   from:oh-my-zsh
 
 zplug "plugins/brew",                   from:oh-my-zsh
 zplug "plugins/colored-man-pages",      from:oh-my-zsh
@@ -102,7 +102,7 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 # RTX is a different version manager compatible with asdf
 # See: https://github.com/jdxcode/rtx for install instructions.
-# I modified the install command via: 
+# I modified the install command via:
 eval "$(/usr/local/bin/rtx activate zsh)"
 
 # zsh plugin creates the k alias for kubectl
