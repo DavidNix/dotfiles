@@ -351,7 +351,7 @@ copy_command "pbcopy"                     // osx
 // theme_dir "/path/to/my/theme_dir"
 //
 
-theme "molokai-dark"
+theme "dracula"
 
 themes {
   dracula {
@@ -369,17 +369,17 @@ themes {
   }
 
   molokai-dark {
-    fg 248 248 240
-    bg 27 29 30
-    black 0 0 0
-    red 255 0 0
-    green 0 140 0
-    yellow 255 255 0
-    blue 102 217 239
-    magenta 174 129 255
-    cyan 0 255 255
-    white 255 255 255
-    orange 253 151 31
+    fg "#f8f8f0"
+    bg "#1b1d1e"
+    black "#000000"
+    red "#ff0000"
+    green "#008c00"
+    yellow "#ffff00"
+    blue "#66d9ef"
+    magenta "#ae81ff"
+    cyan "#00ffff"
+    white "#ffffff"
+    orange "#fd971f"
   }
 
   gruvbox-dark {
@@ -394,6 +394,34 @@ themes {
     cyan 104 157 106
     white 251 241 199
     orange 214 93 14
+  }
+
+  one-half-dark {
+    fg 220 223 228
+    bg 40 44 52
+    black 27 29 35
+    red 227 63 76
+    green 152 195 121
+    yellow 229 192 123
+    blue 97 175 239
+    magenta 198 120 221
+    cyan 86 182 194
+    white 233 225 254
+    orange 216 133 76
+  }
+
+  tokyo-night {
+      fg 169 177 214
+      bg 26 27 38
+      black 56 62 90
+      red 249 51 87
+      green 158 206 106
+      yellow 224 175 104
+      blue 122 162 247
+      magenta 187 154 247
+      cyan 42 195 222
+      white 192 202 245
+      orange 255 158 100
   }
 
   catppuccin-latte {

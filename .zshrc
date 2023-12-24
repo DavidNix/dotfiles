@@ -4,7 +4,7 @@
 
 export ZSH="/Users/davidnix/.oh-my-zsh"
 # Using starship for command prompt instead
-# ZSH_THEME="crunch"
+ZSH_THEME=""
 
 # Standard Plugins
 plugins=(git)
