@@ -1,12 +1,45 @@
 return {
-  { "rebelot/kanagawa.nvim" },
+  -- { "navarasu/onedark.nvim" },
+  { "olimorris/onedarkpro.nvim" },
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "kanagawa-dragon",
+      colorscheme = "onedark_dark",
     },
   },
 }
+
+-- return {
+--   { "decaycs/decay.nvim" },
+--   {
+--     "LazyVim/LazyVim",
+--     opts = {
+--       colorscheme = "decay",
+--     },
+--   },
+-- }
+
+-- return {
+--   "navarasu/onedark.nvim",
+--   lazy = false,
+--   opts = { style = "warmer" },
+--   priority = 1000,
+-- }
+-- return {
+--   { "rebelot/kanagawa.nvim" },
+--   {
+--     "LazyVim/LazyVim",
+--     opts = {
+--       colorscheme = "kanagawa-dragon",
+--     },
+--   },
+-- }
+
+-- return {
+--   "olimorris/onedarkpro.nvim",
+--   priority = 1000, -- Ensure it loads first
+-- }
+
 -- return {
 --   "catppuccin/nvim",
 -- }
