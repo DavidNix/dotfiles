@@ -1,0 +1,13 @@
+#!/bin/sh
+
+SESSION=dotfiles
+
+tmux new-session -d -s "$SESSION"
+
+tmux rename-window 'main'
+
+tmux split-window -h
+
+tmux select-pane -t 0
+
+tmux attach-session -t "$SESSION"

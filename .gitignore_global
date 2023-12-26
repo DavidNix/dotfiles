@@ -50,3 +50,6 @@ __debug_bin
 
 # Canonical place for git worktrees
 .worktree
+
+# Tmux layout
+tmux-setup.sh
