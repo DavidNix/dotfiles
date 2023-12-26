@@ -1,10 +1,11 @@
 return {
   -- { "navarasu/onedark.nvim" },
-  { "olimorris/onedarkpro.nvim" },
+  -- { "olimorris/onedarkpro.nvim" },
+  { "projekt0n/github-nvim-theme" },
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "onedark_dark",
+      colorscheme = "github_dark_default",
     },
   },
 }
