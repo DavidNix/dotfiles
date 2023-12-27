@@ -27,7 +27,7 @@ function ToggleGoTestFile()
       local test_file = vim.fn.substitute(current_file, ".go$", "_test.go", "")
       if vim.fn.filereadable(test_file) == 0 then
         -- Create the test file if it doesn't exist
-        vim.fn.system("gotests -w -exported " .. vim.fn.shellescape(current_file))
+        vim.fn.system("gotests -w -exported" .. vim.fn.shellescape(current_file))
       end
       vim.api.nvim_command("edit " .. test_file)
     end
