@@ -36,3 +36,24 @@ function ToggleGoTestFile()
   end
 end
 map("n", "<leader>gt", ":lua ToggleGoTestFile()<CR>", defaults)
+
+-- Use which-key to surface mappings
+local wk = require("which-key")
+
+wk.register({
+  c = {
+    c = { "<cmd>ChatGPT<CR>", "ChatGPT" },
+    e = { "<cmd>ChatGPTEditWithInstruction<CR>", "AI Edit with instruction", mode = { "n", "v" } },
+    g = { "<cmd>ChatGPTRun grammar_correction<CR>", "AI Grammar Correction", mode = { "n", "v" } },
+    t = { "<cmd>ChatGPTRun translate<CR>", "AI Translate", mode = { "n", "v" } },
+    k = { "<cmd>ChatGPTRun keywords<CR>", "AI Keywords", mode = { "n", "v" } },
+    d = { "<cmd>ChatGPTRun docstring<CR>", "AI Docstring", mode = { "n", "v" } },
+    a = { "<cmd>ChatGPTRun add_tests<CR>", "AI Add Tests", mode = { "n", "v" } },
+    o = { "<cmd>ChatGPTRun optimize_code<CR>", "AI Optimize Code", mode = { "n", "v" } },
+    f = { "<cmd>ChatGPTRun fix_bugs<CR>", "AI Fix Bugs", mode = { "n", "v" } },
+    s = { "<cmd>ChatGPTRun summarize<CR>", "AI Summarize", mode = { "n", "v" } },
+    x = { "<cmd>ChatGPTRun explain_code<CR>", "AI Explain Code", mode = { "n", "v" } },
+    r = { "<cmd>ChatGPTRun roxygen_edit<CR>", "AI Roxygen Edit", mode = { "n", "v" } },
+    l = { "<cmd>ChatGPTRun code_readability_analysis<CR>", "AI Code Readability Analysis", mode = { "n", "v" } },
+  },
+}, { prefix = "<leader>" })
