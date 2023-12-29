@@ -35,12 +35,14 @@ function ToggleGoTestFile()
     print("Not a Go file")
   end
 end
-map("n", "<leader>gt", ":lua ToggleGoTestFile()<CR>", defaults)
 
 -- Use which-key to surface mappings
 local wk = require("which-key")
 
 wk.register({
+  t = {
+    g = { "<cmd>lua ToggleGoTestFile()<CR>", "Toggle Go Test File" },
+  },
   c = {
     c = { "<cmd>ChatGPT<CR>", "ChatGPT" },
     e = { "<cmd>ChatGPTEditWithInstruction<CR>", "AI Edit with instruction", mode = { "n", "v" } },
