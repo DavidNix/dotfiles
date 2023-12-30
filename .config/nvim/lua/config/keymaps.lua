@@ -16,6 +16,7 @@ map("n", ";", ":", { noremap = true })
 -- Go test files
 function ToggleGoTestFile()
   local current_file = vim.fn.expand("%")
+  local current_dir = vim.fn.expand("%:p:h:t")
 
   if vim.fn.expand("%:e") == "go" then
     if vim.fn.match(current_file, "_test.go$") >= 0 then
@@ -27,7 +28,10 @@ function ToggleGoTestFile()
       local test_file = vim.fn.substitute(current_file, ".go$", "_test.go", "")
       if vim.fn.filereadable(test_file) == 0 then
         -- Create the test file if it doesn't exist
-        vim.fn.system("gotests -w -exported" .. vim.fn.shellescape(current_file))
+        local test_content = "package "
+          .. current_dir
+          .. '\n\nimport(\n\t"testing"\n\n\t"github.com/stretchr/testify/require"\n)\n\nfunc TestExample(t *testing.T) {\n\trequire.True(t, true)\n}\n'
+        vim.fn.writefile(vim.fn.split(test_content, "\n"), test_file)
       end
       vim.api.nvim_command("edit " .. test_file)
     end
