@@ -32,7 +32,7 @@ tmux new-session -c "$YND_DIR" -d -s $(basename "$YND_DIR")
 
 tmux rename-window "main"
 
-tmux split-window -c "$YND_DIR" -v -p 20
+tmux split-window -c "$YND_DIR" -v -p 10
 
 tmux select-pane -t 0
 
