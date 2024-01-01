@@ -1,7 +1,7 @@
 set nocompatible "gets rid of all the crap that Vim does to be vi compatible
 filetype off
 
-syntax enable  
+syntax enable
 filetype plugin indent on
 
 " if has('clipboard')
@@ -60,7 +60,7 @@ set hlsearch "highlight search terms
 set shiftwidth=4
 set tabstop=4
 set softtabstop=4
-set smarttab 
+set smarttab
 
 " line wrapping
 set wrap
@@ -73,10 +73,10 @@ set colorcolumn=85
 set noswapfile
 " set nobackup
 
-" misc
-let mapleader=","
+" leader button
+let mapleader=" "
 
-set number  
+set number
 set hidden
 set expandtab
 set backspace=indent,eol,start "allow backspacing over everything in insert mode
@@ -99,7 +99,7 @@ set pastetoggle=<F2>
 
 nnoremap ; :
 
-"forces you to do it the vim way 
+"forces you to do it the vim way
 map <up> <nop>
 map <down> <nop>
 map <left> <nop>
@@ -130,7 +130,7 @@ vnoremap <F1> <ESC>
 nmap <silent> ,/ :nohlsearch<CR>
 
 " copy the line and insert = for each character
-nnoremap <leader>1 yypVr= 
+nnoremap <leader>1 yypVr=
 
 " save when losing focus
 au FocusLost * :wa
@@ -138,7 +138,7 @@ au FocusLost * :wa
 " get back to normal mode quickly
 inoremap jk <Esc>
 
-" fzf 
+" fzf
 nnoremap <leader>f :FZF<CR>
 
 " Find merge conflict markers
@@ -175,7 +175,7 @@ au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
 " open Godoc in the browser
 au FileType go nmap <Leader>gb <Plug>(go-doc-browser)
 
-" Show a list of interfaces which is implemented by the type under your cursor 
+" Show a list of interfaces which is implemented by the type under your cursor
 au FileType go nmap <Leader>s <Plug>(go-implements)
 
 " gorename
