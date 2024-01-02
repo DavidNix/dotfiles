@@ -42,6 +42,8 @@ map <C-j> <C-w>j<CR>
 map <C-k> <C-w>k<CR>
 map <C-h> <C-w>h<CR>
 map <C-l> <C-w>l<CR>
+sethandler <C-j> a:vim
+sethandler <C-k> a:vim
 
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-commentary' " TODO Doesn't seem to work
