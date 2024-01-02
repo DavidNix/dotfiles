@@ -4,6 +4,7 @@ source ~/.vimrc
 " Also https://freedium.cfd/https://towardsdatascience.com/the-essential-ideavim-remaps-291d4cd3971b
 
 nmap <leader>E :e ~/.ideavimrc<CR>
+nmap <leader>R :source ~/.ideavimrc<CR>
 
 map <leader>V <Action>(SplitVertically)
 map <leader>H <Action>(SplitHorizontally)
@@ -14,12 +15,18 @@ map <leader>UU <Action>(UnsplitAll)
 " map H :action Back<CR>
 " map L :action Forward<CR>
 
-map <leader>b <Action>(ToggleLineBreakpoint)
 map <leader>n <Action>(GotoNextError)
 map <leader>e <Action>(SelectInProjectView)
 map <leader>a <Action>(Annotate)
 
-map <leader>d <Action>(Debug)
+" Debugging
+map <leader>dd <Action>(Debug)
+map <leader>db <Action>(ToggleLineBreakpoint)
+
+" Testing
+map <leader>tt <Action>(RunContextGroup)
+map <leader>tr <Action>(ReRunTests)
+
 map <leader>r <Action>(RenameElement)
 map <leader>c <Action>(Stop)
 map <leader>z <Action>(TogglePresentationMode)
@@ -29,7 +36,7 @@ map <leader>rr <Action>(Refactorings.QuickListPopupAction)
 map <leader>s <Action>(ShowUsages)
 map <leader>u <Action>(FindUsages)
 
-map <leader>t <Action>(ActivateTerminalToolWindow)
+map <leader>T <Action>(ActivateTerminalToolWindow)
 map <leader>ai <Action>(ActivateAIAssistantToolWindow)
 
 map <leader>g <Action>(Vcs.ShowHistoryForRevision)
