@@ -3,7 +3,7 @@ source ~/.vimrc
 " :actionlist <command name> in IDE will search for available actions
 " Also https://freedium.cfd/https://towardsdatascience.com/the-essential-ideavim-remaps-291d4cd3971b
 
-nmap <leader>e :e ~/.ideavimrc<CR>
+nmap <leader>E :e ~/.ideavimrc<CR>
 
 map <leader>V <Action>(SplitVertically)
 map <leader>H <Action>(SplitHorizontally)
@@ -16,7 +16,7 @@ map <leader>UU <Action>(UnsplitAll)
 
 map <leader>b <Action>(ToggleLineBreakpoint)
 map <leader>n <Action>(GotoNextError)
-map <leader>o <Action>(SelectInProjectView)
+map <leader>e <Action>(SelectInProjectView)
 map <leader>a <Action>(Annotate)
 
 map <leader>d <Action>(Debug)
