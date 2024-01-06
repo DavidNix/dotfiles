@@ -1,11 +1,30 @@
 source ~/.vimrc
 
 " :actionlist <command name> in IDE will search for available actions
+" Alt: turn on IdeaVim: Track Action Ids in the Action Menu (see <leader>fa)
 " Also https://freedium.cfd/https://towardsdatascience.com/the-essential-ideavim-remaps-291d4cd3971b
+" Excellent tutorials: https://www.youtube.com/@therelentlessprogrammer
 
-nmap <leader>E :e ~/.ideavimrc<CR>
-nmap <leader>R :source ~/.ideavimrc<CR>
+set relativenumber
+set number
 
+" Plugins
+Plug 'preservim/nerdtree'
+" Requires plugin from marketplace
+Plug 'easymotion /vim-easymotion'
+
+let mapleader=" "
+set easymotion
+
+" Easymotion / jumps
+map <leader>J <Plug>(easymotion-s)
+map <leader>j <Plug>(easymotion-f)
+
+" Manage ideavim
+nnoremap <leader>E :e ~/.ideavimrc<CR>
+nnoremap <leader>R :source ~/.ideavimrc<CR>
+
+" Splitting
 map <leader>V <Action>(SplitVertically)
 map <leader>H <Action>(SplitHorizontally)
 map <leader>U <Action>(Unsplit)
@@ -19,13 +38,17 @@ map <leader>n <Action>(GotoNextError)
 map <leader>e <Action>(SelectInProjectView)
 map <leader>a <Action>(Annotate)
 
+" Find
+map <leader>fa <Action>(GotoAction)
+map <leader>ff <Action>(FindInPath)
+
 " Debugging
 map <leader>dd <Action>(Debug)
 map <leader>db <Action>(ToggleLineBreakpoint)
 
 " Testing
-map <leader>tt <Action>(RunContextGroup)
-map <leader>tr <Action>(ReRunTests)
+" Runs current test
+map <leader>tt <Action>(RunClass)
 
 map <leader>r <Action>(RenameElement)
 map <leader>c <Action>(Stop)
@@ -36,7 +59,11 @@ map <leader>rr <Action>(Refactorings.QuickListPopupAction)
 map <leader>s <Action>(ShowUsages)
 map <leader>u <Action>(FindUsages)
 
-map <leader>T <Action>(ActivateTerminalToolWindow)
+" Terminal
+map <c-t> <Action>(ActivateTerminalToolWindow)
+map <leader>T <Action>(Terminal.OpenInTerminal)
+
+" AI
 map <leader>ai <Action>(ActivateAIAssistantToolWindow)
 
 map <leader>g <Action>(Vcs.ShowHistoryForRevision)
@@ -52,11 +79,3 @@ map <C-l> <C-w>l<CR>
 sethandler <C-j> a:vim
 sethandler <C-k> a:vim
 
-Plug 'preservim/nerdtree'
-Plug 'tpope/vim-commentary' " TODO Doesn't seem to work
-
-" nnoremap ; ;
-" set number
-
-" " get back to normal mode quickly
-" inoremap jk <Esc> 
