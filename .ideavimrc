@@ -18,8 +18,7 @@ let mapleader=" "
 set easymotion
 
 " Easymotion / jumps
-map <leader>J <Plug>(easymotion-s)
-map <leader>j <Plug>(easymotion-f)
+map <leader>j <Action>(AceAction)
 
 " Manage ideavim
 nnoremap <leader>E :e ~/.ideavimrc<CR>
