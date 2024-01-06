@@ -12,6 +12,7 @@ set number
 Plug 'preservim/nerdtree'
 " Requires plugin from marketplace
 Plug 'easymotion /vim-easymotion'
+Plug 'tpope/vim-commentary'
 
 let mapleader=" "
 set easymotion
