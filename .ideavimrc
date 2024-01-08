@@ -49,6 +49,7 @@ map <leader>db <Action>(ToggleLineBreakpoint)
 " Testing
 " Runs current test
 map <leader>tt <Action>(RunClass)
+map <leader>tg <Action>(GoToTest)
 
 map <leader>r <Action>(RenameElement)
 map <leader>c <Action>(Stop)
