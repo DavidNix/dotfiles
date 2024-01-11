@@ -57,6 +57,7 @@ map <leader>z <Action>(TogglePresentationMode)
 
 map <leader>h <Action>(HighlightUsagesInFile)
 map <leader>rr <Action>(Refactorings.QuickListPopupAction)
+map <leader>ri <Action>(ShowIntentionActions)
 map <leader>s <Action>(ShowUsages)
 map <leader>u <Action>(FindUsages)
 
