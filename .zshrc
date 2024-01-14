@@ -84,7 +84,7 @@ export EDITOR="$VISUAL"
 export GOPATH=$HOME/go
 
 # PATH modifications
-export PATH="$GOPATH/bin:/usr/local/bin:/usr/local/sbin:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin/flutter/bin"
+export PATH="$GOPATH/bin:/usr/local/bin:/usr/local/sbin:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/bin"
 
 # Homebrew for silicon
 export PATH="/opt/homebrew/bin:$PATH"
