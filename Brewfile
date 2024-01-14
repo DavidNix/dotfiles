@@ -10,12 +10,10 @@ cask "docker"
 cask "font-fira-code-nerd-font"
 cask "git-credential-manager-core"
 
-tap "cantino/mcfly"
 tap "cjbassi/ytop"
 tap "derailed/k9s"
 tap "heroku/brew"
 
-brew "cantino/mcfly/mcfly"
 brew "cjbassi/ytop/ytop"
 brew "derailed/k9s/k9s"
 brew "farmotive/k8s/kpoof"

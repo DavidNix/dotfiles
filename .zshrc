@@ -150,11 +150,6 @@ if [ -f '/Users/davidnix/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidn
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/davidnix/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/completion.zsh.inc'; fi
 
-# Mcfly advanced shell history https://github.com/cantino/mcfly
-# export MCFLY_KEY_SCHEME=vim
-export MCFLY_FUZZY=true
-if command -v mcfly &> /dev/null; then eval "$(mcfly init zsh)"; fi
-
 # starship.rs
 if command -v starship &> /dev/null; then eval "$(starship init zsh)"; fi
 
