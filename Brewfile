@@ -22,6 +22,7 @@ brew "heroku/brew/heroku"
 brew "angle-grinder"
 # Instead of asdf, trying https://github.com/jdxcode/rtx
 # brew "asdf"
+brew "atuin"
 brew "bat"
 brew "coreutils"
 brew "direnv"
