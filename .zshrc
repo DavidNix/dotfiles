@@ -157,4 +157,4 @@ if command -v starship &> /dev/null; then eval "$(starship init zsh)"; fi
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
 
-eval "$(atuin init zsh)"
+eval "$(atuin init zsh --disable-up-arrow)"
