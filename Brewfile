@@ -20,8 +20,7 @@ brew "farmotive/k8s/kpoof"
 brew "heroku/brew/heroku"
 
 brew "angle-grinder"
-# Instead of asdf, trying https://github.com/jdxcode/rtx
-# brew "asdf"
+# brew "asdf" Using mise instead
 brew "atuin"
 brew "bat"
 brew "coreutils"
@@ -56,7 +55,6 @@ brew "procs"
 brew "redis"
 brew "rename"
 brew "ripgrep"
-brew "rtx"
 brew "sd"
 brew "snappy"
 brew "sqlite3"
