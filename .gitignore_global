@@ -16,7 +16,7 @@ Session.vim
 # asdf https://asdf-vm.com
 .tool-versions
 
-# rtx (asdf replacement)
+# mise (asdf replacement)
 .rtx.toml
 
 # Mac

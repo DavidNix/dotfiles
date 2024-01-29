@@ -49,6 +49,7 @@ brew "legit"
 brew "lsd"
 brew "luarocks"
 brew "make"
+brew "mise" # asdf replacement
 brew "neovim"
 brew "postgresql@13"
 brew "procs"
