@@ -2,15 +2,18 @@ source ~/.bash_completions
 
 # automatically add keys to ssh-agent
 #
-{ eval `ssh-agent`; ssh-add -A; } &>/dev/null
+{
+	eval $(ssh-agent)
+	ssh-add -A
+} &>/dev/null
 
 # get correct colorscheme on tmux
 alias tmux="TERM=screen-256color-bce tmux"
 
-VISUAL=vim; export VISUAL
-EDITOR=vim; export EDITOR
-
-export GOBIN="/Users/davidnix/go/bin"
+VISUAL=vim
+export VISUAL
+EDITOR=vim
+export EDITOR
 
 alias k="kubectl"
 
@@ -37,7 +40,7 @@ export PS2="\[\033[1;92m\]\u@\h : \w > \[\033[0m\]"
 export TERM=xterm-256color
 export GREP_OPTIONS='--color=auto' GREP_COLOR='0;36'
 export CLICOLOR=1
- 
+
 # The order of the attributes are as follows (fgbg):
 # 01. directory
 # 02. symbolic link
@@ -52,7 +55,7 @@ export CLICOLOR=1
 # 11. directory writable to others, without sticky bit
 #      LSCOLORS=0102030405060708091011
 export LSCOLORS=excxgxfxbxdxbxbxbxexex
- 
+
 # Color          | Escaped    | ANSI
 # -------------- | ---------- | ------------
 # No Color       | \033[0m    | x (default foreground)
@@ -74,19 +77,15 @@ export LSCOLORS=excxgxfxbxdxbxbxbxexex
 # White          | \033[1;37m | H
 
 parse_git_branch() {
-  __git_ps1 " [%s]"
+	__git_ps1 " [%s]"
 }
- 
+
 export GIT_PS1_SHOWDIRTYSTATE='true'
 export PS1="\[\033[35m\][\h\[\033[00m\]\[\033[35m\]] \[\033[34m\]\W\[\033[32m\]\[\033[31m\]\$(__git_ps1 \" [%s]\")\[\033[00m\] \[\033[0m\]"
 export PS2="\[\033[35m\]→ \[\033[0m\]"
 
 # PATH modifications
 export PATH="/usr/local/bin:/usr/local/sbin:$GOBIN:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin/flutter/bin"
-
-# ASDF
-. $HOME/.asdf/asdf.sh
-. $HOME/.asdf/completions/asdf.bash
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/davidnix/Downloads/google-cloud-sdk/path.bash.inc' ]; then . '/Users/davidnix/Downloads/google-cloud-sdk/path.bash.inc'; fi
