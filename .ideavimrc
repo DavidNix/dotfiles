@@ -5,6 +5,8 @@ source ~/.vimrc
 " Also https://freedium.cfd/https://towardsdatascience.com/the-essential-ideavim-remaps-291d4cd3971b
 " Excellent tutorials: https://www.youtube.com/@therelentlessprogrammer
 
+imap jk <Esc>
+
 set relativenumber
 set number
 
