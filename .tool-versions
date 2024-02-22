@@ -1,6 +1,6 @@
 # python 3.11.2
+flux2 0.39.0
 golang 1.21.3
 helm 3.9.4
 nodejs 20.10.0
 terraform 1.5.7
-flux2 0.39.0
