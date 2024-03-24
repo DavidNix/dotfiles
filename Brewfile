@@ -20,7 +20,7 @@ brew "farmotive/k8s/kpoof"
 brew "heroku/brew/heroku"
 
 brew "angle-grinder"
-# brew "asdf" Using mise instead
+brew "ansible"
 brew "atuin"
 brew "bat"
 brew "coreutils"
