@@ -64,9 +64,9 @@ set smarttab
 
 " line wrapping
 set wrap
-set textwidth=79
+set textwidth=0 " don't wrap text
 set formatoptions=qrnl
-set colorcolumn=85
+set colorcolumn=120
 
 " backups
 " set nowritebackup
