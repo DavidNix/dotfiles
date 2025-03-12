@@ -4,4 +4,5 @@ require("config.lazy")
 -- Auto-closing pairs can be annoying
 vim.g.minipairs_disable = false
 
-require("config.snippets").setup()
+-- TODO: snippets module returning error
+-- require("config.snippets").setup()
