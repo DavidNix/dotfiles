@@ -41,8 +41,8 @@ map <leader>e <Action>(SelectInProjectView)
 map <leader>a <Action>(Annotate)
 
 " Find
-map <leader>fa <Action>(GotoAction)
-map <leader>ff <Action>(FindInPath)
+" map <leader>fa <Action>(GotoAction)
+" map <leader>ff <Action>(FindInPath)
 
 " Debugging
 map <leader>dd <Action>(Debug)
