@@ -4,7 +4,8 @@ globs: **/*_test.go
 alwaysApply: false
 ---
 - Only use testify's require matchers (from package `github.com/stretchr/testify/require`)
-- Include `t.Parallel()` in top-level tests
+- Include `t.Parallel()` in top-level tests but not in subtests
+- Do not write comments in test code; Code should be self-documenting
 - Use naming convention `Test<FunctionName>(t *testing.T)` for functions
 - Use naming convention `Test<Type>_<FunctionName>(t *testing.T)` for methods
 - Prefer `synctest` (experimental in Go 1.24) for tests with concurrency
