@@ -11,6 +11,7 @@ alwaysApply: false
 - Always use test utility functions such as `t.Context()`, `t.TempDir()`, `t.SetEnv()`, etc
 - Unless otherwise instructed, ensure "zero state" is tested such as empty arguments like blank strings, nil arguments, nil slices and maps, etc
 - Unless otherwise instructed, ensure error paths are tested
+- Use variables names `want` for expected values and `got` for the actual values
 - Refer to this template when generating tests:
 ```
 package <the package>

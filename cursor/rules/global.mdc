@@ -1,0 +1,10 @@
+---
+description: Global best practices
+globs: *
+alwaysApply: false
+---
+- Do not write comments in code unless the implementation is not clear
+- Do not apologize
+- Be concise with your responses
+- Do not generate a header with your responses
+- Leave NO todos, placeholders, or missing pieces in implementations
