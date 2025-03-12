@@ -1,0 +1,38 @@
+---
+description: Best practices for Go 1.24 applications
+globs: **/*.go
+alwaysApply: false
+---
+- Follow RESTful API design principles
+- Implement proper structured logging with slog package
+- Implement input validation for endpoints
+- Use appropriate status codes for responses
+- If a call needs `context.Context`, always pass it as the first argument (named `ctx`)
+- Make logger the first or second argument after `context.Context`
+- Wrap errors with context using `fmt.Errorf("<context>: %w", err)`
+- Avoid using `else` where possible
+- Return errors, do not panic
+- Try not to use more than one sync primitive at a time
+- Preallocate slices when you know the size
+- Ensure every goroutine will exit
+- Do not use `init()`
+- Do not use concurrency unless instructed or necessary
+- Prefer errgroup.Group over sync.WaitGroup
+- Use v2 versions of standard packages such as math/v2
+- Use go modules for dependency management
+- Never store contexts in structs
+- Prefer stdlib or x packages to third party packages unless the stdlib does not implement what's needed
+- Define interfaces where they're used, not where they're implemented
+- Keep interfaces small (1-3 methods)
+- Keep variable names short but descriptive
+- Use consistent abbreviations (e.g. `ctx` for context)
+- Never create packages named "util", "utils", "shared", "common", "helpers", etc
+- Follow accept interfaces, return structs principle
+- Ensure channels are initialized properly, using buffered channels where appropriate
+- Ensure channels are closed only once and when closed there are no more senders
+- Avoid deadlocks at all costs
+- Never write naked returns
+- Keep package names short, lowercase, and descriptive
+- Make the zero value useful
+- Use `any` instead of `interface{}`
+- Prefer generics over `any`

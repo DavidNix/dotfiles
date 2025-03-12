@@ -1,0 +1,11 @@
+---
+description: Best practices for Templ, a Go-based HTML tempalting library
+globs: **/*.templ
+alwaysApply: false
+---
+- Use Templ for server-side rendering of HTML templates
+- Keep templates simple and focused on presentation logic
+- Use Go's type system to ensure template safety
+- Leverage Templ's built-in escaping for security
+- Use partials to reuse common template fragments
+- Use proper, semantic html

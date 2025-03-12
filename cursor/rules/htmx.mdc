@@ -1,0 +1,23 @@
+---
+description: Best practices for HTMX
+globs: **/**.templ
+alwaysApply: false
+---
+HTMX Usage
+- Utilize HTMX's capabilities to enhance the interactivity of web applications without heavy JavaScript.
+- Prioritize maintainability and readability; adhere to clean coding practices throughout your HTML.
+- Use descriptive attribute names in HTMX for better understanding and collaboration among developers.
+- Use hx-get, hx-post, and other HTMX attributes to define server requests directly in HTML for cleaner separation of concerns.
+- Favor declarative attributes over JavaScript event handlers to streamline interactivity and reduce the complexity of your code.
+- Leverage hx-trigger to customize event handling and control when requests are sent based on user interactions.
+- Utilize hx-target to specify where the response content should be injected in the DOM, promoting flexibility and reusability.
+- Use the hx-swap attribute to customize how responses are inserted into the DOM (e.g., innerHTML, outerHTML, etc.) for error messages or validation feedback.
+- Utilize HTMX's hx-confirm to prompt users for confirmation before performing critical actions (e.g., deletions).
+- Combine HTMX with other frontend libraries or frameworks (like Tailwind CSS) for enhanced UI components without conflicting scripts.
+- Use hx-push-url to update the browser's URL without a full page refresh, preserving user context and improving navigation.
+
+Key Conventions
+1. Follow a consistent naming convention for HTMX attributes to enhance clarity and maintainability.
+2. Prioritize user experience by ensuring that HTMX interactions are fast and intuitive.
+
+Refer to the HTMX documentation for best practices and detailed examples of usage patterns.

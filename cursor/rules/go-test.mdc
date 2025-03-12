@@ -1,0 +1,33 @@
+---
+description: Best practices for Go tests
+globs: **/*_test.go
+alwaysApply: false
+---
+- Only use testify's require matchers (from package `github.com/stretchr/testify/require`)
+- Include `t.Parallel()` in top-level tests
+- Use naming convention `Test<FunctionName>(t *testing.T)` for functions
+- Use naming convention `Test<Type>_<FunctionName>(t *testing.T)` for methods
+- Prefer `synctest` (experimental in Go 1.24) for tests with concurrency
+- Always use test utility functions such as `t.Context()`, `t.TempDir()`, `t.SetEnv()`, etc
+- Unless otherwise instructed, ensure "zero state" is tested such as empty arguments like blank strings, nil arguments, nil slices and maps, etc
+- Unless otherwise instructed, ensure error paths are tested
+- Refer to this template when generating tests:
+```
+package <the package>
+
+import (
+    <imported packages>
+)
+
+func Test<Name>(t *testing.T) {
+	t.Parallel()
+
+	t.Run("happy path", func(t *testing.T) {
+        <happy path test>
+	})
+
+	t.Run("<error condition>", func(t *testing.T) {
+        <expected errors>
+	})
+}
+```
