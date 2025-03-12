@@ -100,3 +100,5 @@
 	defaultBranch = main
 [credential "https://dev.azure.com"]
 	useHttpPath = true
+[http]
+	postBuffer = 524288000
