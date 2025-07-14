@@ -1,0 +1,134 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  // Standard macOS bindings
+  {
+    "use_key_equivalents": true,
+    "bindings": {
+      "ctrl-m": "workspace::ToggleZoom"
+    }
+  },
+  {
+    "context": "Workspace",
+    "use_key_equivalents": true,
+    "bindings": {
+      // Change the default action on `menu::Confirm` by setting the parameter
+      // "alt-cmd-o": ["projects::OpenRecent", {"create_new_window": true }],
+      // "alt-cmd-o": ["projects::OpenRecent", { "create_new_window": false }],
+      // "ctrl-cmd-o": ["projects::OpenRemote", { "from_existing_connection": false, "create_new_window": false }],
+      // "ctrl-cmd-shift-o": ["projects::OpenRemote", { "from_existing_connection": true, "create_new_window": false }],
+      // "cmd-ctrl-b": "branches::OpenRecent",
+      // "ctrl-~": "workspace::NewTerminal",
+      // "cmd-s": "workspace::Save",
+      // "cmd-k s": "workspace::SaveWithoutFormat",
+      // "alt-shift-enter": "toast::RunAction",
+      // "cmd-shift-s": "workspace::SaveAs",
+      // "cmd-shift-n": "workspace::NewWindow",
+      "space a i": "agent::ToggleFocus",
+      "ctrl-t": "terminal_panel::ToggleFocus"
+      // "cmd-1": ["workspace::ActivatePane", 0],
+      // "cmd-2": ["workspace::ActivatePane", 1],
+      // "cmd-3": ["workspace::ActivatePane", 2],
+      // "cmd-4": ["workspace::ActivatePane", 3],
+      // "cmd-5": ["workspace::ActivatePane", 4],
+      // "cmd-6": ["workspace::ActivatePane", 5],
+      // "cmd-7": ["workspace::ActivatePane", 6],
+      // "cmd-8": ["workspace::ActivatePane", 7],
+      // "cmd-9": ["workspace::ActivatePane", 8],
+      // "cmd-b": "workspace::ToggleLeftDock",
+      // "cmd-alt-b": "workspace::ToggleRightDock",
+      // "cmd-r": "workspace::ToggleRightDock",
+      // "cmd-j": "workspace::ToggleBottomDock",
+      // "alt-cmd-y": "workspace::CloseAllDocks",
+      // // For 0px parameter, uses UI font size value.
+      // "ctrl-alt-0": "workspace::ResetActiveDockSize",
+      // "ctrl-alt--": ["workspace::DecreaseActiveDockSize", { "px": 0 }],
+      // "ctrl-alt-=": ["workspace::IncreaseActiveDockSize", { "px": 0 }],
+      // "ctrl-alt-)": "workspace::ResetOpenDocksSize",
+      // "ctrl-alt-_": ["workspace::DecreaseOpenDocksSize", { "px": 0 }],
+      // "ctrl-alt-+": ["workspace::IncreaseOpenDocksSize", { "px": 0 }],
+      // "cmd-shift-f": "pane::DeploySearch",
+      // "cmd-shift-h": ["pane::DeploySearch", { "replace_enabled": true }],
+      // "cmd-shift-t": "pane::ReopenClosedItem",
+      // "cmd-k cmd-s": "zed::OpenKeymap",
+      // "cmd-k cmd-t": "theme_selector::Toggle",
+      // "cmd-t": "project_symbols::Toggle",
+      // "cmd-p": "file_finder::Toggle",
+      // "ctrl-tab": "tab_switcher::Toggle",
+      // "ctrl-shift-tab": ["tab_switcher::Toggle", { "select_last": true }],
+      // "cmd-shift-p": "command_palette::Toggle",
+      // "cmd-shift-m": "diagnostics::Deploy",
+      // "cmd-shift-e": "project_panel::ToggleFocus",
+      // "cmd-shift-b": "outline_panel::ToggleFocus",
+      // "ctrl-shift-g": "git_panel::ToggleFocus",
+      // "cmd-shift-d": "debug_panel::ToggleFocus",
+      // "cmd-alt-s": "workspace::SaveAll",
+      // "cmd-k m": "language_selector::Toggle",
+      // "escape": "workspace::Unfollow",
+      // "cmd-k cmd-left": "workspace::ActivatePaneLeft",
+      // "cmd-k cmd-right": "workspace::ActivatePaneRight",
+      // "cmd-k cmd-up": "workspace::ActivatePaneUp",
+      // "cmd-k cmd-down": "workspace::ActivatePaneDown",
+      // "cmd-k shift-left": "workspace::SwapPaneLeft",
+      // "cmd-k shift-right": "workspace::SawpPaneRight",
+      // "cmd-k shift-up": "workspace::SwapPaneUp",
+      // "cmd-k shift-down": "workspace::SwapPaneDown",
+      // "cmd-shift-x": "zed::Extensions",
+      // "f5": "debugger::Rerun"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == normal && !menu",
+    "bindings": {
+      "cmd-k": "assistant::InlineAssist",
+      "space k": "assistant::InlineAssist",
+
+      "ctrl-a": "editor::ShowEditPrediction",
+      "ctrl-t": "terminal_panel::ToggleFocus",
+
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-j": "workspace::ActivatePaneDown",
+
+      "space f": "editor::Format",
+      "space r": "editor::Rename",
+      "space e": "project_panel::ToggleFocus",
+      "space n": "editor::GoToDiagnostic",
+      "space p": "editor::GoToPreviousDiagnostic",
+      "space w": "pane::SplitRight",
+      "space s": "pane::SplitDown",
+
+      ";": "command_palette::Toggle",
+
+      "space space": "file_finder::Toggle",
+
+      "space t t": ["task::Spawn", { "task_name": "go test symbol" }],
+      "space t f": ["task::Spawn", { "task_name": "go test package" }],
+      "space T": "task::Rerun"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == insert && !menu",
+    "bindings": {
+      "cmd-k": "assistant::InlineAssist",
+      "ctrl-a": "editor::ShowEditPrediction",
+      "j k": "vim::SwitchToNormalMode"
+    }
+  },
+  {
+    "context": "ProjectPanel && not_editing",
+    "bindings": {
+      "k": "menu::SelectPrevious",
+      "j": "menu::SelectNext",
+      "h": "project_panel::CollapseSelectedEntry",
+      "l": "project_panel::ExpandSelectedEntry",
+      "o": "project_panel::Open"
+    }
+  }
+]

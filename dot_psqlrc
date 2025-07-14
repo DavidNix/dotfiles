@@ -1,0 +1,14 @@
+\set PROMPT1 '%~%x%# '
+\x auto
+\set ON_ERROR_STOP on
+\set ON_ERROR_ROLLBACK interactive
+\set timing
+
+\pset null 'Ø'
+\pset linestyle 'unicode'
+set intervalstyle to 'postgres_verbose';
+
+\setenv LESS '-iMFXSx4R'
+\setenv EDITOR '/usr/bin/vim'
+
+\timing
