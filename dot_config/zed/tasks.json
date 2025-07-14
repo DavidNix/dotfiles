@@ -5,7 +5,15 @@
   {
     "label": "go test symbol",
     "command": "go",
-    "args": ["test", "-v", "-cover", "-run", "$ZED_SYMBOL", "$ZED_DIRNAME"],
+    "args": [
+      "test",
+      "-v",
+      "-count=1",
+      "-cover",
+      "-run",
+      "$ZED_SYMBOL",
+      "$ZED_DIRNAME"
+    ],
     "use_new_terminal": false,
     "allow_concurrent_runs": false,
     "group": "test",
@@ -15,7 +23,7 @@
   {
     "label": "go test package",
     "command": "go",
-    "args": ["test", "-v", "-cover", "$ZED_DIRNAME"],
+    "args": ["test", "-v", "-count=1", "-cover", "$ZED_DIRNAME"],
     "use_new_terminal": false,
     "allow_concurrent_runs": false,
     "group": "test",
