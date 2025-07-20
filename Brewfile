@@ -12,12 +12,10 @@ cask "git-credential-manager-core"
 
 tap "cjbassi/ytop"
 tap "derailed/k9s"
-tap "heroku/brew"
 
 brew "cjbassi/ytop/ytop"
 brew "derailed/k9s/k9s"
 brew "farmotive/k8s/kpoof"
-brew "heroku/brew/heroku"
 
 brew "aichat"
 brew "angle-grinder"
