@@ -84,7 +84,7 @@
 	prompt = false
 [credential]
 	helper = osxkeychain
-	helper = /usr/local/share/gcm-core/git-credential-manager
+	helper = /usr/local/bin/git-credential-manager
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
