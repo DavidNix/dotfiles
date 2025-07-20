@@ -1,3 +1,7 @@
 # Dotfiles
 
-Archived. Moved management of dotfiles to chezmoi.
+My personal dotfiles repository.
+
+I tried using chezmoi, but I did not like having to add files each time I made a change.
+
+I prefer symlinks so I can make a change and then push updates.
