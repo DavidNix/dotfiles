@@ -1,0 +1,33 @@
+// Project tasks configuration. See https://zed.dev/docs/tasks for documentation.
+//
+// Example:
+[
+  {
+    "label": "go test symbol",
+    "command": "go",
+    "args": [
+      "test",
+      "-v",
+      "-count=1",
+      "-cover",
+      "-run",
+      "$ZED_SYMBOL",
+      "$ZED_DIRNAME"
+    ],
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "group": "test",
+    "reveal": "no_focus",
+    "hide": "never"
+  },
+  {
+    "label": "go test package",
+    "command": "go",
+    "args": ["test", "-v", "-count=1", "-cover", "$ZED_DIRNAME"],
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "group": "test",
+    "reveal": "no_focus",
+    "hide": "never"
+  }
+]
