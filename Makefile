@@ -365,7 +365,6 @@ cli-apps: ## Installs command line tools
 	@arch -arm64 brew bundle
 	@echo "Cleaning up brew"
 	@brew cleanup
-	@ln -s /opt/homebrew/bin/mcfly /usr/local/bin/mcfly
 
 KREW = kubectl krew
 .PHONY: krew
