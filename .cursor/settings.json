@@ -1,0 +1,259 @@
+{
+  "window.commandCenter": 1,
+  "extensions.autoUpdate": true,
+  "files.autoSave": "onFocusChange",
+  "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?",
+  "editor.lineNumbers": "relative",
+  "explorer.confirmDelete": false,
+  "cursor.chat.smoothStreaming": true,
+  "npm.autoDetect": "off",
+  "workbench.colorTheme": "Darcula",
+  "editor.fontFamily": "Fira Code",
+  "editor.fontLigatures": true,
+  "go.formatTool": "goimports",
+  "go.testFlags": [
+    "-count=1",
+    "-tags=synctest",
+    "-v"
+  ],
+  "go.testTimeout": "300s",
+  "go.toolsManagement.autoUpdate": true,
+  "go.coverOnSingleTest": false,
+  "go.coverOnSingleTestFile": false,
+  "go.lintTool": "golangci-lint",
+  "go.testEnvFile": "${workspaceFolder}/.envrc",
+  "go.testEnvVars": {
+    "GOEXPERIMENT": "synctest"
+  },
+  "cSpell.words": [
+    "metarouter",
+    "clickhouse"
+  ],
+  "vim.hlsearch": true,
+  "vim.useSystemClipboard": true,
+  "vim.leader": "<Space>",
+  "vim.handleKeys": {
+    "<C-n>": false,
+    "<C-d>": true,
+  },
+  "vim.easymotion": true,
+  "vim.normalModeKeyBindings": [
+    {
+      "before": [
+        "leader",
+        "c"
+      ],
+      "commands": [
+        "workbench.action.closeActiveEditor",
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "e"
+      ],
+      "commands": [
+        "workbench.files.action.focusFilesExplorer",
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "p",
+        "d"
+      ],
+      "commands": [
+        "editor.action.peekDefinition"
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "h"
+      ],
+      "commands": [
+        "editor.action.showDefinitionPreviewHover"
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "i"
+      ],
+      "commands": [
+        "editor.action.goToImplementation"
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "p",
+        "i"
+      ],
+      "commands": [
+        "editor.action.peekImplementation"
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "q"
+      ],
+      "commands": [
+        "editor.action.quickFix"
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "r"
+      ],
+      "commands": [
+        "editor.action.referenceSearch.trigger"
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "t"
+      ],
+      "commands": [
+        "editor.action.goToTypeDefinition"
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "p",
+        "t"
+      ],
+      "commands": [
+        "editor.action.peekTypeDefinition"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "t",
+        "t"
+      ],
+      "commands": [
+        "testing.runAtCursor",
+        "workbench.action.focusActiveEditorGroup"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "t",
+        "f"
+      ],
+      "commands": [
+        "testing.runCurrentFile",
+        "workbench.action.focusActiveEditorGroup"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "b"
+      ],
+      "commands": [
+        "editor.debug.action.toggleBreakpoint"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "d"
+      ],
+      "commands": [
+        "testing.debugAtCursor",
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "r"
+      ],
+      "commands": [
+        "editor.action.rename"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "n"
+      ],
+      "commands": [
+        "editor.action.marker.next"
+      ]
+    },
+    {
+      "before": [
+        ":"
+      ],
+      "commands": [
+        "workbench.action.showCommands",
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "a"
+      ],
+      "commands": [
+        "gitlens.toggleFileBlame"
+      ]
+    },
+  ],
+  "vim.vimrc.enable": true,
+  "extensions.experimental.affinity": {
+    "vscodevim.vim": 1
+  },
+  "terminal.integrated.enableMultiLinePasteWarning": "never",
+  "makefile.configureOnOpen": false,
+  "extensions.ignoreRecommendations": true,
+  "search.useIgnoreFiles": false,
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+  },
+  "editor.accessibilitySupport": "off",
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+  "[templ]": {
+    "editor.formatOnSave": false
+  },
+  "[go]": {
+    "editor.formatOnSave": true
+  },
+  "files.exclude": {
+    "**/control/database/migrations/**": false
+  },
+  "cursor.general.globalCursorIgnoreList": [
+    "**/.env",
+    "**/.env.*",
+    "**/credentials.json",
+    "**/credentials.*.json",
+    "**/secret.json",
+    "**/secrets.json",
+    "**/*.key",
+    "**/*.pem",
+    "**/*.pfx",
+    "**/*.p12",
+    "**/*.crt",
+    "**/*.cer",
+    "**/id_rsa",
+    "**/id_dsa",
+    "**/.ssh/id_*",
+    "**/.envrc",
+    "**/.envrc.*"
+  ],
+  "git.autofetch": true,
+  "sqltools.formatLanguages": [],
+  "sqltools.format": {},
+  "editor.formatOnSave": true
+}

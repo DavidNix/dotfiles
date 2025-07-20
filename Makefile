@@ -14,11 +14,14 @@ help: ## Print this help message
 relink: ## Create new symbolic links for dotfiles in this dir to your home dir.
 	@echo "Generating links.."
 	find $$PWD -name ".[^.]*" -type f -print0 | xargs -0tJ % ln -sf %  ~
-	@mkdir -p ~/.vim
-	@ln -sf $$PWD/.vim/* ~/.vim
-	@mkdir -p ~/.config
-	@ln -sf $$PWD/.config/*/ ~/.config
-	@ln -sf $$PWD/.config/* ~/.config
+	mkdir -p ~/.vim
+	ln -sf $$PWD/.vim/* ~/.vim
+	mkdir -p ~/.config
+	ln -sf $$PWD/.config/*/ ~/.config
+	ln -sf $$PWD/.config/* ~/.config
+	mkdir -p ~/Library/Application\ Support/Cursor/User/
+	ln -sf $$PWD/.cursor/settings.json ~/Library/Application\ Support/Cursor/User/settings.json
+	ln -sf $$PWD/.cursor/keybindings.json ~/Library/Application\ Support/Cursor/User/keybindings.json
 
 .PHONY: defaults
 defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.
