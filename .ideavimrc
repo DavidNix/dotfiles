@@ -7,7 +7,7 @@ source ~/.vimrc
 
 imap jk <Esc>
 
-set relativenumber
+" set relativenumber
 set number
 
 " Plugins

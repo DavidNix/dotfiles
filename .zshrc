@@ -111,6 +111,14 @@ if which direnv &> /dev/null; then
   eval "$(direnv hook $SHELL)"
 fi
 
+# Custom Vim Keybindings
+# 1 – Enable vi keymaps
+bindkey -v
+# 2 – Let combos wait a bit longer (ms) for the second key
+KEYTIMEOUT=100               # default is 40
+# 3 – In the vi-insert map, send jk → command mode (same as <Esc>)
+bindkey -M viins 'jk' vi-cmd-mode
+
 # Useful Aliases
 alias ag="agrind" # angle-grinder
 alias c="clear"
