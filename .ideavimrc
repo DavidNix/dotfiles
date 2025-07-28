@@ -69,6 +69,7 @@ map <leader>T <Action>(Terminal.OpenInTerminal)
 
 " AI
 map <leader>ai <Action>(ActivateAIAssistantToolWindow)
+map <leader>cc <Action>(com.anthropic.code.plugin.actions.OpenClaudeInTerminalAction)
 
 map <leader>g <Action>(Vcs.ShowHistoryForRevision)
 
