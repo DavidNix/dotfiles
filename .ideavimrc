@@ -16,6 +16,8 @@ Plug 'preservim/nerdtree'
 Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-commentary'
 
+set NERDTree
+
 let mapleader=" "
 set easymotion
 
