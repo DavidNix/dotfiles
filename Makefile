@@ -19,6 +19,8 @@ relink: ## Create new symbolic links for dotfiles in this dir to your home dir.
 	mkdir -p ~/.config
 	ln -sf $$PWD/.config/*/ ~/.config
 	ln -sf $$PWD/.config/* ~/.config
+	ln -sf $$PWD/.claude/settings.json ~/.claude/settings.json
+	ln -sf $$PWD/.claude/commands/* ~/.claude/commands
 	mkdir -p ~/Library/Application\ Support/Cursor/User/
 	ln -sf $$PWD/.cursor/settings.json ~/Library/Application\ Support/Cursor/User/settings.json
 	ln -sf $$PWD/.cursor/keybindings.json ~/Library/Application\ Support/Cursor/User/keybindings.json
