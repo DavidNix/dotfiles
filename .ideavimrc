@@ -54,6 +54,8 @@ map <leader>db <Action>(ToggleLineBreakpoint)
 " Runs current test
 map <leader>tt <Action>(RunClass)
 map <leader>tg <Action>(GotoTest)
+" Stops running tests
+map <leader>T <Action>(Stop)
 
 map <leader>r <Action>(RenameElement)
 map <leader>c <Action>(Stop)
@@ -67,7 +69,6 @@ map <leader>u <Action>(FindUsages)
 
 " Terminal
 map <c-t> <Action>(ActivateTerminalToolWindow)
-map <leader>T <Action>(Terminal.OpenInTerminal)
 
 " AI
 map <leader>ai <Action>(ActivateAIAssistantToolWindow)
