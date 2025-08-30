@@ -157,3 +157,8 @@ export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
 
 eval "$(atuin init zsh --disable-up-arrow)"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/davidnix/.lmstudio/bin"
+# End of LM Studio CLI section
+
