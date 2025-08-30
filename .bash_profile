@@ -94,3 +94,8 @@ if [ -f '/Users/davidnix/Downloads/google-cloud-sdk/path.bash.inc' ]; then . '/U
 if [ -f '/Users/davidnix/Downloads/google-cloud-sdk/completion.bash.inc' ]; then . '/Users/davidnix/Downloads/google-cloud-sdk/completion.bash.inc'; fi
 
 export PATH="$HOME/.cargo/bin:$PATH"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/davidnix/.lmstudio/bin"
+# End of LM Studio CLI section
+
