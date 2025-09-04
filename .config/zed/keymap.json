@@ -29,8 +29,7 @@
       // "alt-shift-enter": "toast::RunAction",
       // "cmd-shift-s": "workspace::SaveAs",
       // "cmd-shift-n": "workspace::NewWindow",
-      "space a i": "agent::ToggleFocus",
-      "ctrl-t": "terminal_panel::ToggleFocus"
+      "ctrl-t": "terminal_panel::ToggleFocus",
       // "cmd-1": ["workspace::ActivatePane", 0],
       // "cmd-2": ["workspace::ActivatePane", 1],
       // "cmd-3": ["workspace::ActivatePane", 2],
@@ -58,7 +57,7 @@
       // "cmd-k cmd-s": "zed::OpenKeymap",
       // "cmd-k cmd-t": "theme_selector::Toggle",
       // "cmd-t": "project_symbols::Toggle",
-      // "cmd-p": "file_finder::Toggle",
+      "cmd-shift-o": "file_finder::Toggle"
       // "ctrl-tab": "tab_switcher::Toggle",
       // "ctrl-shift-tab": ["tab_switcher::Toggle", { "select_last": true }],
       // "cmd-shift-p": "command_palette::Toggle",
@@ -85,11 +84,12 @@
   {
     "context": "Editor && vim_mode == normal && !menu",
     "bindings": {
+      "space a i": "agent::ToggleFocus",
       "cmd-k": "assistant::InlineAssist",
       "space k": "assistant::InlineAssist",
 
-      "ctrl-a": "editor::ShowEditPrediction",
       "ctrl-t": "terminal_panel::ToggleFocus",
+      // does not work "ctrl-a": "editor::ShowEditPrediction",
 
       "ctrl-l": "workspace::ActivatePaneRight",
       "ctrl-h": "workspace::ActivatePaneLeft",
@@ -117,7 +117,6 @@
     "context": "Editor && vim_mode == insert && !menu",
     "bindings": {
       "cmd-k": "assistant::InlineAssist",
-      "ctrl-a": "editor::ShowEditPrediction",
       "j k": "vim::SwitchToNormalMode"
     }
   },

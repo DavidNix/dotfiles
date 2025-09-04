@@ -11,7 +11,10 @@
     "metrics": false,
     "diagnostics": false
   },
+  "show_completions_on_input": true,
+  "show_edit_predictions": true,
   "edit_predictions": {
+    "mode": "subtle", // "eager" vs. "subtle"
     "disabled_globs": [
       "**/.env",
       "**/.env.*",
@@ -30,8 +33,7 @@
       "**/.ssh/id_*",
       "**/.envrc",
       "**/.envrc.*"
-    ],
-    "mode": "eager"
+    ]
   },
   "base_keymap": "VSCode",
   "search": {
@@ -47,6 +49,16 @@
     "regex": true
   },
   "relative_line_numbers": false,
+  "file_types": {
+    "Helm": [
+      "**/templates/**/*.tpl",
+      "**/templates/**/*.yaml",
+      "**/templates/**/*.yml",
+      "**/helmfile.d/**/*.yaml",
+      "**/helmfile.d/**/*.yml",
+      "**/values*.yaml"
+    ]
+  },
   "gutter": {
     "line_numbers": true
   },
@@ -62,7 +74,6 @@
     "edit_prediction_provider": "zed"
   },
   "hide_mouse": "on_typing_and_movement",
-  "show_edit_predictions": true,
   "inlay_hints": {
     "enabled": true
   },
