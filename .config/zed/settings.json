@@ -107,7 +107,7 @@
   "icon_theme": "Colored Zed Icons Theme Dark",
   "vim_mode": true,
   "ui_font_size": 14,
-  "buffer_font_size": 14,
+  "buffer_font_size": 13,
   "theme": {
     "mode": "system",
     "light": "One Light",
