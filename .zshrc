@@ -80,11 +80,8 @@ export DOCKER_HOST=unix:///var/run/docker.sock
 export VISUAL=nvim
 export EDITOR="$VISUAL"
 
-# Go specific
-export GOPATH=$HOME/go
-
 # PATH modifications
-export PATH="$GOPATH/bin:/usr/local/bin:/usr/local/sbin:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/bin"
+export PATH="/usr/local/bin:/usr/local/sbin:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/bin"
 
 # Homebrew for silicon
 export PATH="/opt/homebrew/bin:$PATH"
