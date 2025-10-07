@@ -78,14 +78,14 @@
     "enabled": true
   },
   "agent": {
-    "default_profile": "write",
+    "default_profile": "ask",
     "inline_assistant_model": {
-      "provider": "zed.dev",
-      "model": "claude-sonnet-4"
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5-latest"
     },
     "default_model": {
-      "provider": "zed.dev",
-      "model": "claude-sonnet-4"
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-latest"
     }
   },
   "indent_guides": {
