@@ -16,7 +16,6 @@
     ],
     "use_new_terminal": false,
     "allow_concurrent_runs": false,
-    "group": "test",
     "reveal": "no_focus",
     "hide": "never"
   },
@@ -26,8 +25,20 @@
     "args": ["test", "-v", "-count=1", "-cover", "$ZED_DIRNAME"],
     "use_new_terminal": false,
     "allow_concurrent_runs": false,
-    "group": "test",
     "reveal": "no_focus",
     "hide": "never"
+  },
+  {
+    "label": "LazyGit",
+    "command": "lazygit",
+    "shell": {
+      "program": "sh"
+    },
+    "hide": "on_success",
+    "reveal_target": "center",
+    "show_summary": false,
+    "show_command": false,
+    "allow_concurrent_runs": true,
+    "use_new_terminal": true
   }
 ]

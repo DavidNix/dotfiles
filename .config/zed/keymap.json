@@ -57,14 +57,18 @@
       // "cmd-k cmd-s": "zed::OpenKeymap",
       // "cmd-k cmd-t": "theme_selector::Toggle",
       // "cmd-t": "project_symbols::Toggle",
-      "cmd-shift-o": "file_finder::Toggle"
+      "cmd-shift-o": "file_finder::Toggle",
+      "cmd-shift-g": [
+        "task::Spawn",
+        { "task_name": "LazyGit", "reveal_target": "center" }
+      ]
       // "ctrl-tab": "tab_switcher::Toggle",
       // "ctrl-shift-tab": ["tab_switcher::Toggle", { "select_last": true }],
       // "cmd-shift-p": "command_palette::Toggle",
       // "cmd-shift-m": "diagnostics::Deploy",
       // "cmd-shift-e": "project_panel::ToggleFocus",
       // "cmd-shift-b": "outline_panel::ToggleFocus",
-      // "ctrl-shift-g": "git_panel::ToggleFocus",
+      // "ctrl-shift-g": "git_panel::ToggleFocus"
       // "cmd-shift-d": "debug_panel::ToggleFocus",
       // "cmd-alt-s": "workspace::SaveAll",
       // "cmd-k m": "language_selector::Toggle",
