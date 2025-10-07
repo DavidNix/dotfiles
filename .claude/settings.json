@@ -1,5 +1,4 @@
 {
-  "model": "opusplan",
   "hooks": {
     "Notification": [
       {
@@ -17,5 +16,6 @@
     "type": "command",
     "command": "npx -y ccstatusline@latest",
     "padding": 0
-  }
+  },
+  "alwaysThinkingEnabled": false
 }
