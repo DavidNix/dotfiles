@@ -24,6 +24,8 @@ relink: ## Create new symbolic links for dotfiles in this dir to your home dir.
 	mkdir -p ~/Library/Application\ Support/Cursor/User/
 	ln -sf $$PWD/.cursor/settings.json ~/Library/Application\ Support/Cursor/User/settings.json
 	ln -sf $$PWD/.cursor/keybindings.json ~/Library/Application\ Support/Cursor/User/keybindings.json
+	# Add mcp servers
+	claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp
 
 .PHONY: defaults
 defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.
@@ -402,4 +404,3 @@ $(CARGO)/%:
 superhuman:
 	@echo "Download Superhuman at https://mail.superhuman.com"
 	@echo "Send yourself a test email to get Superhuman to register with macOS notification settings."
-
