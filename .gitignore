@@ -1,1 +1,7 @@
 !.cursor
+
+# Zed config - only track the three main JSON files
+.config/zed/*
+!.config/zed/keymap.json
+!.config/zed/settings.json
+!.config/zed/tasks.json
