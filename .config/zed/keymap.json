@@ -60,7 +60,10 @@
       "cmd-shift-o": "file_finder::Toggle",
       "cmd-shift-g": [
         "task::Spawn",
-        { "task_name": "LazyGit", "reveal_target": "center" }
+        {
+          "task_name": "LazyGit",
+          "reveal_target": "center"
+        }
       ]
       // "ctrl-tab": "tab_switcher::Toggle",
       // "ctrl-shift-tab": ["tab_switcher::Toggle", { "select_last": true }],
