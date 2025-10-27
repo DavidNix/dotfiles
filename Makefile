@@ -10,8 +10,15 @@ default: help
 help: ## Print this help message
 	@echo "Available make commands:"; grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+.PHONY: install-scripts
+install-scripts: ## Install custom scripts to /usr/local/bin
+	@echo "Installing scripts to /usr/local/bin..."
+	@chmod +x $$PWD/bin/*
+	@sudo cp -f $$PWD/bin/* /usr/local/bin/
+	@echo "Scripts installed successfully"
+
 .PHONY: relink
-relink: ## Create new symbolic links for dotfiles in this dir to your home dir.
+relink: install-scripts ## Create new symbolic links for dotfiles in this dir to your home dir.
 	@echo "Generating links.."
 	find $$PWD -name ".[^.]*" -type f -print0 | xargs -0tJ % ln -sf %  ~
 	mkdir -p ~/.vim

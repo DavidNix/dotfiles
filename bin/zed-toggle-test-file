@@ -1,0 +1,74 @@
+#!/bin/bash
+# Toggle between implementation and test files in Zed
+# Uses environment variables provided by Zed: ZED_RELATIVE_FILE, ZED_WORKTREE_ROOT
+
+set -euo pipefail
+
+# Check required environment variables
+if [[ -z "${ZED_RELATIVE_FILE:-}" ]] || [[ -z "${ZED_WORKTREE_ROOT:-}" ]]; then
+    echo "Error: ZED_RELATIVE_FILE and ZED_WORKTREE_ROOT must be set"
+    exit 1
+fi
+
+# Determine the target file based on current file extension
+toggle_go_file() {
+    local current_file="$1"
+    local target_file=""
+
+    if [[ "$current_file" == *_test.go ]]; then
+        # Currently in test file, switch to implementation
+        target_file="${current_file%_test.go}.go"
+    elif [[ "$current_file" == *.go ]]; then
+        # Currently in implementation file, switch to test
+        target_file="${current_file%.go}_test.go"
+    else
+        echo "Error: Not a Go file"
+        exit 1
+    fi
+
+    echo "$target_file"
+}
+
+# Create Go test file template
+create_go_test_template() {
+    local file_path="$1"
+    local package_name=$(basename "$(dirname "$file_path")")
+
+    cat <<EOF
+package ${package_name}
+EOF
+}
+
+main() {
+    local target_file=""
+
+    # Determine language and toggle file
+    if [[ "$ZED_RELATIVE_FILE" == *.go ]]; then
+        target_file=$(toggle_go_file "$ZED_RELATIVE_FILE")
+    else
+        echo "Error: Unsupported file type. Currently only .go files are supported."
+        exit 1
+    fi
+
+    local full_target_path="${ZED_WORKTREE_ROOT}/${target_file}"
+
+    # Open existing file or create new one
+    if [[ -f "$full_target_path" ]]; then
+        zed --wait "$full_target_path"
+    else
+        # Create parent directory if it doesn't exist
+        mkdir -p "$(dirname "$full_target_path")"
+
+        # Create file with template based on language
+        if [[ "$target_file" == *_test.go ]]; then
+            create_go_test_template "$full_target_path" > "$full_target_path"
+        else
+            # For implementation files, create empty file
+            touch "$full_target_path"
+        fi
+
+        zed --wait "$full_target_path"
+    fi
+}
+
+main

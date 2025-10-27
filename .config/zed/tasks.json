@@ -40,5 +40,16 @@
     "show_command": false,
     "allow_concurrent_runs": true,
     "use_new_terminal": true
+  },
+  {
+    "label": "Toggle tests",
+    "reveal_target": "center",
+    "command": "zed-toggle-test-file",
+    "hide": "on_success",
+    "show_summary": false,
+    "show_command": false,
+    "allow_concurrent_runs": false,
+    "use_new_terminal": false,
+    "reveal": "never"
   }
 ]

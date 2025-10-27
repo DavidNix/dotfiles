@@ -64,6 +64,12 @@
           "task_name": "LazyGit",
           "reveal_target": "center"
         }
+      ],
+      "cmd-shift-t": [
+        "task::Spawn",
+        {
+          "task_name": "Toggle tests"
+        }
       ]
       // "ctrl-tab": "tab_switcher::Toggle",
       // "ctrl-shift-tab": ["tab_switcher::Toggle", { "select_last": true }],
