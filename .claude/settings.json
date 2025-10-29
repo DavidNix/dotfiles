@@ -17,5 +17,8 @@
     "command": "npx -y ccstatusline@latest",
     "padding": 0
   },
+  "enabledPlugins": {
+    "example-skills@anthropic-agent-skills": true
+  },
   "alwaysThinkingEnabled": false
 }
