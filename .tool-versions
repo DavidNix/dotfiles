@@ -1,7 +1,3 @@
-# python 3.11.2
-flux2 0.39.0
-golang 1.21.3
-helm 3.9.4
-nodejs 24
-terraform 1.5.7
-ruby 3.2.0
+python prefix:3.14
+golang prefix:1.25
+nodejs prefix:25.1
