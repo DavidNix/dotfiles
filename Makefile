@@ -32,9 +32,9 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	mkdir -p ~/Library/Application\ Support/Cursor/User/
 	ln -sf $$PWD/.cursor/settings.json ~/Library/Application\ Support/Cursor/User/settings.json
 	ln -sf $$PWD/.cursor/keybindings.json ~/Library/Application\ Support/Cursor/User/keybindings.json
+	curl -LsSf https://astral.sh/uv/install.sh | sh
 	# Add mcp servers
 	claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp
-	curl -LsSf https://astral.sh/uv/install.sh | sh
 
 .PHONY: defaults
 defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.
