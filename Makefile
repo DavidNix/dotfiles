@@ -20,6 +20,7 @@ install-scripts: ## Install custom scripts to /usr/local/bin
 .PHONY: relink
 relink: install-scripts ## Create new symbolic links for dotfiles in this dir to your home dir.
 	@echo "Generating links.."
+	# Link all the dotfiles
 	find $$PWD -name ".[^.]*" -type f -print0 | xargs -0tJ % ln -sf %  ~
 	mkdir -p ~/.vim
 	ln -sf $$PWD/.vim/* ~/.vim
@@ -33,6 +34,7 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	ln -sf $$PWD/.cursor/keybindings.json ~/Library/Application\ Support/Cursor/User/keybindings.json
 	# Add mcp servers
 	claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp
+	curl -LsSf https://astral.sh/uv/install.sh | sh
 
 .PHONY: defaults
 defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.
