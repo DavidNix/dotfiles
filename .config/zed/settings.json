@@ -80,8 +80,8 @@
   "agent": {
     "default_profile": "ask",
     "inline_assistant_model": {
-      "provider": "anthropic",
-      "model": "claude-sonnet-4-5-latest"
+      "provider": "zed.dev",
+      "model": "grok-4-fast-reasoning"
     },
     "default_model": {
       "provider": "anthropic",
