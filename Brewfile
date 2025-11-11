@@ -18,6 +18,7 @@ brew "derailed/k9s/k9s"
 brew "farmotive/k8s/kpoof"
 
 brew "aichat"
+brew "air"
 brew "angle-grinder"
 brew "ansible"
 brew "atuin"
