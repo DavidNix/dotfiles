@@ -84,8 +84,8 @@
       "model": "grok-4-fast-reasoning"
     },
     "default_model": {
-      "provider": "anthropic",
-      "model": "claude-sonnet-4-latest"
+      "provider": "zed.dev",
+      "model": "grok-4-fast-non-reasoning"
     }
   },
   "indent_guides": {
