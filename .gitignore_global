@@ -8,10 +8,12 @@ Session.vim
 
 # direnv https://direnv.net
 .envrc
+.env
 
-# IDE
-# jetbrains
+# IDEs and Editors
 .idea
+.vscode/
+*.swp
 
 # asdf https://asdf-vm.com
 .tool-versions
