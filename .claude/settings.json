@@ -1,5 +1,11 @@
 {
   "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs"
+    ],
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
