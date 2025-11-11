@@ -18,7 +18,7 @@ brew "derailed/k9s/k9s"
 brew "farmotive/k8s/kpoof"
 
 brew "aichat"
-brew "air"
+# brew "air" This is NOT the golang filewatcher, but something related to R
 brew "angle-grinder"
 brew "ansible"
 brew "atuin"
