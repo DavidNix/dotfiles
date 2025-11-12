@@ -7,6 +7,9 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "file_finder": {
+    "include_ignored": "all"
+  },
   "telemetry": {
     "metrics": false,
     "diagnostics": false
