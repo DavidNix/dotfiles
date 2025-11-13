@@ -3,6 +3,12 @@
     "allow": [
       "Bash(find:*)",
       "Bash(tree:*)",
+      "Bash(make fmt:*)",
+      "Bash(make vet:*)",
+      "Bash(make test:*)",
+      "Bash(go build:*)",
+      "Bash(go test:*)",
+      "Bash(go mod tidy:*)",
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs"
     ],
