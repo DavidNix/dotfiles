@@ -341,7 +341,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	@echo "Turn on alt key in Terminal. Terminal > Preferences > Settings > Keyboard"
 
 .PHONY: setup
-	setup: relink ~/.ssh xcode homebtrew git cli-apps rust zsh superhuman terminal krew ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+	setup: relink ~/.ssh xcode homebtrew git cli-apps rust zsh superhuman terminal krew npm ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -390,6 +390,10 @@ krew: ## Installs kubectl krew plugins
 	$(KREW) install ns
 	$(KREW) install stern
 
+.PHONY: npm
+npm: ## Install global npm packages
+	npm install -g @musistudio/claude-code-router
+	# Add other global npm packages here
 
 ~/.oh-my-zsh:
 	@echo "Installing ohmyzsh"
