@@ -8,7 +8,7 @@
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
   "file_finder": {
-    "include_ignored": "all"
+    "include_ignored": "smart"
   },
   "telemetry": {
     "metrics": false,
@@ -51,7 +51,7 @@
     // Allows regular expression searches, which can be powerful but may also be complex.
     "regex": true
   },
-  "relative_line_numbers": false,
+  "relative_line_numbers": "disabled",
   "file_types": {
     "Helm": [
       "**/templates/**/*.tpl",

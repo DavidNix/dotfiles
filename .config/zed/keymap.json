@@ -10,7 +10,14 @@
   {
     "use_key_equivalents": true,
     "bindings": {
-      "ctrl-m": "workspace::ToggleZoom"
+      "ctrl-m": "workspace::ToggleZoom",
+      "cmd-shift-g": [
+        "task::Spawn",
+        {
+          "task_name": "LazyGit",
+          "reveal_target": "center"
+        }
+      ]
     }
   },
   {
@@ -58,13 +65,6 @@
       // "cmd-k cmd-t": "theme_selector::Toggle",
       // "cmd-t": "project_symbols::Toggle",
       "cmd-shift-o": "file_finder::Toggle",
-      "cmd-shift-g": [
-        "task::Spawn",
-        {
-          "task_name": "LazyGit",
-          "reveal_target": "center"
-        }
-      ],
       "cmd-shift-t": [
         "task::Spawn",
         {
