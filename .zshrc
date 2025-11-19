@@ -2,6 +2,31 @@
 #   - https://scriptingosx.com/2019/06/moving-to-zsh-part-3-shell-options/
 #   - https://github.com/manilarome/the-glorious-dotfiles
 
+# Functions
+#
+# Loads default secrets into env vars, such as for claude code router. Can be overridden with direnv.
+load-secrets() {
+    if ! command -v op &> /dev/null; then
+        echo "⚠️  Warning: 1Password CLI (op) is not installed"
+        echo "   Install with: brew install --cask 1password-cli"
+        return 1
+    fi
+
+    if ! op account list &> /dev/null; then
+        echo "🔐 Not signed in to 1Password. Signing in..."
+        eval $(op signin)
+        if [ $? -ne 0 ]; then
+            echo "❌ Failed to sign in to 1Password"
+            return 1
+        fi
+    fi
+
+    export GEMINI_API_KEY=$(op read "op://Private/Gemini API Key/password")
+    export OPENAPI_API_KEY=$(op read "op://Private/OpenAPI API Key/password")
+}
+
+# Main
+#
 export ZSH="/Users/davidnix/.oh-my-zsh"
 # Using starship for command prompt instead
 ZSH_THEME=""
@@ -152,8 +177,12 @@ if command -v starship &> /dev/null; then eval "$(starship init zsh)"; fi
 # See: https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
-
 eval "$(atuin init zsh --disable-up-arrow)"
+
+# Make 1Password cli session longer so it won't bug me as much
+export OP_SESSION_TIMEOUT=86400  # 24 hours in seconds
+
+load-secrets
 
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/davidnix/.lmstudio/bin"
