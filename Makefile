@@ -20,18 +20,17 @@ install-scripts: ## Install custom scripts to /usr/local/bin
 .PHONY: relink
 relink: install-scripts ## Create new symbolic links for dotfiles in this dir to your home dir.
 	@echo "Generating links.."
-	# Link all the dotfiles
+	@# Link all the dotfiles
 	find $$PWD -name ".[^.]*" -type f -print0 | xargs -0tJ % ln -sf %  ~
 	mkdir -p ~/.vim
 	ln -sf $$PWD/.vim/* ~/.vim
 	mkdir -p ~/.config
 	ln -sf $$PWD/.config/*/ ~/.config
 	ln -sf $$PWD/.config/* ~/.config
+	mkdir -p ~/.claude/commands
 	ln -sf $$PWD/.claude/settings.json ~/.claude/settings.json
 	ln -sf $$PWD/.claude/commands/* ~/.claude/commands
-	ln -sf $$PWD/./commands/* ~/.claude/commands
-	curl -LsSf https://astral.sh/uv/install.sh | sh
-	# Add mcp servers here because symlinking ~/.claude.json is a bad idea. Huge and changes often.
+	@# Add mcp servers here because symlinking ~/.claude.json is a bad idea. Huge and changes often.
 	-claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp
 
 .PHONY: defaults
@@ -76,6 +75,7 @@ cli-apps: ## Installs command line tools
 	brew cleanup
 	mise install
 	npm install -g @musistudio/claude-code-router
+	curl -LsSf https://astral.sh/uv/install.sh | sh
 
 KREW = kubectl krew
 .PHONY: krew
