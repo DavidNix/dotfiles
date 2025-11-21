@@ -41,17 +41,12 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	@$$PWD/script/macos-defaults.sh
 
 .PHONY: setup
-	setup: relink ~/.ssh xcode homebtrew git cli-apps rust zsh superhuman terminal krew npm ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git cli-apps zsh superhuman krew npm ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
 ~/.ssh:
 	mkdir -p ~/.ssh
-
-terminal:
-	echo "Terminal Preferences: Shell -> Use Settings as Default"
-	echo "Additional themes at https://github.com/lysyi3m/macos-terminal-themes"
-	open Kibble.terminal
 
 .PHONY: xcode
 xcode:
@@ -78,9 +73,11 @@ git:
 .PHONY: cli-apps
 cli-apps: ## Installs command line tools
 	@echo "Installing command line tools"
-	@arch -arm64 brew bundle
+	arch -arm64 brew bundle
 	@echo "Cleaning up brew"
-	@brew cleanup
+	brew cleanup
+	mise install
+	npm install -g @musistudio/claude-code-router
 
 KREW = kubectl krew
 .PHONY: krew
@@ -90,10 +87,6 @@ krew: ## Installs kubectl krew plugins
 	$(KREW) install ns
 	$(KREW) install stern
 
-.PHONY: npm
-npm: ## Install global npm packages
-	npm install -g @musistudio/claude-code-router
-	# Add other global npm packages here
 
 ~/.oh-my-zsh:
 	@echo "Installing ohmyzsh"
@@ -102,16 +95,6 @@ npm: ## Install global npm packages
 .PHONY: zsh
 zsh:  ~/.oh-my-zsh
 	 @$(SHELL) -c "source ~/.zshrc && zplug install"
-
-.PHONY: rust
-rust: $(CARGO) ~/.cargo/bin/ytop
-
-CARGO:=~/.cargo/bin
-$(CARGO):
-	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-$(CARGO)/%:
-	cargo install "$(notdir $@)"
 
 .PHONY: superhuman
 superhuman:
