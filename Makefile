@@ -29,9 +29,7 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	ln -sf $$PWD/.config/* ~/.config
 	ln -sf $$PWD/.claude/settings.json ~/.claude/settings.json
 	ln -sf $$PWD/.claude/commands/* ~/.claude/commands
-	mkdir -p ~/Library/Application\ Support/Cursor/User/
-	ln -sf $$PWD/.cursor/settings.json ~/Library/Application\ Support/Cursor/User/settings.json
-	ln -sf $$PWD/.cursor/keybindings.json ~/Library/Application\ Support/Cursor/User/keybindings.json
+	ln -sf $$PWD/./commands/* ~/.claude/commands
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 	# Add mcp servers here because symlinking ~/.claude.json is a bad idea. Huge and changes often.
 	-claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp
@@ -86,7 +84,6 @@ krew: ## Installs kubectl krew plugins
 	$(KREW) install ctx
 	$(KREW) install ns
 	$(KREW) install stern
-
 
 ~/.oh-my-zsh:
 	@echo "Installing ohmyzsh"
