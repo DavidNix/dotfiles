@@ -17,7 +17,8 @@
       "Read(./.env.*)",
       "Read(./.envrc)",
       "Read(./.envrc.*)"
-    ]
+    ],
+    "defaultMode": "plan"
   },
   "hooks": {
     "Notification": [
@@ -38,7 +39,7 @@
     "padding": 0
   },
   "enabledPlugins": {
-    "example-skills@anthropic-agent-skills": true
+    "frontend-design@claude-code-plugins": true
   },
   "alwaysThinkingEnabled": true
 }
