@@ -1,0 +1,10 @@
+{
+  "claude-code-plugins": {
+    "source": {
+      "source": "github",
+      "repo": "anthropics/claude-code"
+    },
+    "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/claude-code-plugins",
+    "lastUpdated": "2025-11-29T16:24:47.726Z"
+  }
+}
