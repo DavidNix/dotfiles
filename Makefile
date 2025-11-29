@@ -27,10 +27,13 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	mkdir -p ~/.config
 	ln -sf $$PWD/.config/*/ ~/.config
 	ln -sf $$PWD/.config/* ~/.config
+	@#Claude Code
 	mkdir -p ~/.claude/commands
 	ln -sf $$PWD/.claude/settings.json ~/.claude/settings.json
 	ln -sf $$PWD/.claude/commands/* ~/.claude/commands
 	ln -sf $$PWD/.claude/plugins/* ~/.claude/plugins
+	cp -r claude-skills/skill-creator .claude/skills
+	ln -sf $$PWD/.claude/skills/* ~/.claude/skills
 	@# Add mcp servers here because symlinking ~/.claude.json is a bad idea. Huge and changes often.
 	-claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp
 
