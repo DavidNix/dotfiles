@@ -74,7 +74,7 @@ cli-apps: ## Installs command line tools
 	@echo "Cleaning up brew"
 	brew cleanup
 	mise install
-	npm install -g @musistudio/claude-code-router
+	curl -fsSL https://claude.ai/install.sh | bash
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 
 KREW = kubectl krew
