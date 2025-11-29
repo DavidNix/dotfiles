@@ -5,3 +5,5 @@
 !.config/zed/keymap.json
 !.config/zed/settings.json
 !.config/zed/tasks.json
+
+__pycache__

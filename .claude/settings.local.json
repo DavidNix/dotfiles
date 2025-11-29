@@ -1,11 +1,6 @@
 {
   "permissions": {
-    "allow": [
-      "WebSearch",
-      "Bash(claude mcp list:*)",
-      "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs"
-    ],
+    "allow": ["WebSearch", "Bash(claude mcp list:*)"],
     "deny": [],
     "ask": []
   }
