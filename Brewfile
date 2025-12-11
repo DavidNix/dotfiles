@@ -5,7 +5,7 @@ tap "homebrew/services"
 tap "homebrew/cask-fonts"
 tap "microsoft/git"
 
-cask "claude-code"
+# cask "claude-code" # The brew version of claude code does not get updates quickly
 cask "docker"
 cask "font-fira-code-nerd-font"
 cask "git-credential-manager-core"
