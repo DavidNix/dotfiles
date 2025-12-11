@@ -5,7 +5,7 @@ tap "homebrew/services"
 tap "homebrew/cask-fonts"
 tap "microsoft/git"
 
-# cask "claude-code" # Use native install
+cask "claude-code"
 cask "docker"
 cask "font-fira-code-nerd-font"
 cask "git-credential-manager-core"

@@ -30,9 +30,7 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	@#Claude Code
 	mkdir -p ~/.claude/commands
 	ln -sf $$PWD/.claude/settings.json ~/.claude/settings.json
-	ln -sf $$PWD/.claude/commands/* ~/.claude/commands
 	ln -sf $$PWD/.claude/plugins/* ~/.claude/plugins
-	ln -sf $$PWD/.claude/skills/* ~/.claude/skills
 	@# Add mcp servers here because symlinking ~/.claude.json is a bad idea. Huge and changes often.
 	-claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp
 
@@ -77,7 +75,6 @@ cli-apps: ## Installs command line tools
 	@echo "Cleaning up brew"
 	brew cleanup
 	mise install
-	curl -fsSL https://claude.ai/install.sh | bash
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 
 KREW = kubectl krew
