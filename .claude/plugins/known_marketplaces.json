@@ -13,14 +13,14 @@
       "repo": "obra/superpowers-marketplace"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/superpowers-marketplace",
-    "lastUpdated": "2025-12-11T15:22:34.543Z"
+    "lastUpdated": "2025-12-14T14:55:00.937Z"
   },
   "nixpowers": {
     "source": {
       "source": "github",
-      "repo": "davidnix/nixpowers"
+      "repo": "DavidNix/nixpowers"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/nixpowers",
-    "lastUpdated": "2025-12-11T15:35:36.314Z"
+    "lastUpdated": "2025-12-14T15:21:47.994Z"
   }
 }

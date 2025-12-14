@@ -39,8 +39,9 @@
   },
   "enabledPlugins": {
     "frontend-design@claude-code-plugins": true,
+    "nixpowers@nixpowers": true,
     "superpowers@superpowers-marketplace": true,
-    "nixpowers@nixpowers": true
+    "elements-of-style@superpowers-marketplace": true
   },
   "alwaysThinkingEnabled": true
 }
