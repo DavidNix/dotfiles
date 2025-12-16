@@ -5,7 +5,7 @@
       "repo": "anthropics/claude-code"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/claude-code-plugins",
-    "lastUpdated": "2025-12-14T15:34:44.977Z"
+    "lastUpdated": "2025-12-16T16:46:33.128Z"
   },
   "superpowers-marketplace": {
     "source": {
@@ -13,7 +13,7 @@
       "repo": "obra/superpowers-marketplace"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/superpowers-marketplace",
-    "lastUpdated": "2025-12-14T14:55:00.937Z"
+    "lastUpdated": "2025-12-16T15:32:21.734Z"
   },
   "nixpowers-marketplace": {
     "source": {
@@ -21,6 +21,14 @@
       "url": "git@github.com:DavidNix/nixpowers.git"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/nixpowers-marketplace",
-    "lastUpdated": "2025-12-14T15:44:15.826Z"
+    "lastUpdated": "2025-12-15T23:31:06.226Z"
+  },
+  "claude-plugins-official": {
+    "source": {
+      "source": "github",
+      "repo": "anthropics/claude-plugins-official"
+    },
+    "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/claude-plugins-official",
+    "lastUpdated": "2025-12-16T15:32:25.039Z"
   }
 }
