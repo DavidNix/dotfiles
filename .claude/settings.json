@@ -13,7 +13,8 @@
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./.envrc)",
-      "Read(./.envrc.*)"
+      "Read(./.envrc.*)",
+      "Read(./.vault-password)"
     ],
     "defaultMode": "plan"
   },

@@ -5,7 +5,7 @@
       "repo": "anthropics/claude-code"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/claude-code-plugins",
-    "lastUpdated": "2025-12-16T16:46:33.128Z"
+    "lastUpdated": "2025-12-17T15:05:22.440Z"
   },
   "superpowers-marketplace": {
     "source": {
@@ -29,6 +29,6 @@
       "repo": "anthropics/claude-plugins-official"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/claude-plugins-official",
-    "lastUpdated": "2025-12-16T15:32:25.039Z"
+    "lastUpdated": "2025-12-17T16:04:09.250Z"
   }
 }
