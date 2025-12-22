@@ -7,7 +7,11 @@
       "Bash(go test:*)",
       "Bash(go mod tidy:*)",
       "mcp__context7__*",
-      "Skill(skill-creator)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git log:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git show:*)"
     ],
     "deny": [
       "Read(./.env)",
@@ -42,5 +46,6 @@
     "elements-of-style@superpowers-marketplace": true,
     "nixpowers@nixpowers-marketplace": true
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "promptSuggestionEnabled": false
 }
