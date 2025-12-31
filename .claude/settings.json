@@ -4,6 +4,7 @@
       "Bash(find:*)",
       "Bash(tree:*)",
       "Bash(go build:*)",
+      "Bash(go list:*)",
       "Bash(go mod tidy:*)",
       "Bash(go test:*)",
       "Bash(go vet:*)",
@@ -42,10 +43,17 @@
     "padding": 0
   },
   "enabledPlugins": {
-    "frontend-design@claude-code-plugins": true,
+    "frontend-design@claude-code-plugins": false,
     "superpowers@superpowers-marketplace": true,
     "elements-of-style@superpowers-marketplace": true,
-    "nixpowers@nixpowers-marketplace": true
+    "nixpowers@nixpowers-marketplace": true,
+    "ralph-wiggum@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true,
+    "ralph-wiggum@claude-code-plugins": false,
+    "frontend-design@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
   "promptSuggestionEnabled": false
