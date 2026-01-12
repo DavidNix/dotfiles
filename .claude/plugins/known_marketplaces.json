@@ -5,7 +5,7 @@
       "repo": "obra/superpowers-marketplace"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/superpowers-marketplace",
-    "lastUpdated": "2025-12-16T15:32:21.734Z"
+    "lastUpdated": "2026-01-11T21:22:45.898Z"
   },
   "nixpowers-marketplace": {
     "source": {
@@ -13,7 +13,7 @@
       "url": "git@github.com:DavidNix/nixpowers.git"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/nixpowers-marketplace",
-    "lastUpdated": "2025-12-31T02:40:21.188Z"
+    "lastUpdated": "2026-01-11T21:22:43.957Z"
   },
   "claude-plugins-official": {
     "source": {
@@ -21,6 +21,14 @@
       "repo": "anthropics/claude-plugins-official"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/claude-plugins-official",
-    "lastUpdated": "2025-12-31T02:33:24.130Z"
+    "lastUpdated": "2026-01-12T13:48:24.493Z"
+  },
+  "anthropic-agent-skills": {
+    "source": {
+      "source": "github",
+      "repo": "anthropics/skills"
+    },
+    "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/anthropic-agent-skills",
+    "lastUpdated": "2026-01-08T14:12:22.043Z"
   }
 }
