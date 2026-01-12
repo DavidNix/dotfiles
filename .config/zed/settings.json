@@ -84,7 +84,7 @@
     "default_profile": "ask",
     "inline_assistant_model": {
       "provider": "zed.dev",
-      "model": "grok-4-fast-non-reasoning"
+      "model": "claude-opus-4-5"
     },
     "default_model": {
       "provider": "zed.dev",
