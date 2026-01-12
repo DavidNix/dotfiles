@@ -5,12 +5,13 @@ tap "homebrew/services"
 tap "homebrew/cask-fonts"
 tap "microsoft/git"
 
-# cask "claude-code" # The brew version of claude code does not get updates quickly
+# cask "claude-code" # The brew version of claude code does not get updates quickly, use their official install path
+case "ghostty"
+cask "1password-cli"
 cask "docker"
 cask "font-fira-code-nerd-font"
 cask "git-credential-manager-core"
 cask "ksdiff"
-cask "1password-cli"
 
 tap "cjbassi/ytop"
 tap "derailed/k9s"
