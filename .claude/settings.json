@@ -9,6 +9,7 @@
       "Bash(go test:*)",
       "Bash(go vet:*)",
       "mcp__context7__*",
+      "mcp__plugin_context7*",
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git log:*)",
