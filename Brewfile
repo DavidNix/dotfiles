@@ -13,6 +13,7 @@ cask "font-fira-code-nerd-font"
 cask "git-credential-manager-core"
 cask "ksdiff"
 
+tap "anomalyco/tap"
 tap "cjbassi/ytop"
 tap "derailed/k9s"
 
@@ -55,6 +56,7 @@ brew "luarocks"
 brew "make"
 brew "mise" # asdf replacement
 brew "neovim"
+brew "opencode"
 brew "postgresql@13"
 brew "procs"
 brew "redis"
