@@ -1,0 +1,44 @@
+#!/bin/bash
+# Create a git worktree for isolated feature work
+# Usage: worktree <branch-name>
+
+set -euo pipefail
+
+# Require branch name argument
+if [[ $# -lt 1 ]]; then
+    echo "Usage: worktree <branch-name>"
+    exit 1
+fi
+
+branch_name="$1"
+worktree_path="../worktrees/${branch_name}"
+
+# Create worktrees directory
+mkdir -p ../worktrees
+
+# Create worktree with new branch
+git worktree add "$worktree_path" -b "$branch_name"
+
+# Copy env files with warnings if missing
+if [[ -f .env ]]; then
+    cp .env "$worktree_path/"
+else
+    echo "Warning: .env not found, skipped"
+fi
+
+if [[ -f .envrc ]]; then
+    cp .envrc "$worktree_path/"
+else
+    echo "Warning: .envrc not found, skipped"
+fi
+
+# Report result
+abs_path="$(cd "$worktree_path" && pwd)"
+echo ""
+echo "Worktree created at: ${abs_path}"
+echo "Branch: ${branch_name}"
+echo ""
+
+# Spawn a new shell in the worktree directory
+cd "$abs_path"
+exec $SHELL
