@@ -45,7 +45,7 @@
   },
   "enabledPlugins": {
     "frontend-design@claude-code-plugins": false,
-    "superpowers@superpowers-marketplace": true,
+    "superpowers@superpowers-marketplace": false,
     "elements-of-style@superpowers-marketplace": true,
     "nixpowers@nixpowers-marketplace": true,
     "ralph-wiggum@claude-plugins-official": true,
@@ -60,7 +60,10 @@
     "lua-lsp@claude-plugins-official": true,
     "document-skills@anthropic-agent-skills": true,
     "code-simplifier@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true
+    "frontend-design@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "hookify@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
   "promptSuggestionEnabled": false

@@ -2,12 +2,14 @@
 # Install Claude Code and setup plugins
 # Works on macOS and Linux
 # Usage: claude-init
+# This script is idempotent - safe to run multiple times
 
 set -euo pipefail
 
 # Colors (ANSI escape codes - work on both macOS and Linux)
 YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
+GRAY='\033[0;90m'
 NC='\033[0m' # No Color
 
 echo "Claude Code Initialization"
@@ -27,9 +29,13 @@ try_or_warn() {
     fi
 }
 
-# Install Claude Code via official installer
+# Install Claude Code via official installer (if not already installed)
 install_claude() {
     echo ""
+    if command -v claude &>/dev/null; then
+        echo -e "${GRAY}Claude Code already installed, skipping${NC}"
+        return 0
+    fi
     echo "Installing Claude Code..."
     curl -fsSL https://claude.ai/install.sh | bash
     echo -e "${GREEN}Claude Code installed${NC}"
@@ -50,50 +56,87 @@ check_github_ssh() {
     fi
 }
 
+# Check if marketplace is already added
+has_marketplace() {
+    local name="$1"
+    claude plugin marketplace list 2>/dev/null | grep -q "$name"
+}
+
+# Check if plugin is already installed
+has_plugin() {
+    local name="$1"
+    claude plugin list 2>/dev/null | grep -q "$name"
+}
+
+# Add marketplace if not already added
+add_marketplace() {
+    local name="$1"
+    local url="$2"
+    if has_marketplace "$name"; then
+        echo -e "${GRAY}  $name already added${NC}"
+    else
+        try_or_warn "add $name" claude plugin marketplace add "$url"
+        echo -e "${GREEN}  $name added${NC}"
+    fi
+}
+
+# Install plugin if not already installed
+install_plugin() {
+    local name="$1"
+    if has_plugin "$name"; then
+        echo -e "${GRAY}  $name already installed${NC}"
+    else
+        try_or_warn "install $name" claude plugin install "$name"
+        echo -e "${GREEN}  $name installed${NC}"
+    fi
+}
+
 # Add marketplaces
 add_marketplaces() {
     echo ""
     echo "Adding marketplaces..."
 
     # Public marketplaces
-    try_or_warn "add superpowers-marketplace" claude plugins add-marketplace github:obra/superpowers-marketplace
-    try_or_warn "add claude-plugins-official" claude plugins add-marketplace github:anthropics/claude-plugins-official
-    try_or_warn "add anthropic-agent-skills" claude plugins add-marketplace github:anthropics/skills
+    add_marketplace "superpowers-marketplace" "github:obra/superpowers-marketplace"
+    add_marketplace "claude-plugins-official" "github:anthropics/claude-plugins-official"
+    add_marketplace "anthropic-agent-skills" "github:anthropics/skills"
 
     # Private marketplace (nixpowers) - only if SSH auth works
     if [[ "${SKIP_PRIVATE:-}" != "1" ]]; then
-        try_or_warn "add nixpowers-marketplace (private)" claude plugins add-marketplace git:git@github.com:DavidNix/nixpowers.git
+        add_marketplace "nixpowers-marketplace" "git:git@github.com:DavidNix/nixpowers.git"
     fi
 }
 
-# Enable plugins
-enable_plugins() {
+# Install plugins
+install_plugins() {
     echo ""
-    echo "Enabling plugins..."
+    echo "Installing plugins..."
 
     # Superpowers marketplace
-    try_or_warn "enable superpowers" claude plugins enable superpowers@superpowers-marketplace
-    try_or_warn "enable elements-of-style" claude plugins enable elements-of-style@superpowers-marketplace
+    install_plugin "elements-of-style@superpowers-marketplace"
 
     # Claude plugins official
-    try_or_warn "enable ralph-wiggum" claude plugins enable ralph-wiggum@claude-plugins-official
-    try_or_warn "enable context7" claude plugins enable context7@claude-plugins-official
-    try_or_warn "enable gopls-lsp" claude plugins enable gopls-lsp@claude-plugins-official
-    try_or_warn "enable pyright-lsp" claude plugins enable pyright-lsp@claude-plugins-official
-    try_or_warn "enable typescript-lsp" claude plugins enable typescript-lsp@claude-plugins-official
-    try_or_warn "enable rust-analyzer-lsp" claude plugins enable rust-analyzer-lsp@claude-plugins-official
-    try_or_warn "enable ralph-loop" claude plugins enable ralph-loop@claude-plugins-official
-    try_or_warn "enable swift-lsp" claude plugins enable swift-lsp@claude-plugins-official
-    try_or_warn "enable lua-lsp" claude plugins enable lua-lsp@claude-plugins-official
-    try_or_warn "enable code-simplifier" claude plugins enable code-simplifier@claude-plugins-official
-    try_or_warn "enable frontend-design" claude plugins enable frontend-design@claude-plugins-official
+    install_plugin "ralph-wiggum@claude-plugins-official"
+    install_plugin "context7@claude-plugins-official"
+    install_plugin "gopls-lsp@claude-plugins-official"
+    install_plugin "pyright-lsp@claude-plugins-official"
+    install_plugin "typescript-lsp@claude-plugins-official"
+    install_plugin "rust-analyzer-lsp@claude-plugins-official"
+    install_plugin "ralph-loop@claude-plugins-official"
+    install_plugin "swift-lsp@claude-plugins-official"
+    install_plugin "lua-lsp@claude-plugins-official"
+    install_plugin "code-simplifier@claude-plugins-official"
+    install_plugin "frontend-design@claude-plugins-official"
+    install_plugin "playwright@claude-plugins-official"
+    install_plugin "hookify@claude-plugins-official"
+    install_plugin "superpowers@claude-plugins-official"
 
     # Anthropic agent skills
-    try_or_warn "enable document-skills" claude plugins enable document-skills@anthropic-agent-skills
+    install_plugin "document-skills@anthropic-agent-skills"
 
     # Nixpowers (private)
     if [[ "${SKIP_PRIVATE:-}" != "1" ]]; then
-        try_or_warn "enable nixpowers" claude plugins enable nixpowers@nixpowers-marketplace
+        install_plugin "nixpowers@nixpowers-marketplace"
     fi
 }
 
@@ -106,10 +149,10 @@ main() {
     fi
 
     add_marketplaces
-    enable_plugins
+    install_plugins
 
     echo ""
-    echo -e "${GREEN}Done!${NC} Run 'claude plugins list' to verify."
+    echo -e "${GREEN}Done!${NC} Run 'claude plugin list' to verify."
 }
 
 main
