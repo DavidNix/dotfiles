@@ -97,13 +97,13 @@ add_marketplaces() {
     echo "Adding marketplaces..."
 
     # Public marketplaces
-    add_marketplace "superpowers-marketplace" "github:obra/superpowers-marketplace"
-    add_marketplace "claude-plugins-official" "github:anthropics/claude-plugins-official"
-    add_marketplace "anthropic-agent-skills" "github:anthropics/skills"
+    add_marketplace "superpowers-marketplace" "obra/superpowers-marketplace"
+    add_marketplace "claude-plugins-official" "anthropics/claude-plugins-official"
+    add_marketplace "anthropic-agent-skills" "anthropics/skills"
 
     # Private marketplace (nixpowers) - only if SSH auth works
     if [[ "${SKIP_PRIVATE:-}" != "1" ]]; then
-        add_marketplace "nixpowers-marketplace" "git:git@github.com:DavidNix/nixpowers.git"
+        add_marketplace "nixpowers-marketplace" "git@github.com:DavidNix/nixpowers.git"
     fi
 }
 
