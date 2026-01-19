@@ -1,83 +1,44 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code when working in this repository.
 
-## Repository Overview
+## Overview
 
-This is a personal dotfiles repository that manages shell configurations, editor settings, and macOS system preferences using symlinks. The repository uses a Makefile-based approach for installation and management, avoiding the complexity of tools like chezmoi in favor of direct symlinks that allow immediate changes.
+Personal dotfiles repository. Uses symlinks (not chezmoi) so edits in `~/` immediately reflect here.
 
-## Common Commands
+## Commands
 
-### Setup and Installation
 ```bash
-make help              # Show all available make commands
-make relink            # Create/update symbolic links for dotfiles to home directory
-make setup             # Full setup for a new Mac (NOT idempotent)
-make defaults          # Apply macOS system preferences (requires reboot)
+make help      # Show all commands
+make relink    # Symlink dotfiles to ~/
+make setup     # Full new Mac setup (NOT idempotent)
+make defaults  # Apply macOS preferences (requires reboot)
+make pkgs      # Install Homebrew packages
 ```
 
-### Package Management
-```bash
-make cli-apps          # Install command line tools via Homebrew
-make krew              # Install kubectl krew plugins
-```
+## Key Files
 
-## Architecture
+| File | Purpose |
+|------|---------|
+| `Makefile` | Installation, linking, macOS defaults |
+| `Brewfile` | Homebrew packages |
+| `.zshrc` | Shell config (plugins, aliases, vi-mode) |
+| `.cursor/rules/` | Cursor editor rules |
+| `.claude/` | Claude Code settings |
+| `.config/zed/` | Zed editor config |
+| `.config/nvim/` | Neovim config (LazyVim) |
+| `bin/claude-init` | Claude Code plugin installer |
 
-### Symlink-Based Configuration Management
+Read these files directly for details.
 
-The core philosophy is to use symlinks instead of copying files, enabling direct editing without intermediary commands:
+## Workflow
 
-- Dotfiles (`.bash_profile`, `.zshrc`, `.gitconfig`, etc.) are symlinked from this repo to `~/`
-- `.config/*` directories are symlinked to `~/.config/`
-- Editor configurations (Cursor, Claude, Zed, Neovim) are symlinked to their respective locations
-- Changes made to files in `~/` are immediately reflected in this repository
+**Add dotfiles:** Add file to repo, run `make relink`, commit.
 
-### Key Configuration Files
+**Update packages:** Edit `Brewfile`, run `make pkgs`, commit.
 
-- **Makefile**: Primary orchestration for installation, linking, and macOS defaults
-- **Brewfile**: Homebrew package manifest for CLI tools and casks
-- **.zshrc**: Shell configuration with zplug plugin management, vi-mode keybindings, and tool aliases
-- **.cursor/rules/**: Language-specific coding rules for Cursor editor (Go, Templ, HTMX, global)
-- **.claude/**: Claude Code settings and custom commands
-- **.config/zed/**: Zed editor configuration including tasks, keymaps, and prompts
-- **.config/nvim/**: Neovim configuration (LazyVim-based)
+**Shell changes:** Edit `.zshrc`, reload with `source ~/.zshrc`.
 
-### Editor Configurations
+## Claude Plugin Maintenance
 
-### Shell Environment
-
-The `.zshrc` configures:
-- **Plugin manager**: zplug for zsh plugins
-- **Version manager**: mise (asdf replacement) for language runtimes
-- **Package manager**: Homebrew (Apple Silicon optimized)
-- **Editor**: Neovim as default ($VISUAL, $EDITOR)
-- **Prompt**: Starship.rs
-- **History**: Atuin for advanced shell history
-- **Vi-mode**: Custom keybindings with `jk` to exit insert mode
-- **Aliases**: Modern CLI tools (bat, lsd, ripgrep, etc.)
-
-### macOS System Preferences
-
-The `make defaults` target applies extensive macOS customizations:
-- Finder preferences (show extensions, column view, no .DS_Store on network)
-- Dock settings (size, autohide, Mission Control animations)
-- Keyboard settings (fast repeat rate, full keyboard access)
-- Safari developer tools
-- Energy management
-- Screenshot location and format
-
-## Development Workflow
-
-### Adding New Dotfiles
-1. Add the file to this repository
-2. Run `make relink` to create the symlink
-3. Commit and push changes
-
-### Updating Homebrew Packages
-1. Edit `Brewfile` to add/remove packages
-2. Run `make cli-apps` to install
-3. Commit changes to Brewfile and Brewfile.lock.json
-
-### Shell Configuration Changes
-Changes to `.zshrc` or other shell files are immediately active in this repo. Reload with `source ~/.zshrc` or open a new shell.
+When adding, removing, or updating Claude Code plugins, update `bin/claude-init` to match. This script installs plugins on new machines and must stay in sync.
