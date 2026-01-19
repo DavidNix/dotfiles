@@ -11,10 +11,11 @@ help: ## Print this help message
 	@echo "Available make commands:"; grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: install-scripts
-install-scripts: ## Install custom scripts to /usr/local/bin
-	@echo "Installing scripts to /usr/local/bin..."
+install-scripts: ## Symlink custom scripts to ~/.local/bin
+	@echo "Symlinking scripts to ~/.local/bin..."
+	@mkdir -p ~/.local/bin
 	@chmod +x $$PWD/bin/*
-	@sudo cp -f $$PWD/bin/* /usr/local/bin/
+	@ln -sf $$PWD/bin/* ~/.local/bin/
 	@echo "Scripts installed successfully"
 
 .PHONY: relink
