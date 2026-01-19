@@ -24,9 +24,6 @@ zinit light zsh-users/zsh-autosuggestions
 
 # OMZ plugins with turbo mode
 zinit ice wait"0" lucid
-zinit snippet OMZP::git
-
-zinit ice wait"0" lucid
 zinit snippet OMZP::kubectl
 
 zinit ice wait"0" lucid
@@ -35,8 +32,8 @@ zinit snippet OMZP::colored-man-pages
 zinit ice wait"0" lucid
 zinit snippet OMZP::jsontools
 
-zinit ice wait"0" lucid
-zinit snippet OMZP::z
+# zoxide (smarter alternative to z)
+eval "$(zoxide init zsh)"
 
 zinit ice wait"0" lucid
 zinit snippet OMZP::tmux
