@@ -2,40 +2,52 @@
 #   - https://scriptingosx.com/2019/06/moving-to-zsh-part-3-shell-options/
 #   - https://github.com/manilarome/the-glorious-dotfiles
 
-export ZSH="/Users/davidnix/.oh-my-zsh"
-# Using starship for command prompt instead
-ZSH_THEME=""
+# ==============================================================================
+# Zinit Setup
+# ==============================================================================
+source /opt/homebrew/opt/zinit/zinit.zsh
 
-# Standard Plugins
-plugins=(git)
-source $ZSH/oh-my-zsh.sh
+# ==============================================================================
+# Immediate Plugins (needed before prompt)
+# ==============================================================================
+zinit snippet OMZP::vi-mode
 
-# Zplug plugins
-[ ! -d ~/.zplug ] && git clone https://github.com/zplug/zplug ~/.zplug
-source ~/.zplug/init.zsh
+# ==============================================================================
+# Turbo Mode Plugins (load after prompt)
+# ==============================================================================
+# Completions - load early in turbo
+zinit ice wait"0" lucid
+zinit light zsh-users/zsh-completions
 
-zplug 'zplug/zplug', hook-build:'zplug --self-manage'
+zinit ice wait"0" lucid
+zinit light zsh-users/zsh-autosuggestions
 
-zplug "zsh-users/zsh-completions"
-zplug "zsh-users/zsh-autosuggestions"
-zplug "felixr/docker-zsh-completion"
+# OMZ plugins with turbo mode
+zinit ice wait"0" lucid
+zinit snippet OMZP::git
 
+zinit ice wait"0" lucid
+zinit snippet OMZP::kubectl
 
-# Using mise instead (formerly rtx): https://github.com/jdx/mise
-zplug "plugins/brew",                   from:oh-my-zsh
-zplug "plugins/colored-man-pages",      from:oh-my-zsh
-zplug "plugins/git",                    from:oh-my-zsh
-zplug "plugins/jsontools",              from:oh-my-zsh
-zplug "plugins/kubectl",                from:oh-my-zsh
-zplug "plugins/osx",                    from:oh-my-zsh
-zplug "plugins/ssh-agent",              from:oh-my-zsh
-zplug "plugins/tmux",                   from:oh-my-zsh
-zplug "plugins/vi-mode",                from:oh-my-zsh
-zplug "plugins/z",                      from:oh-my-zsh
+zinit ice wait"0" lucid
+zinit snippet OMZP::colored-man-pages
 
-zplug load
+zinit ice wait"0" lucid
+zinit snippet OMZP::jsontools
 
+zinit ice wait"0" lucid
+zinit snippet OMZP::z
+
+zinit ice wait"0" lucid
+zinit snippet OMZP::tmux
+
+# Fast syntax highlighting (faster than zsh-syntax-highlighting)
+zinit ice wait"0" lucid
+zinit light zdharma-continuum/fast-syntax-highlighting
+
+# ==============================================================================
 # ZSH Options
+# ==============================================================================
 # http://zsh.sourceforge.net/Doc/Release/Options.html
 # auto cd into directories
 setopt AUTO_CD
@@ -58,7 +70,7 @@ setopt hist_reduce_blanks       # Remove superfluous blanks.
 setopt hist_save_no_dups        # Omit older commands in favor of newer ones.
 setopt hist_verify              # ask before subbing commands via !!
 setopt inc_append_history       # adds commands as they are typed, not at shell exit
-setopt mark_dirs # Append a trailing ‘/’ to all directory names resulting from filename generation (globbing).
+setopt mark_dirs                # Append a trailing '/' to all directory names resulting from filename generation (globbing).
 setopt nomatch                  # If a pattern for filename generation has no matches, print an error, instead of leaving it unchanged in the argument list
 setopt share_history            # Share history between multiple shells
 
@@ -71,6 +83,9 @@ autoload -Uz compinit && compinit
 # load bashcompinit for some old bash completions
 autoload bashcompinit && bashcompinit
 
+# ==============================================================================
+# Environment Variables
+# ==============================================================================
 # Point to Colima's docker socket
 export DOCKER_HOST="unix://${HOME}/.colima/default/docker.sock"
 
@@ -78,43 +93,72 @@ export DOCKER_HOST="unix://${HOME}/.colima/default/docker.sock"
 export VISUAL=nvim
 export EDITOR="$VISUAL"
 
-# PATH modifications
+# See: https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
+export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+
+# ==============================================================================
+# PATH Modifications
+# ==============================================================================
 export PATH="/usr/local/bin:/usr/local/sbin:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/bin"
 
-# Homebrew for silicon
+# Homebrew for silicon (cached)
 export PATH="/opt/homebrew/bin:$PATH"
-eval "$(/opt/homebrew/bin/brew shellenv)"
+export HOMEBREW_PREFIX="/opt/homebrew"
+export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
+export HOMEBREW_REPOSITORY="/opt/homebrew"
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}"
+export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
+export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
 
 # makes homebrew gmake to just make
 export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
 # krew kubectl plugin manager
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
-
-# Mise  is a different version manager compatible with asdf
-# See: https://github.com/jdx/mise
-eval "$(mise activate zsh)"
-
-# zsh plugin creates the k alias for kubectl
-complete -F __start_kubectl k
-source <(kubectl completion zsh)
-
 # vim fzf needs this
 export PATH="$PATH:$HOME/.vim/pack/bundle/start/fzf/bin"
 
+# LM Studio CLI (lms)
+export PATH="$PATH:/Users/davidnix/.lmstudio/bin"
+
+# ==============================================================================
+# Tool Initialization (using cache where possible)
+# ==============================================================================
+# Mise version manager (formerly rtx)
+# See: https://github.com/jdx/mise
+eval "$(mise activate zsh)"
+
+# kubectl completions (deferred)
+zinit ice wait"1" lucid
+zinit light-mode for \
+  id-as"kubectl-completion" \
+  as"completion" \
+  atload"complete -F __start_kubectl k" \
+  has"kubectl" \
+  run-atpull \
+  atclone"kubectl completion zsh > _kubectl" \
+  atpull"%atclone" \
+  pick"_kubectl" \
+  zdharma-continuum/null
+
+# direnv (if available)
 if which direnv &> /dev/null; then
   eval "$(direnv hook $SHELL)"
 fi
 
+# ==============================================================================
 # Custom Vim Keybindings
-# 1 – Enable vi keymaps
+# ==============================================================================
+# 1 - Enable vi keymaps
 bindkey -v
-# 2 – Let combos wait a bit longer (ms) for the second key
+# 2 - Let combos wait a bit longer (ms) for the second key
 KEYTIMEOUT=100               # default is 40
-# 3 – In the vi-insert map, send jk → command mode (same as <Esc>)
+# 3 - In the vi-insert map, send jk -> command mode (same as <Esc>)
 bindkey -M viins 'jk' vi-cmd-mode
 
-# Useful Aliases
+# ==============================================================================
+# Aliases
+# ==============================================================================
 alias ag="agrind" # angle-grinder
 alias c="clear"
 alias cat="bat"
@@ -138,23 +182,25 @@ alias intel="env /usr/bin/arch -x86_64 /bin/zsh --login"
 # find the current public ip address
 alias myip="curl ifconfig.me"
 
+# ==============================================================================
+# Google Cloud SDK
+# ==============================================================================
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/davidnix/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/path.zsh.inc'; fi
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/davidnix/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/completion.zsh.inc'; fi
 
+# ==============================================================================
+# Prompt and History Tools
+# ==============================================================================
 # starship.rs
 if command -v starship &> /dev/null; then eval "$(starship init zsh)"; fi
 
-# See: https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
-export USE_GKE_GCLOUD_AUTH_PLUGIN=True
-
+# atuin shell history
 eval "$(atuin init zsh --disable-up-arrow)"
 
-# Load default env vars
+# ==============================================================================
+# Load Environment File
+# ==============================================================================
 source "$HOME/.envrc" || print -P "%F{yellow}%BFailed to source ~/.envrc%b%f"
-
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/davidnix/.lmstudio/bin"
-# End of LM Studio CLI section
