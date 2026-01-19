@@ -22,8 +22,6 @@ zplug "felixr/docker-zsh-completion"
 
 
 # Using mise instead (formerly rtx): https://github.com/jdx/mise
-# zplug "plugins/asdf",                   from:oh-my-zsh
-
 zplug "plugins/brew",                   from:oh-my-zsh
 zplug "plugins/colored-man-pages",      from:oh-my-zsh
 zplug "plugins/git",                    from:oh-my-zsh
