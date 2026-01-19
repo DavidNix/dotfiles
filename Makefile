@@ -37,7 +37,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 	@$$PWD/script/macos-defaults.sh
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git cli-apps zsh superhuman krew npm ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git cli-apps zsh superhuman krew npm claude ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -95,3 +95,7 @@ zsh:  ~/.oh-my-zsh
 superhuman:
 	@echo "Download Superhuman at https://mail.superhuman.com"
 	@echo "Send yourself a test email to get Superhuman to register with macOS notification settings."
+
+.PHONY: claude
+claude: ## Install Claude Code and setup plugins
+	@$$PWD/bin/claude-init

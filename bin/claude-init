@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+# Install Claude Code and setup plugins
+# Works on macOS and Linux
+# Usage: claude-init
+
+set -euo pipefail
+
+# Colors (ANSI escape codes - work on both macOS and Linux)
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+echo "Claude Code Initialization"
+echo "=========================="
+
+# Helper: run command, warn on failure with error output
+try_or_warn() {
+    local desc="$1"
+    shift
+    local output
+    if output=$("$@" 2>&1); then
+        return 0
+    else
+        echo -e "${YELLOW}Warning: Failed: ${desc}${NC}"
+        echo -e "${YELLOW}  ${output}${NC}"
+        return 0  # Continue anyway
+    fi
+}
+
+# Install Claude Code via official installer
+install_claude() {
+    echo ""
+    echo "Installing Claude Code..."
+    curl -fsSL https://claude.ai/install.sh | bash
+    echo -e "${GREEN}Claude Code installed${NC}"
+}
+
+# Check for SSH access to GitHub (needed for nixpowers private repo)
+check_github_ssh() {
+    echo ""
+    echo "Checking GitHub SSH authentication..."
+    if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+        echo -e "${GREEN}GitHub SSH authentication successful${NC}"
+        return 0
+    else
+        echo -e "${YELLOW}Warning: GitHub SSH authentication failed${NC}"
+        echo -e "${YELLOW}  nixpowers (private repo) will be skipped.${NC}"
+        echo -e "${YELLOW}  To enable: add SSH key to GitHub (https://github.com/settings/keys)${NC}"
+        return 1
+    fi
+}
+
+# Add marketplaces
+add_marketplaces() {
+    echo ""
+    echo "Adding marketplaces..."
+
+    # Public marketplaces
+    try_or_warn "add superpowers-marketplace" claude plugins add-marketplace github:obra/superpowers-marketplace
+    try_or_warn "add claude-plugins-official" claude plugins add-marketplace github:anthropics/claude-plugins-official
+    try_or_warn "add anthropic-agent-skills" claude plugins add-marketplace github:anthropics/skills
+
+    # Private marketplace (nixpowers) - only if SSH auth works
+    if [[ "${SKIP_PRIVATE:-}" != "1" ]]; then
+        try_or_warn "add nixpowers-marketplace (private)" claude plugins add-marketplace git:git@github.com:DavidNix/nixpowers.git
+    fi
+}
+
+# Enable plugins
+enable_plugins() {
+    echo ""
+    echo "Enabling plugins..."
+
+    # Superpowers marketplace
+    try_or_warn "enable superpowers" claude plugins enable superpowers@superpowers-marketplace
+    try_or_warn "enable elements-of-style" claude plugins enable elements-of-style@superpowers-marketplace
+
+    # Claude plugins official
+    try_or_warn "enable ralph-wiggum" claude plugins enable ralph-wiggum@claude-plugins-official
+    try_or_warn "enable context7" claude plugins enable context7@claude-plugins-official
+    try_or_warn "enable gopls-lsp" claude plugins enable gopls-lsp@claude-plugins-official
+    try_or_warn "enable pyright-lsp" claude plugins enable pyright-lsp@claude-plugins-official
+    try_or_warn "enable typescript-lsp" claude plugins enable typescript-lsp@claude-plugins-official
+    try_or_warn "enable rust-analyzer-lsp" claude plugins enable rust-analyzer-lsp@claude-plugins-official
+    try_or_warn "enable ralph-loop" claude plugins enable ralph-loop@claude-plugins-official
+    try_or_warn "enable swift-lsp" claude plugins enable swift-lsp@claude-plugins-official
+    try_or_warn "enable lua-lsp" claude plugins enable lua-lsp@claude-plugins-official
+    try_or_warn "enable code-simplifier" claude plugins enable code-simplifier@claude-plugins-official
+    try_or_warn "enable frontend-design" claude plugins enable frontend-design@claude-plugins-official
+
+    # Anthropic agent skills
+    try_or_warn "enable document-skills" claude plugins enable document-skills@anthropic-agent-skills
+
+    # Nixpowers (private)
+    if [[ "${SKIP_PRIVATE:-}" != "1" ]]; then
+        try_or_warn "enable nixpowers" claude plugins enable nixpowers@nixpowers-marketplace
+    fi
+}
+
+main() {
+    install_claude
+
+    # Check SSH auth for nixpowers (non-fatal)
+    if ! check_github_ssh; then
+        export SKIP_PRIVATE=1
+    fi
+
+    add_marketplaces
+    enable_plugins
+
+    echo ""
+    echo -e "${GREEN}Done!${NC} Run 'claude plugins list' to verify."
+}
+
+main
