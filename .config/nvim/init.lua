@@ -170,6 +170,13 @@ vim.o.scrolloff = 10
 -- See `:help 'confirm'`
 vim.o.confirm = true
 
+-- Ported from vimrc
+vim.o.swapfile = false
+vim.o.showmatch = true
+vim.o.virtualedit = 'onemore'
+vim.o.autowrite = true
+vim.o.shiftround = true
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -207,6 +214,22 @@ vim.keymap.set('n', '<leader>qq', '<cmd>qa<cr>', { desc = 'Quit all' })
 -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
+-- Visual line movement (respects wrapped lines)
+vim.keymap.set('n', 'j', 'gj', { desc = 'Move down by visual line' })
+vim.keymap.set('n', 'k', 'gk', { desc = 'Move up by visual line' })
+
+-- Window splits
+vim.keymap.set('n', '<leader>w', '<C-w>v<C-w>l', { desc = 'Vertical split and focus' })
+vim.keymap.set('n', '<leader>h', '<C-w>s<C-w>j', { desc = 'Horizontal split and focus' })
+vim.keymap.set('n', '<leader>=', '<C-w>=', { desc = 'Equalize window sizes' })
+
+-- Visual mode indent (stay in visual mode)
+vim.keymap.set('v', '<', '<gv', { desc = 'Indent left and reselect' })
+vim.keymap.set('v', '>', '>gv', { desc = 'Indent right and reselect' })
+
+-- Disable F1 help
+vim.keymap.set({ 'n', 'i', 'v' }, '<F1>', '<Esc>', { desc = 'Disable F1 help' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -220,6 +243,16 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.hl.on_yank()
   end,
 })
+
+-- Auto-save when losing focus
+vim.api.nvim_create_autocmd('FocusLost', {
+  desc = 'Auto-save when losing focus',
+  pattern = '*',
+  command = 'silent! wa',
+})
+
+-- Disable markdown folding
+vim.g.vim_markdown_folding_disabled = 1
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
