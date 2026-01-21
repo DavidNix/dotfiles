@@ -32,9 +32,6 @@ zinit snippet OMZP::colored-man-pages
 zinit ice wait"0" lucid
 zinit snippet OMZP::jsontools
 
-# zoxide (smarter alternative to z)
-eval "$(zoxide init zsh)"
-
 zinit ice wait"0" lucid
 zinit snippet OMZP::tmux
 
@@ -125,6 +122,9 @@ export PATH="$PATH:/Users/davidnix/.lmstudio/bin"
 # Mise version manager (formerly rtx)
 # See: https://github.com/jdx/mise
 eval "$(mise activate zsh)"
+
+# zoxide (smarter cd)
+eval "$(zoxide init zsh)"
 
 # kubectl completions (deferred)
 zinit ice wait"1" lucid
