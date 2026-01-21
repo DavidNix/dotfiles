@@ -180,6 +180,12 @@ alias intel="env /usr/bin/arch -x86_64 /bin/zsh --login"
 # find the current public ip address
 alias myip="curl ifconfig.me"
 
+# AI shell command generator using Claude haiku
+# Uses print -z to put the command in the input buffer, ready to execute or edit
+ai() {
+  print -z "$(claude -p --model haiku --system-prompt "Output only shell commands. No explanations, no questions, no markdown formatting. Just the raw command(s) ready to copy and execute." "$*")"
+}
+
 # ==============================================================================
 # Google Cloud SDK
 # ==============================================================================
