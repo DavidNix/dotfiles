@@ -93,6 +93,10 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
 
+-- Disable netrw (using neo-tree instead)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
@@ -193,6 +197,7 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 -- Custom keymaps
 vim.keymap.set('i', 'jk', '<Esc>', { desc = 'Exit insert mode' })
 vim.keymap.set('n', ';', ':', { desc = 'Command mode' })
+vim.keymap.set('n', '<leader>qq', '<cmd>qa<cr>', { desc = 'Quit all' })
 
 -- NOTE: Ctrl+hjkl navigation is handled by vim-tmux-navigator plugin
 
@@ -893,6 +898,7 @@ require('lazy').setup({
       'MunifTanjim/nui.nvim',
     },
     keys = {
+      { '<C-n>', '<cmd>Neotree toggle<cr>', desc = 'Toggle file explorer' },
       { '<leader>e', '<cmd>Neotree toggle<cr>', desc = 'Toggle file explorer' },
       { '<leader>o', '<cmd>Neotree focus<cr>', desc = 'Focus file explorer' },
     },
