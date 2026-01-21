@@ -100,3 +100,18 @@ superhuman:
 .PHONY: claude
 claude: ## Install Claude Code and setup plugins
 	@$$PWD/bin/claude-init
+
+.PHONY: check-clean
+check-clean: ## Check if git state is clean
+	@git diff-index --quiet HEAD -- || { echo "Error: Git is dirty."; exit 1; }
+
+FEAT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+.PHONY: pr
+pr: check-clean ## Mimic a local PR from a branch into upstream
+	@if [ "$(FEAT_BRANCH)" = "main" ]; then \
+		echo "Error: You are on the master branch."; \
+		exit 1; \
+	fi
+	@git checkout master
+	@git merge --squash $(FEAT_BRANCH)
+

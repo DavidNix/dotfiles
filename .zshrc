@@ -32,9 +32,6 @@ zinit snippet OMZP::colored-man-pages
 zinit ice wait"0" lucid
 zinit snippet OMZP::jsontools
 
-# zoxide (smarter alternative to z)
-eval "$(zoxide init zsh)"
-
 zinit ice wait"0" lucid
 zinit snippet OMZP::tmux
 
@@ -126,6 +123,9 @@ export PATH="$PATH:/Users/davidnix/.lmstudio/bin"
 # See: https://github.com/jdx/mise
 eval "$(mise activate zsh)"
 
+# zoxide (smarter cd)
+eval "$(zoxide init zsh)"
+
 # kubectl completions (deferred)
 zinit ice wait"1" lucid
 zinit light-mode for \
@@ -179,6 +179,12 @@ alias intel="env /usr/bin/arch -x86_64 /bin/zsh --login"
 
 # find the current public ip address
 alias myip="curl ifconfig.me"
+
+# AI shell command generator using Claude haiku
+# Uses print -z to put the command in the input buffer, ready to execute or edit
+ai() {
+  print -z "$(claude -p --model haiku --system-prompt "Output only shell commands. No explanations, no questions, no markdown formatting. Just the raw command(s) ready to copy and execute." "$*")"
+}
 
 # ==============================================================================
 # Google Cloud SDK
