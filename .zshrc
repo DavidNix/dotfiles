@@ -84,7 +84,8 @@ autoload bashcompinit && bashcompinit
 # Environment Variables
 # ==============================================================================
 # Point to Colima's docker socket
-export DOCKER_HOST="unix://${HOME}/.colima/default/docker.sock"
+# Had to switch back to Docker Desktop for sandbox feature
+# export DOCKER_HOST="unix://${HOME}/.colima/default/docker.sock"
 
 # Make neovim default editor
 export VISUAL=nvim
