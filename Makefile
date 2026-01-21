@@ -23,8 +23,6 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	@echo "Generating links.."
 	@# Link all the dotfiles
 	find $$PWD -name ".[^.]*" -type f -print0 | xargs -0tJ % ln -sf %  ~
-	mkdir -p ~/.vim
-	ln -sf $$PWD/.vim/* ~/.vim
 	mkdir -p ~/.config
 	ln -sf $$PWD/.config/*/ ~/.config
 	ln -sf $$PWD/.config/* ~/.config
