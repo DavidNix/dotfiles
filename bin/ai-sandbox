@@ -106,7 +106,7 @@ run_sandbox() {
 
     # Use absolute path
     work_dir=$(cd "$work_dir" && pwd)
-    local container_home="/home/sandbox"
+    local container_home="${HOME}"
 
     log_info "Starting sandbox for: $work_dir"
 
@@ -120,23 +120,27 @@ run_sandbox() {
         "--interactive"
         "--tty"
         "--name" "$container_name"
-        "-v" "${work_dir}:${work_dir}"
-        "--mount" "source=${HOME}/.claude,target=${container_home}/.claude"
+        "--mount" "type=bind,source=${work_dir},target=${work_dir}"
+        "--mount" "type=bind,source=${HOME}/.claude,target=${container_home}/.claude"
         "-w" "$work_dir"
         "--ssh"
         "-e" "HOME=${container_home}"
+        "-e" "ZDOTDIR=/home/sandbox"
         "-e" "XDG_CONFIG_HOME=${container_home}/.config"
         "-e" "XDG_CACHE_HOME=${container_home}/.cache"
         "-e" "XDG_DATA_HOME=${container_home}/.local/share"
-        "-e" "MISE_DATA_DIR=/home/sandbox/.local/share/mise"
-        "-e" "MISE_STATE_DIR=/home/sandbox/.local/state/mise"
-        "-e" "MISE_CACHE_DIR=/home/sandbox/.cache/mise"
-        "-e" "GNUPGHOME=/home/sandbox/.gnupg"
+        "-e" "MISE_DATA_DIR=${container_home}/.local/share/mise"
+        "-e" "MISE_STATE_DIR=${container_home}/.local/state/mise"
+        "-e" "MISE_CACHE_DIR=${container_home}/.cache/mise"
+        "-e" "GNUPGHOME=${container_home}/.gnupg"
         "-e" "GIT_AUTHOR_NAME=${git_name}"
         "-e" "GIT_COMMITTER_NAME=${git_name}"
         "-e" "GIT_AUTHOR_EMAIL=${git_email}"
         "-e" "GIT_COMMITTER_EMAIL=${git_email}"
     )
+    if [[ ! -d "${HOME}/.claude" ]]; then
+        log_warn "Host ~/.claude not found at: ${HOME}/.claude"
+    fi
 
     # TODO: mise support temporarily disabled
     # local needs_mise=false

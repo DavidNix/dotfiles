@@ -6,6 +6,7 @@ An attempt to mimic [Docker's AI Sandbox](https://docs.docker.com/ai/sandboxes/)
 
 Run AI coding agents (starting with Claude Code) in an isolated container with:
 - Project directory mounted at the same absolute path as host
+- Host home path mirrored inside the container (e.g., `/Users/davidnix`)
 - Git identity injected
 - Claude authentication persisted
 - Bypass permissions mode (`--dangerously-skip-permissions`)
@@ -16,8 +17,8 @@ Run AI coding agents (starting with Claude Code) in an isolated container with:
 Main launcher script that:
 - Builds the container image if it doesn't exist
 - Mounts project directory at same absolute path
-- Mounts `~/.claude` (read-write) for auth/plugins/settings
-- Sets `HOME` to `/home/sandbox` and uses XDG dirs inside the container
+- Mounts only `~/.claude` (read-write) for auth/plugins/settings
+- Sets `HOME` to match host home path and uses XDG dirs under that path
 - Forwards SSH agent via `--ssh`
 - Injects Git identity via environment variables
 
@@ -42,20 +43,21 @@ ai-sandbox delete    # Remove sandbox for current directory
 
 ### Directory Mounting
 - Project dir mounted at same absolute path (e.g., `/Users/davidnix/src/project`)
-- This matches Docker sandbox behavior for familiar error messages and hardcoded paths
+- Host home path exists in the container, but only `~/.claude` is mounted
 
 ### Home Directory
-- Set `HOME=/home/sandbox` (container home) via env var
-- Container user is `sandbox` with home at `/home/sandbox`
-- XDG dirs point inside the container:
-  - `XDG_CONFIG_HOME=/home/sandbox/.config`
-  - `XDG_CACHE_HOME=/home/sandbox/.cache`
-  - `XDG_DATA_HOME=/home/sandbox/.local/share`
+- Set `HOME` to the host home path (e.g., `/Users/davidnix`) via env var
+- Container user is `sandbox` with home at `/home/sandbox`, but tools use `$HOME`
+- `ZDOTDIR=/home/sandbox` avoids reading host `~/.zshrc` and suppresses first-run prompts
+- XDG dirs point inside the host home path:
+  - `XDG_CONFIG_HOME=$HOME/.config`
+  - `XDG_CACHE_HOME=$HOME/.cache`
+  - `XDG_DATA_HOME=$HOME/.local/share`
 - Other writable tool dirs:
-  - `MISE_DATA_DIR=/home/sandbox/.local/share/mise`
-  - `MISE_STATE_DIR=/home/sandbox/.local/state/mise`
-  - `MISE_CACHE_DIR=/home/sandbox/.cache/mise`
-  - `GNUPGHOME=/home/sandbox/.gnupg`
+  - `MISE_DATA_DIR=$HOME/.local/share/mise`
+  - `MISE_STATE_DIR=$HOME/.local/state/mise`
+  - `MISE_CACHE_DIR=$HOME/.cache/mise`
+  - `GNUPGHOME=$HOME/.gnupg`
 
 ### Git Identity
 - Mounted `~/.gitconfig` initially, but Apple Container only mounts directories (not files)
