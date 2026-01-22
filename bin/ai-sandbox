@@ -106,7 +106,7 @@ run_sandbox() {
 
     # Use absolute path
     work_dir=$(cd "$work_dir" && pwd)
-    local container_home="${HOME}"
+    local container_home="/home/sandbox"
 
     log_info "Starting sandbox for: $work_dir"
 
@@ -117,13 +117,17 @@ run_sandbox() {
 
     # Build run command
     local run_args=(
-        "-it"
+        "--interactive"
+        "--tty"
         "--name" "$container_name"
         "-v" "${work_dir}:${work_dir}"
-        "--mount" "source=${HOME}/.claude,target=${container_home}/.claude,readonly"
+        "--mount" "source=${HOME}/.claude,target=${container_home}/.claude"
         "-w" "$work_dir"
         "--ssh"
-        "-e" "HOME=${HOME}"
+        "-e" "HOME=${container_home}"
+        "-e" "XDG_CONFIG_HOME=${container_home}/.config"
+        "-e" "XDG_CACHE_HOME=${container_home}/.cache"
+        "-e" "XDG_DATA_HOME=${container_home}/.local/share"
         "-e" "MISE_DATA_DIR=/home/sandbox/.local/share/mise"
         "-e" "MISE_STATE_DIR=/home/sandbox/.local/state/mise"
         "-e" "MISE_CACHE_DIR=/home/sandbox/.cache/mise"
@@ -142,11 +146,10 @@ run_sandbox() {
 
     # Determine what to run
     local cmd=()
-    local extra_args="${agent_args[*]:-}"
     case "$agent" in
         claude)
             cmd=("claude" "--dangerously-skip-permissions")
-            [[ -n "$extra_args" ]] && cmd+=($extra_args)
+            ((${#agent_args[@]})) && cmd+=("${agent_args[@]}")
             ;;
         codex)
             log_warn "Codex support is planned but not yet implemented"
@@ -156,7 +159,7 @@ run_sandbox() {
             ;;
         *)
             cmd=("$agent")
-            [[ -n "$extra_args" ]] && cmd+=($extra_args)
+            ((${#agent_args[@]})) && cmd+=("${agent_args[@]}")
             ;;
     esac
 
@@ -170,7 +173,7 @@ run_sandbox() {
         log_info "Reusing existing sandbox: $container_name"
         container start "$container_name" 2>/dev/null || true
         # [[ "$needs_mise" == "true" ]] && run_mise_install
-        container exec -it "$container_name" "${cmd[@]}"
+        container exec --interactive --tty "$container_name" "${cmd[@]}"
     else
         log_info "Creating new sandbox: $container_name"
         # if [[ "$needs_mise" == "true" ]]; then
