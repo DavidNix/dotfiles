@@ -156,6 +156,7 @@ EOF
         "--name" "$container_name"
         "--uid" "$host_uid"
         "--gid" "$host_gid"
+        "--mount" "type=tmpfs,target=${container_home}"
         "--mount" "type=bind,source=${work_dir},target=${work_dir}"
         "--mount" "type=volume,source=${CLAUDE_VOLUME},target=${container_home}/.claude"
         "-w" "$work_dir"
@@ -197,27 +198,12 @@ EOF
             ;;
     esac
 
-    # TODO: mise support temporarily disabled
-    # run_mise_install() {
-    #     log_info "Running mise install..."
-    #     container exec "$container_name" /usr/local/bin/mise install
-    # }
-
     if container_exists "$container_name"; then
-        log_info "Reusing existing sandbox: $container_name"
-        container start "$container_name" 2>/dev/null || true
-        # [[ "$needs_mise" == "true" ]] && run_mise_install
-        container exec --interactive --tty --uid "$host_uid" --gid "$host_gid" "$container_name" "${cmd[@]}"
-    else
-        log_info "Creating new sandbox: $container_name"
-        # if [[ "$needs_mise" == "true" ]]; then
-        #     container run -d "${run_args[@]}" "$SANDBOX_IMAGE" sleep infinity
-        #     run_mise_install
-        #     container exec -it "$container_name" "${cmd[@]}"
-        # else
-            container run "${run_args[@]}" "$SANDBOX_IMAGE" "${cmd[@]}"
-        # fi
+        remove_container "$container_name"
     fi
+
+    log_info "Creating sandbox: $container_name"
+    container run "${run_args[@]}" "$SANDBOX_IMAGE" "${cmd[@]}"
 }
 
 main() {
