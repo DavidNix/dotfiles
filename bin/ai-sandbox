@@ -1,0 +1,228 @@
+#!/bin/bash
+# ai-sandbox - Run AI coding agents in an isolated Apple Container environment
+# Mimics Docker sandbox functionality using Apple's container tool
+
+set -euo pipefail
+
+# Configuration
+SANDBOX_IMAGE="ai-sandbox:latest"
+DOCKERFILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+log_info() { echo -e "${BLUE}[INFO]${NC} $*"; }
+log_success() { echo -e "${GREEN}[OK]${NC} $*"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $*"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $*" >&2; }
+
+# Show usage
+usage() {
+    cat <<EOF
+Usage: ai-sandbox [OPTIONS] [AGENT] [AGENT_ARGS...]
+
+Run AI coding agents in an isolated container environment.
+
+COMMANDS:
+    claude      Run Claude Code (default)
+    codex       Run OpenAI Codex (planned)
+    shell       Open interactive shell
+    clean       Remove sandbox for current directory
+
+OPTIONS:
+    -h, --help  Show this help message
+
+EXAMPLES:
+    ai-sandbox claude                   # Run Claude (builds image if needed)
+    ai-sandbox shell                    # Open shell in sandbox
+    ai-sandbox clean                    # Remove sandbox for current directory
+
+EOF
+}
+
+ensure_system_running() {
+    if ! container system info &>/dev/null; then
+        log_info "Starting container system..."
+        container system start
+        sleep 2
+    fi
+}
+
+# Build the sandbox image if it doesn't exist
+build_image() {
+    if container image list 2>/dev/null | grep -q "$SANDBOX_IMAGE"; then
+        return 0
+    fi
+
+    log_info "Building sandbox image..."
+
+    container build \
+        -f "${DOCKERFILE_DIR}/Dockerfile.ai-sandbox" \
+        -t "$SANDBOX_IMAGE" \
+        "${DOCKERFILE_DIR}"
+
+    log_success "Image built successfully"
+}
+
+# Generate container name from directory
+container_name_from_dir() {
+    local dir="$1"
+    # Create a stable name from the directory path
+    # Use md5 on macOS, md5sum on Linux
+    if command -v md5 &>/dev/null; then
+        echo "sandbox-$(echo "$dir" | md5 | cut -c1-12)"
+    else
+        echo "sandbox-$(echo "$dir" | md5sum | cut -c1-12)"
+    fi
+}
+
+# Check if container exists
+container_exists() {
+    local name="$1"
+    container list -a 2>/dev/null | grep -q "$name"
+}
+
+# Remove existing container
+remove_container() {
+    local name="$1"
+    if container_exists "$name"; then
+        log_info "Removing existing container: $name"
+        container stop "$name" 2>/dev/null || true
+        container rm "$name" 2>/dev/null || true
+    fi
+}
+
+# Run the sandbox
+run_sandbox() {
+    local work_dir="$1"
+    local container_name="$2"
+    local agent="$3"
+    shift 3
+    local agent_args=("$@")
+
+    # Use absolute path
+    work_dir=$(cd "$work_dir" && pwd)
+    local container_home="${HOME}"
+
+    log_info "Starting sandbox for: $work_dir"
+
+    # Build run command
+    local run_args=(
+        "-it"
+        "--name" "$container_name"
+        "-v" "${work_dir}:${work_dir}"
+        "--mount" "source=${HOME}/.claude,target=${container_home}/.claude,readonly"
+        "--mount" "source=${HOME}/.gitconfig,target=${container_home}/.gitconfig,readonly"
+        "-w" "$work_dir"
+        "--ssh"
+        "-e" "HOME=${HOME}"
+    )
+
+    # Build mise install prefix if .tool-versions exists
+    local mise_prefix=""
+    if [[ -f "${work_dir}/.tool-versions" ]]; then
+        log_info "Detected .tool-versions, will run mise install"
+        mise_prefix="~/.local/bin/mise install && "
+    fi
+
+    # Determine what to run
+    local cmd=()
+    case "$agent" in
+        claude)
+            cmd=("zsh" "-c" "${mise_prefix}claude --dangerously-skip-permissions ${agent_args[*]}")
+            ;;
+        codex)
+            log_warn "Codex support is planned but not yet implemented"
+            # cmd=("zsh" "-c" "${mise_prefix}codex ${agent_args[*]}")
+            ;;
+        shell)
+            if [[ -n "$mise_prefix" ]]; then
+                cmd=("zsh" "-c" "${mise_prefix}exec zsh")
+            else
+                cmd=("/bin/zsh")
+            fi
+            ;;
+        *)
+            cmd=("zsh" "-c" "${mise_prefix}$agent ${agent_args[*]}")
+            ;;
+    esac
+
+    if container_exists "$container_name"; then
+        log_info "Reusing existing sandbox: $container_name"
+        container start "$container_name" 2>/dev/null || true
+        container exec -it "$container_name" "${cmd[@]}"
+    else
+        log_info "Creating new sandbox: $container_name"
+        container run "${run_args[@]}" "$SANDBOX_IMAGE" "${cmd[@]}"
+    fi
+}
+
+main() {
+    local work_dir="."
+    local agent=""
+    local agent_args=()
+
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            claude|codex|shell|clean)
+                agent="$1"
+                shift
+                agent_args=("$@")
+                break
+                ;;
+            -*)
+                log_error "Unknown option: $1"
+                usage
+                exit 1
+                ;;
+            *)
+                agent="$1"
+                shift
+                agent_args=("$@")
+                break
+                ;;
+        esac
+    done
+
+    # Require a command
+    if [[ -z "$agent" ]]; then
+        log_error "Command required"
+        usage
+        exit 1
+    fi
+
+    # Validate working directory
+    if [[ ! -d "$work_dir" ]]; then
+        log_error "Directory does not exist: $work_dir"
+        exit 1
+    fi
+
+    # Generate container name from directory
+    work_dir=$(cd "$work_dir" && pwd)
+    local container_name
+    container_name=$(container_name_from_dir "$work_dir")
+
+    # Handle clean command
+    if [[ "$agent" == "clean" ]]; then
+        remove_container "$container_name"
+        log_success "Sandbox cleaned"
+        exit 0
+    fi
+
+    ensure_system_running
+
+    build_image
+
+    run_sandbox "$work_dir" "$container_name" "$agent" "${agent_args[@]}"
+}
+
+main "$@"

@@ -1,0 +1,50 @@
+# AI Sandbox Image for Apple Container
+# Designed to run AI coding agents (Claude, Codex, etc.) in an isolated environment
+FROM docker.io/ubuntu:24.04
+
+# Avoid prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install base dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Core tools
+    ca-certificates \
+    curl \
+    wget \
+    git \
+    # Shell and editors
+    zsh \
+    vim \
+    # Build essentials (for native npm packages)
+    build-essential \
+    python3 \
+    # Useful utilities
+    jq \
+    ripgrep \
+    fd-find \
+    fzf \
+    unzip \
+    sudo \
+    openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js (LTS)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Claude Code CLI globally
+RUN npm install -g @anthropic-ai/claude-code
+
+# Create non-root user
+RUN useradd -m -s /bin/zsh sandbox \
+    && echo "sandbox ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/sandbox
+
+USER sandbox
+WORKDIR /home/sandbox
+
+# Install mise
+RUN curl https://mise.run | sh \
+    && echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc
+
+CMD ["/bin/zsh"]
