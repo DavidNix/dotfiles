@@ -28,10 +28,10 @@ Usage: ai-sandbox [OPTIONS] [AGENT] [AGENT_ARGS...]
 Run AI coding agents in an isolated container environment.
 
 COMMANDS:
-    claude      Run Claude Code (default)
-    codex       Run OpenAI Codex (planned)
+    claude      Run Claude Code
     shell       Open interactive shell
-    clean       Remove sandbox for current directory
+    build       Build/rebuild the sandbox image
+    delete       Remove sandbox for current directory
 
 OPTIONS:
     -h, --help  Show this help message
@@ -39,7 +39,8 @@ OPTIONS:
 EXAMPLES:
     ai-sandbox claude                   # Run Claude (builds image if needed)
     ai-sandbox shell                    # Open shell in sandbox
-    ai-sandbox clean                    # Remove sandbox for current directory
+    ai-sandbox build                    # Build/rebuild the image
+    ai-sandbox delete                    # Remove sandbox for current directory
 
 EOF
 }
@@ -68,7 +69,6 @@ build_image() {
     log_success "Image built successfully"
 }
 
-# Generate container name from directory
 container_name_from_dir() {
     local dir="$1"
     # Create a stable name from the directory path
@@ -124,48 +124,62 @@ run_sandbox() {
         "-w" "$work_dir"
         "--ssh"
         "-e" "HOME=${HOME}"
+        "-e" "MISE_DATA_DIR=/home/sandbox/.local/share/mise"
+        "-e" "MISE_STATE_DIR=/home/sandbox/.local/state/mise"
+        "-e" "MISE_CACHE_DIR=/home/sandbox/.cache/mise"
+        "-e" "GNUPGHOME=/home/sandbox/.gnupg"
         "-e" "GIT_AUTHOR_NAME=${git_name}"
         "-e" "GIT_COMMITTER_NAME=${git_name}"
         "-e" "GIT_AUTHOR_EMAIL=${git_email}"
         "-e" "GIT_COMMITTER_EMAIL=${git_email}"
     )
 
-    # Build mise install prefix if .tool-versions exists
-    local mise_prefix=""
-    if [[ -f "${work_dir}/.tool-versions" ]]; then
-        log_info "Detected .tool-versions, will run mise install"
-        mise_prefix="~/.local/bin/mise install && "
-    fi
+    # TODO: mise support temporarily disabled
+    # local needs_mise=false
+    # if [[ -f "${work_dir}/.tool-versions" ]]; then
+    #     needs_mise=true
+    # fi
 
     # Determine what to run
     local cmd=()
     local extra_args="${agent_args[*]:-}"
     case "$agent" in
         claude)
-            cmd=("zsh" "-c" "${mise_prefix}claude --dangerously-skip-permissions ${extra_args}")
+            cmd=("claude" "--dangerously-skip-permissions")
+            [[ -n "$extra_args" ]] && cmd+=($extra_args)
             ;;
         codex)
             log_warn "Codex support is planned but not yet implemented"
             ;;
         shell)
-            if [[ -n "$mise_prefix" ]]; then
-                cmd=("zsh" "-c" "${mise_prefix}exec zsh")
-            else
-                cmd=("/bin/zsh")
-            fi
+            cmd=("/bin/zsh")
             ;;
         *)
-            cmd=("zsh" "-c" "${mise_prefix}$agent ${extra_args}")
+            cmd=("$agent")
+            [[ -n "$extra_args" ]] && cmd+=($extra_args)
             ;;
     esac
+
+    # TODO: mise support temporarily disabled
+    # run_mise_install() {
+    #     log_info "Running mise install..."
+    #     container exec "$container_name" /usr/local/bin/mise install
+    # }
 
     if container_exists "$container_name"; then
         log_info "Reusing existing sandbox: $container_name"
         container start "$container_name" 2>/dev/null || true
+        # [[ "$needs_mise" == "true" ]] && run_mise_install
         container exec -it "$container_name" "${cmd[@]}"
     else
         log_info "Creating new sandbox: $container_name"
-        container run "${run_args[@]}" "$SANDBOX_IMAGE" "${cmd[@]}"
+        # if [[ "$needs_mise" == "true" ]]; then
+        #     container run -d "${run_args[@]}" "$SANDBOX_IMAGE" sleep infinity
+        #     run_mise_install
+        #     container exec -it "$container_name" "${cmd[@]}"
+        # else
+            container run "${run_args[@]}" "$SANDBOX_IMAGE" "${cmd[@]}"
+        # fi
     fi
 }
 
@@ -181,7 +195,7 @@ main() {
                 usage
                 exit 0
                 ;;
-            claude|codex|shell|clean)
+            claude|codex|shell|delete|build)
                 agent="$1"
                 shift
                 agent_args=("$@")
@@ -219,10 +233,15 @@ main() {
     local container_name
     container_name=$(container_name_from_dir "$work_dir")
 
-    # Handle clean command
-    if [[ "$agent" == "clean" ]]; then
+    if [[ "$agent" == "delete" ]]; then
         remove_container "$container_name"
-        log_success "Sandbox cleaned"
+        log_success "Sandbox deleted"
+        exit 0
+    fi
+
+    if [[ "$agent" == "build" ]]; then
+        ensure_system_running
+        build_image true
         exit 0
     fi
 

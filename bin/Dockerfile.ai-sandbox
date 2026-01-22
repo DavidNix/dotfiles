@@ -36,15 +36,14 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 # Install Claude Code CLI globally
 RUN npm install -g @anthropic-ai/claude-code
 
+# Install mise system-wide
+RUN curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
+
 # Create non-root user
 RUN useradd -m -s /bin/zsh sandbox \
     && echo "sandbox ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/sandbox
 
 USER sandbox
 WORKDIR /home/sandbox
-
-# Install mise
-RUN curl https://mise.run | sh \
-    && echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc
 
 CMD ["/bin/zsh"]

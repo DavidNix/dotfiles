@@ -21,7 +21,7 @@
       "repo": "anthropics/claude-plugins-official"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/claude-plugins-official",
-    "lastUpdated": "2026-01-22T03:40:21.423Z"
+    "lastUpdated": "2026-01-22T15:07:45.476Z"
   },
   "anthropic-agent-skills": {
     "source": {
@@ -30,5 +30,13 @@
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/anthropic-agent-skills",
     "lastUpdated": "2026-01-08T14:12:22.043Z"
+  },
+  "n8n-mcp-skills": {
+    "source": {
+      "source": "github",
+      "repo": "czlonkowski/n8n-skills"
+    },
+    "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/n8n-mcp-skills",
+    "lastUpdated": "2026-01-22T15:07:52.594Z"
   }
 }
