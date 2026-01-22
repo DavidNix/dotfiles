@@ -18,6 +18,7 @@ Main launcher script that:
 - Builds the container image if it doesn't exist
 - Mounts project directory at same absolute path
 - Mounts only `~/.claude` (read-write) for auth/plugins/settings
+- Uses tmpfs for `$HOME/.config`, `$HOME/.cache`, `$HOME/.local`, `$HOME/.gnupg`
 - Sets `HOME` to match host home path and uses XDG dirs under that path
 - Forwards SSH agent via `--ssh`
 - Injects Git identity via environment variables
@@ -44,6 +45,7 @@ ai-sandbox delete    # Remove sandbox for current directory
 ### Directory Mounting
 - Project dir mounted at same absolute path (e.g., `/Users/davidnix/src/project`)
 - Host home path exists in the container, but only `~/.claude` is mounted
+ - Other `$HOME` directories use tmpfs mounts to keep writes isolated
 
 ### Home Directory
 - Set `HOME` to the host home path (e.g., `/Users/davidnix`) via env var

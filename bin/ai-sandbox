@@ -107,6 +107,9 @@ run_sandbox() {
     # Use absolute path
     work_dir=$(cd "$work_dir" && pwd)
     local container_home="${HOME}"
+    local host_uid host_gid
+    host_uid=$(id -u)
+    host_gid=$(id -g)
 
     log_info "Starting sandbox for: $work_dir"
 
@@ -120,12 +123,18 @@ run_sandbox() {
         "--interactive"
         "--tty"
         "--name" "$container_name"
+        "--uid" "$host_uid"
+        "--gid" "$host_gid"
         "--mount" "type=bind,source=${work_dir},target=${work_dir}"
         "--mount" "type=bind,source=${HOME}/.claude,target=${container_home}/.claude"
+        "--tmpfs" "${container_home}/.config"
+        "--tmpfs" "${container_home}/.cache"
+        "--tmpfs" "${container_home}/.local"
+        "--tmpfs" "${container_home}/.gnupg"
         "-w" "$work_dir"
         "--ssh"
         "-e" "HOME=${container_home}"
-        "-e" "ZDOTDIR=/home/sandbox"
+        "-e" "ZDOTDIR=/home/sandbox" # prevents zsh warnings
         "-e" "XDG_CONFIG_HOME=${container_home}/.config"
         "-e" "XDG_CACHE_HOME=${container_home}/.cache"
         "-e" "XDG_DATA_HOME=${container_home}/.local/share"
@@ -177,7 +186,7 @@ run_sandbox() {
         log_info "Reusing existing sandbox: $container_name"
         container start "$container_name" 2>/dev/null || true
         # [[ "$needs_mise" == "true" ]] && run_mise_install
-        container exec --interactive --tty "$container_name" "${cmd[@]}"
+        container exec --interactive --tty --uid "$host_uid" --gid "$host_gid" "$container_name" "${cmd[@]}"
     else
         log_info "Creating new sandbox: $container_name"
         # if [[ "$needs_mise" == "true" ]]; then
