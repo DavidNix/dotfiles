@@ -110,16 +110,24 @@ run_sandbox() {
 
     log_info "Starting sandbox for: $work_dir"
 
+    # Get git config for env vars (can't mount files, only directories)
+    local git_name git_email
+    git_name=$(git config --global user.name 2>/dev/null || echo "")
+    git_email=$(git config --global user.email 2>/dev/null || echo "")
+
     # Build run command
     local run_args=(
         "-it"
         "--name" "$container_name"
         "-v" "${work_dir}:${work_dir}"
         "--mount" "source=${HOME}/.claude,target=${container_home}/.claude,readonly"
-        "--mount" "source=${HOME}/.gitconfig,target=${container_home}/.gitconfig,readonly"
         "-w" "$work_dir"
         "--ssh"
         "-e" "HOME=${HOME}"
+        "-e" "GIT_AUTHOR_NAME=${git_name}"
+        "-e" "GIT_COMMITTER_NAME=${git_name}"
+        "-e" "GIT_AUTHOR_EMAIL=${git_email}"
+        "-e" "GIT_COMMITTER_EMAIL=${git_email}"
     )
 
     # Build mise install prefix if .tool-versions exists
@@ -131,13 +139,13 @@ run_sandbox() {
 
     # Determine what to run
     local cmd=()
+    local extra_args="${agent_args[*]:-}"
     case "$agent" in
         claude)
-            cmd=("zsh" "-c" "${mise_prefix}claude --dangerously-skip-permissions ${agent_args[*]}")
+            cmd=("zsh" "-c" "${mise_prefix}claude --dangerously-skip-permissions ${extra_args}")
             ;;
         codex)
             log_warn "Codex support is planned but not yet implemented"
-            # cmd=("zsh" "-c" "${mise_prefix}codex ${agent_args[*]}")
             ;;
         shell)
             if [[ -n "$mise_prefix" ]]; then
@@ -147,7 +155,7 @@ run_sandbox() {
             fi
             ;;
         *)
-            cmd=("zsh" "-c" "${mise_prefix}$agent ${agent_args[*]}")
+            cmd=("zsh" "-c" "${mise_prefix}$agent ${extra_args}")
             ;;
     esac
 
@@ -222,7 +230,7 @@ main() {
 
     build_image
 
-    run_sandbox "$work_dir" "$container_name" "$agent" "${agent_args[@]}"
+    run_sandbox "$work_dir" "$container_name" "$agent" ${agent_args[@]+"${agent_args[@]}"}
 }
 
 main "$@"
