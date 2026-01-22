@@ -39,13 +39,10 @@ RUN npm install -g @anthropic-ai/claude-code
 # Install mise system-wide
 RUN curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
 
-# Create non-root user
-RUN useradd -m -s /bin/zsh sandbox \
-    && echo "sandbox ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/sandbox \
-    && echo "# Minimal zshrc to suppress first-run prompt" > /home/sandbox/.zshrc \
-    && chown sandbox:sandbox /home/sandbox/.zshrc
+# Minimal zshrc to suppress first-run prompt
+RUN mkdir -p /root \
+    && echo "# Minimal zshrc to suppress first-run prompt" > /root/.zshrc
 
-USER sandbox
-WORKDIR /home/sandbox
+WORKDIR /root
 
 CMD ["/bin/zsh"]

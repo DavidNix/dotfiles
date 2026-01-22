@@ -7,6 +7,7 @@ set -euo pipefail
 # Configuration
 SANDBOX_IMAGE="ai-sandbox:latest"
 DOCKERFILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CLAUDE_VOLUME="claude-config"
 
 # Colors for output
 RED='\033[0;31m'
@@ -20,6 +21,33 @@ log_success() { echo -e "${GREEN}[OK]${NC} $*"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $*"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $*" >&2; }
 
+ensure_volume() {
+    if ! container volume list 2>/dev/null | grep -q "$CLAUDE_VOLUME"; then
+        container volume create "$CLAUDE_VOLUME"
+    fi
+}
+
+refresh_claude_config() {
+    ensure_volume
+    local host_home="$HOME"
+
+    log_info "Refreshing Claude credentials in volume..."
+
+    container run --rm \
+        --mount "type=bind,source=${host_home},target=/host-home,readonly" \
+        --mount "type=volume,source=${CLAUDE_VOLUME},target=/claude-config" \
+        "$SANDBOX_IMAGE" \
+        bash -c '
+            rm -rf /claude-config/*
+            cp -R /host-home/.claude/. /claude-config/ 2>/dev/null || true
+            cp /host-home/.claude.json /claude-config/_claude.json 2>/dev/null || true
+            chmod -R 700 /claude-config 2>/dev/null || true
+            echo "Credentials refreshed"
+        '
+
+    log_success "Claude credentials updated"
+}
+
 # Show usage
 usage() {
     cat <<EOF
@@ -31,7 +59,8 @@ COMMANDS:
     claude      Run Claude Code
     shell       Open interactive shell
     build       Build/rebuild the sandbox image
-    delete       Remove sandbox for current directory
+    delete      Remove sandbox for current directory
+    refresh     Copy host ~/.claude/ and ~/.claude.json into shared volume
 
 OPTIONS:
     -h, --help  Show this help message
@@ -40,7 +69,8 @@ EXAMPLES:
     ai-sandbox claude                   # Run Claude (builds image if needed)
     ai-sandbox shell                    # Open shell in sandbox
     ai-sandbox build                    # Build/rebuild the image
-    ai-sandbox delete                    # Remove sandbox for current directory
+    ai-sandbox delete                   # Remove sandbox for current directory
+    ai-sandbox refresh                  # Refresh Claude credentials from host
 
 EOF
 }
@@ -71,22 +101,14 @@ build_image() {
 
 container_name_from_dir() {
     local dir="$1"
-    # Create a stable name from the directory path
-    # Use md5 on macOS, md5sum on Linux
-    if command -v md5 &>/dev/null; then
-        echo "sandbox-$(echo "$dir" | md5 | cut -c1-12)"
-    else
-        echo "sandbox-$(echo "$dir" | md5sum | cut -c1-12)"
-    fi
+    echo "sandbox-$(echo "$dir" | md5 | cut -c1-12)"
 }
 
-# Check if container exists
 container_exists() {
     local name="$1"
     container list -a 2>/dev/null | grep -q "$name"
 }
 
-# Remove existing container
 remove_container() {
     local name="$1"
     if container_exists "$name"; then
@@ -96,13 +118,12 @@ remove_container() {
     fi
 }
 
-# Run the sandbox
 run_sandbox() {
     local work_dir="$1"
     local container_name="$2"
     local agent="$3"
     shift 3
-    local agent_args=("$@")
+    local -a agent_args=("$@")
 
     # Use absolute path
     work_dir=$(cd "$work_dir" && pwd)
@@ -110,6 +131,16 @@ run_sandbox() {
     local host_uid host_gid
     host_uid=$(id -u)
     host_gid=$(id -g)
+    local prep_cmd
+prep_cmd=$(cat <<'EOF'
+: "${XDG_CONFIG_HOME:=$HOME/.config}"
+: "${XDG_CACHE_HOME:=$HOME/.cache}"
+: "${XDG_DATA_HOME:=$HOME/.local/share}"
+mkdir -p "$HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" \
+  "$HOME/.local/state"
+cp "$HOME/.claude/_claude.json" "$HOME/.claude.json" 2>/dev/null || true
+EOF
+)
 
     log_info "Starting sandbox for: $work_dir"
 
@@ -126,31 +157,16 @@ run_sandbox() {
         "--uid" "$host_uid"
         "--gid" "$host_gid"
         "--mount" "type=bind,source=${work_dir},target=${work_dir}"
-        "--mount" "type=bind,source=${HOME}/.claude,target=${container_home}/.claude"
-        "--tmpfs" "${container_home}/.config"
-        "--tmpfs" "${container_home}/.cache"
-        "--tmpfs" "${container_home}/.local"
-        "--tmpfs" "${container_home}/.gnupg"
+        "--mount" "type=volume,source=${CLAUDE_VOLUME},target=${container_home}/.claude"
         "-w" "$work_dir"
         "--ssh"
         "-e" "HOME=${container_home}"
-        "-e" "ZDOTDIR=/home/sandbox" # prevents zsh warnings
-        "-e" "XDG_CONFIG_HOME=${container_home}/.config"
-        "-e" "XDG_CACHE_HOME=${container_home}/.cache"
-        "-e" "XDG_DATA_HOME=${container_home}/.local/share"
-        "-e" "MISE_DATA_DIR=${container_home}/.local/share/mise"
-        "-e" "MISE_STATE_DIR=${container_home}/.local/state/mise"
-        "-e" "MISE_CACHE_DIR=${container_home}/.cache/mise"
-        "-e" "GNUPGHOME=${container_home}/.gnupg"
+        "-e" "ZDOTDIR=/root" # prevents zsh warnings
         "-e" "GIT_AUTHOR_NAME=${git_name}"
         "-e" "GIT_COMMITTER_NAME=${git_name}"
         "-e" "GIT_AUTHOR_EMAIL=${git_email}"
         "-e" "GIT_COMMITTER_EMAIL=${git_email}"
     )
-    if [[ ! -d "${HOME}/.claude" ]]; then
-        log_warn "Host ~/.claude not found at: ${HOME}/.claude"
-    fi
-
     # TODO: mise support temporarily disabled
     # local needs_mise=false
     # if [[ -f "${work_dir}/.tool-versions" ]]; then
@@ -161,18 +177,17 @@ run_sandbox() {
     local cmd=()
     case "$agent" in
         claude)
-            cmd=("claude" "--dangerously-skip-permissions")
-            ((${#agent_args[@]})) && cmd+=("${agent_args[@]}")
+            cmd=("/bin/bash" "-lc" "${prep_cmd}; exec \"\$@\"" "bash" "claude" "--dangerously-skip-permissions" "${agent_args[@]}")
             ;;
         codex)
             log_warn "Codex support is planned but not yet implemented"
+            exit 0
             ;;
         shell)
-            cmd=("/bin/zsh")
+            cmd=("/bin/bash" "-lc" "${prep_cmd}; exec /bin/zsh")
             ;;
         *)
-            cmd=("$agent")
-            ((${#agent_args[@]})) && cmd+=("${agent_args[@]}")
+            cmd=("/bin/bash" "-lc" "${prep_cmd}; exec \"\$@\"" "bash" "$agent" "${agent_args[@]}")
             ;;
     esac
 
@@ -211,7 +226,7 @@ main() {
                 usage
                 exit 0
                 ;;
-            claude|codex|shell|delete|build)
+            claude|codex|shell|delete|build|refresh)
                 agent="$1"
                 shift
                 agent_args=("$@")
@@ -258,6 +273,13 @@ main() {
     if [[ "$agent" == "build" ]]; then
         ensure_system_running
         build_image true
+        exit 0
+    fi
+
+    if [[ "$agent" == "refresh" ]]; then
+        ensure_system_running
+        build_image
+        refresh_claude_config
         exit 0
     fi
 

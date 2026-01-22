@@ -17,8 +17,8 @@ Run AI coding agents (starting with Claude Code) in an isolated container with:
 Main launcher script that:
 - Builds the container image if it doesn't exist
 - Mounts project directory at same absolute path
-- Mounts only `~/.claude` (read-write) for auth/plugins/settings
-- Uses tmpfs for `$HOME/.config`, `$HOME/.cache`, `$HOME/.local`, `$HOME/.gnupg`
+- Mounts only `~/.claude` (read-write) for auth/settings
+- Creates `$HOME` inside the container and symlinks `$HOME/.claude.json` -> `$HOME/.claude/.claude.json`
 - Sets `HOME` to match host home path and uses XDG dirs under that path
 - Forwards SSH agent via `--ssh`
 - Injects Git identity via environment variables
@@ -44,22 +44,14 @@ ai-sandbox delete    # Remove sandbox for current directory
 
 ### Directory Mounting
 - Project dir mounted at same absolute path (e.g., `/Users/davidnix/src/project`)
-- Host home path exists in the container, but only `~/.claude` is mounted
- - Other `$HOME` directories use tmpfs mounts to keep writes isolated
+- Host home path exists in the container but is not mounted from the host
+- Other `$HOME` writes stay inside the container filesystem
 
 ### Home Directory
 - Set `HOME` to the host home path (e.g., `/Users/davidnix`) via env var
 - Container user is `sandbox` with home at `/home/sandbox`, but tools use `$HOME`
 - `ZDOTDIR=/home/sandbox` avoids reading host `~/.zshrc` and suppresses first-run prompts
-- XDG dirs point inside the host home path:
-  - `XDG_CONFIG_HOME=$HOME/.config`
-  - `XDG_CACHE_HOME=$HOME/.cache`
-  - `XDG_DATA_HOME=$HOME/.local/share`
-- Other writable tool dirs:
-  - `MISE_DATA_DIR=$HOME/.local/share/mise`
-  - `MISE_STATE_DIR=$HOME/.local/state/mise`
-  - `MISE_CACHE_DIR=$HOME/.cache/mise`
-  - `GNUPGHOME=$HOME/.gnupg`
+- XDG defaults are used (`$HOME/.config`, `$HOME/.cache`, `$HOME/.local/share`)
 
 ### Git Identity
 - Mounted `~/.gitconfig` initially, but Apple Container only mounts directories (not files)
@@ -68,6 +60,7 @@ ai-sandbox delete    # Remove sandbox for current directory
 ### Read-only Mounts
 - Apple Container uses `--mount source=...,target=...,readonly` syntax
 - Docker-style `:ro` suffix doesn't work
+
 
 ## Current Issue: Claude Hangs
 
