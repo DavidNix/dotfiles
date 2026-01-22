@@ -30,10 +30,15 @@ ensure_volume() {
 refresh_claude_config() {
     ensure_volume
     local host_home="$HOME"
+    local host_uid host_gid
+    host_uid=$(id -u)
+    host_gid=$(id -g)
 
     log_info "Refreshing Claude credentials in volume..."
 
     container run --rm \
+        -e "HOST_UID=${host_uid}" \
+        -e "HOST_GID=${host_gid}" \
         --mount "type=bind,source=${host_home},target=/host-home,readonly" \
         --mount "type=volume,source=${CLAUDE_VOLUME},target=/claude-config" \
         "$SANDBOX_IMAGE" \
@@ -41,6 +46,7 @@ refresh_claude_config() {
             rm -rf /claude-config/*
             cp -R /host-home/.claude/. /claude-config/ 2>/dev/null || true
             cp /host-home/.claude.json /claude-config/_claude.json 2>/dev/null || true
+            chown -R "${HOST_UID}:${HOST_GID}" /claude-config 2>/dev/null || true
             chmod -R 700 /claude-config 2>/dev/null || true
             echo "Credentials refreshed"
         '
