@@ -81,7 +81,7 @@ EOF
 }
 
 ensure_system_running() {
-    if ! container system info &>/dev/null; then
+    if ! container ls &>/dev/null; then
         log_info "Starting container system..."
         container system start
         sleep 2
@@ -207,7 +207,7 @@ EOF
     local cmd=()
     case "$agent" in
         claude)
-            cmd=("/bin/bash" "-lc" "${prep_cmd}; claude update 2>/dev/null || true; exec \"\$@\"" "bash" "claude" "--dangerously-skip-permissions" "--no-chrome")
+            cmd=("/bin/bash" "-lc" "${prep_cmd}; exec \"\$@\"" "bash" "claude" "--dangerously-skip-permissions" "--no-chrome")
             if ((${#agent_args[@]})); then
                 cmd+=("${agent_args[@]}")
             fi
