@@ -28,9 +28,28 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
+# Host-like home path (macOS-style) for absolute path compatibility
+ARG HOST_HOME=/Users/sandbox
+ARG HOST_UID=1000
+ARG HOST_GID=1000
+
+RUN mkdir -p "$(dirname "$HOST_HOME")" \
+    && mkdir -p "$HOST_HOME/.local/bin" \
+       "$HOST_HOME/.local/share" \
+       "$HOST_HOME/.local/state" \
+       "$HOST_HOME/.local/home" \
+       "$HOST_HOME/.config" \
+       "$HOST_HOME/.cache" \
+       "$HOST_HOME/.claude" \
+    && chown -R "$HOST_UID":"$HOST_GID" "$HOST_HOME"
+
+ENV HOME=$HOST_HOME
+ENV PATH=$HOST_HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 # Install Claude Code CLI
 RUN curl -fsSL https://claude.ai/install.sh | bash \
-    && install -m 755 "$(readlink -f /root/.local/bin/claude)" /usr/local/bin/claude
+    && install -m 755 "$(readlink -f "$HOME/.local/bin/claude")" /usr/local/bin/claude \
+    && chown -R "$HOST_UID":"$HOST_GID" "$HOME"
 
 # Install mise system-wide
 RUN curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
@@ -39,6 +58,6 @@ RUN curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
 RUN mkdir -p /root \
     && echo "# Minimal zshrc to suppress first-run prompt" > /root/.zshrc
 
-WORKDIR /root
+WORKDIR $HOME
 
 CMD ["/bin/zsh"]

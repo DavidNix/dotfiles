@@ -89,15 +89,24 @@ ensure_system_running() {
 
 # Build the sandbox image if it doesn't exist
 build_image() {
-    if container image list 2>/dev/null | grep -q "$SANDBOX_IMAGE"; then
+    local force="${1:-}"
+    if [[ -z "$force" ]] && container image list 2>/dev/null | grep -q "$SANDBOX_IMAGE"; then
         return 0
     fi
+
+    local host_home host_uid host_gid
+    host_home="$HOME"
+    host_uid=$(id -u)
+    host_gid=$(id -g)
 
     log_info "Building sandbox image..."
 
     container build \
         -f "${DOCKERFILE_DIR}/Dockerfile.ai-sandbox" \
         -t "$SANDBOX_IMAGE" \
+        --build-arg "HOST_HOME=${host_home}" \
+        --build-arg "HOST_UID=${host_uid}" \
+        --build-arg "HOST_GID=${host_gid}" \
         "${DOCKERFILE_DIR}"
 
     log_success "Image built successfully"
@@ -140,8 +149,12 @@ prep_cmd=$(cat <<'EOF'
 : "${XDG_CONFIG_HOME:=$HOME/.config}"
 : "${XDG_CACHE_HOME:=$HOME/.cache}"
 : "${XDG_DATA_HOME:=$HOME/.local/share}"
+: "${XDG_STATE_HOME:=$HOME/.local/state}"
 mkdir -p "$HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" \
-  "$HOME/.local/state"
+  "$XDG_STATE_HOME" "$HOME/.local/bin" "$HOME/.local/home"
+if [ ! -x "$HOME/.local/bin/claude" ] && [ -x /usr/local/bin/claude ]; then
+  ln -sf /usr/local/bin/claude "$HOME/.local/bin/claude"
+fi
 cp "$HOME/.claude/_claude.json" "$HOME/.claude.json" 2>/dev/null || true
 EOF
 )
@@ -160,12 +173,12 @@ EOF
         "--name" "$container_name"
         "--uid" "$host_uid"
         "--gid" "$host_gid"
-        "--mount" "type=tmpfs,target=${container_home}"
         "--mount" "type=bind,source=${work_dir},target=${work_dir}"
         "--mount" "type=volume,source=${CLAUDE_VOLUME},target=${container_home}/.claude"
         "-w" "$work_dir"
         "--ssh"
         "-e" "HOME=${container_home}"
+        "-e" "PATH=${container_home}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         "-e" "ZDOTDIR=/root" # prevents zsh warnings
         "-e" "GIT_AUTHOR_NAME=${git_name}"
         "-e" "GIT_COMMITTER_NAME=${git_name}"
