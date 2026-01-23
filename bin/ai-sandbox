@@ -187,7 +187,7 @@ EOF
         "--mount" "type=bind,source=${work_dir},target=${work_dir}"
         "--mount" "type=volume,source=${CLAUDE_VOLUME},target=${container_home}/.claude"
         "-w" "$work_dir"
-        "--ssh"
+        # "--ssh" # leaving out for now, don't want it comitting to remotes yet
         "-e" "HOME=${container_home}"
         "-e" "PATH=${container_home}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         "-e" "ZDOTDIR=/root" # prevents zsh warnings
