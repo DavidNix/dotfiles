@@ -63,6 +63,7 @@ Run AI coding agents in an isolated container environment.
 
 COMMANDS:
     claude      Run Claude Code
+    codex       Run OpenAI Codex
     shell       Open interactive shell
     build       Build/rebuild the sandbox image
     reset       Remove sandbox and refresh Claude credentials from host
@@ -206,14 +207,16 @@ EOF
     local cmd=()
     case "$agent" in
         claude)
-            cmd=("/bin/bash" "-lc" "${prep_cmd}; exec \"\$@\"" "bash" "claude" "--dangerously-skip-permissions" "--no-chrome")
+            cmd=("/bin/bash" "-lc" "${prep_cmd}; claude update 2>/dev/null || true; exec \"\$@\"" "bash" "claude" "--dangerously-skip-permissions" "--no-chrome")
             if ((${#agent_args[@]})); then
                 cmd+=("${agent_args[@]}")
             fi
             ;;
         codex)
-            log_warn "Codex support is planned but not yet implemented"
-            exit 0
+            cmd=("/bin/bash" "-lc" "${prep_cmd}; exec \"\$@\"" "bash" "codex" "--dangerously-bypass-approvals-and-sandbox")
+            if ((${#agent_args[@]})); then
+                cmd+=("${agent_args[@]}")
+            fi
             ;;
         shell)
             cmd=("/bin/bash" "-lc" "${prep_cmd}; exec /bin/zsh")
@@ -226,6 +229,7 @@ EOF
             ;;
     esac
 
+    # Container names are deterministic; remove stale ones so `container run` succeeds.
     if container_exists "$container_name"; then
         remove_container "$container_name"
     fi
