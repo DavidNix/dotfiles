@@ -39,15 +39,17 @@ refresh_claude_config() {
     container run --rm \
         -e "HOST_UID=${host_uid}" \
         -e "HOST_GID=${host_gid}" \
-        --mount "type=bind,source=${host_home},target=/host-home,readonly" \
+        -e "HOST_HOME=${host_home}" \
+        --mount "type=bind,source=${host_home},target=${host_home},readonly" \
         --mount "type=volume,source=${CLAUDE_VOLUME},target=/claude-config" \
         "$SANDBOX_IMAGE" \
         bash -c '
+            set -e
             rm -rf /claude-config/*
-            cp -R /host-home/.claude/. /claude-config/ 2>/dev/null || true
-            cp /host-home/.claude.json /claude-config/_claude.json 2>/dev/null || true
-            chown -R "${HOST_UID}:${HOST_GID}" /claude-config 2>/dev/null || true
-            chmod -R 700 /claude-config 2>/dev/null || true
+            cp -RLf "$HOST_HOME/.claude/." /claude-config/
+            cp "$HOST_HOME/.claude.json" /claude-config/_claude.json
+            chown -R "${HOST_UID}:${HOST_GID}" /claude-config
+            chmod -R 700 /claude-config
             echo "Credentials refreshed"
         '
 
@@ -127,8 +129,8 @@ remove_container() {
     local name="$1"
     if container_exists "$name"; then
         log_info "Removing existing container: $name"
-        container stop "$name" 2>/dev/null || true
-        container rm "$name" 2>/dev/null || true
+        container stop "$name"
+        container rm "$name"
     fi
 }
 
@@ -163,10 +165,10 @@ mkdir -p "$HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" \
 if [ ! -x "$HOME/.local/bin/claude" ] && [ -x /usr/local/bin/claude ]; then
   ln -sf /usr/local/bin/claude "$HOME/.local/bin/claude"
 fi
-cp "$HOME/.claude/_claude.json" "$HOME/.claude.json" 2>/dev/null || true
+cp "$HOME/.claude/_claude.json" "$HOME/.claude.json"
 if [ -f .tool-versions ] || [ -f .mise.toml ] || [ -f mise.toml ]; then
-  /usr/local/bin/mise install --yes 2>&1 | tail -5 || true
-  eval "$(/usr/local/bin/mise activate bash)" 2>/dev/null || true
+  /usr/local/bin/mise install --yes 2>&1 | tail -5
+  eval "$(/usr/local/bin/mise activate bash)"
 fi
 EOF
 )
@@ -175,8 +177,8 @@ EOF
 
     # Get git config for env vars (can't mount files, only directories)
     local git_name git_email
-    git_name=$(git config --global user.name 2>/dev/null || echo "")
-    git_email=$(git config --global user.email 2>/dev/null || echo "")
+    git_name=$(git config --global user.name)
+    git_email=$(git config --global user.email)
 
     # Build run command
     local run_args=(
