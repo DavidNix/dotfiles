@@ -54,13 +54,11 @@ RUN curl -fsSL https://claude.ai/install.sh | bash \
 # Install mise system-wide
 RUN curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
 
-# Install Homebrew (Linuxbrew)
-RUN NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH
-
-# Install Codex via Homebrew
-RUN brew install --cask codex \
-    && ln -sf "$(brew --prefix)/bin/codex" /usr/local/bin/codex 2>/dev/null || true
+# Install Node.js and Codex CLI
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/* \
+    && npm i -g @openai/codex
 
 # Minimal zshrc to suppress first-run prompt
 RUN mkdir -p /root \
