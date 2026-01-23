@@ -1,6 +1,6 @@
 [user]
 	name = David Nix
-	email = hello@davidnix.io
+	email = hello@davidnix.com
 	signingkey = A410043BEBF42A5E
 [core]
 	excludesfile = /Users/davidnix/.gitignore_global

@@ -1,0 +1,69 @@
+# AI Sandbox Image for Apple Container
+# Designed to run AI coding agents (Claude, Codex, etc.) in an isolated environment
+FROM docker.io/ubuntu:24.04
+
+# Avoid prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install base dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Core tools
+    ca-certificates \
+    curl \
+    wget \
+    git \
+    # Shell and editors
+    zsh \
+    vim \
+    # Build essentials (for native npm packages)
+    build-essential \
+    python3 \
+    # Useful utilities
+    jq \
+    ripgrep \
+    fd-find \
+    fzf \
+    unzip \
+    sudo \
+    openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Host-like home path (macOS-style) for absolute path compatibility
+ARG HOST_HOME=/Users/sandbox
+ARG HOST_UID=1000
+ARG HOST_GID=1000
+
+RUN mkdir -p "$(dirname "$HOST_HOME")" \
+    && mkdir -p "$HOST_HOME/.local/bin" \
+       "$HOST_HOME/.local/share" \
+       "$HOST_HOME/.local/state" \
+       "$HOST_HOME/.local/home" \
+       "$HOST_HOME/.config" \
+       "$HOST_HOME/.cache" \
+       "$HOST_HOME/.claude" \
+    && chown -R "$HOST_UID":"$HOST_GID" "$HOST_HOME"
+
+ENV HOME=$HOST_HOME
+ENV PATH=$HOST_HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Install Claude Code CLI
+RUN curl -fsSL https://claude.ai/install.sh | bash \
+    && install -m 755 "$(readlink -f "$HOME/.local/bin/claude")" /usr/local/bin/claude \
+    && chown -R "$HOST_UID":"$HOST_GID" "$HOME"
+
+# Install mise system-wide
+RUN curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
+
+# Install Node.js and Codex CLI
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/* \
+    && npm i -g @openai/codex
+
+# Minimal zshrc to suppress first-run prompt
+RUN mkdir -p /root \
+    && echo "# Minimal zshrc to suppress first-run prompt" > /root/.zshrc
+
+WORKDIR $HOME
+
+CMD ["/bin/zsh"]
