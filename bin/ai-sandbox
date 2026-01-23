@@ -163,6 +163,10 @@ if [ ! -x "$HOME/.local/bin/claude" ] && [ -x /usr/local/bin/claude ]; then
   ln -sf /usr/local/bin/claude "$HOME/.local/bin/claude"
 fi
 cp "$HOME/.claude/_claude.json" "$HOME/.claude.json" 2>/dev/null || true
+if [ -f .tool-versions ] || [ -f .mise.toml ] || [ -f mise.toml ]; then
+  /usr/local/bin/mise install --yes 2>&1 | tail -5 || true
+  eval "$(/usr/local/bin/mise activate bash)" 2>/dev/null || true
+fi
 EOF
 )
 
@@ -198,12 +202,6 @@ EOF
     if [[ -n "$cpus" ]]; then
         run_args+=("--cpus" "$cpus")
     fi
-    # TODO: mise support temporarily disabled
-    # local needs_mise=false
-    # if [[ -f "${work_dir}/.tool-versions" ]]; then
-    #     needs_mise=true
-    # fi
-
     # Determine what to run
     local cmd=()
     case "$agent" in
