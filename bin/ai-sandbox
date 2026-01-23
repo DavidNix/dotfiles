@@ -65,8 +65,7 @@ COMMANDS:
     claude      Run Claude Code
     shell       Open interactive shell
     build       Build/rebuild the sandbox image
-    delete      Remove sandbox for current directory
-    refresh     Copy host ~/.claude/ and ~/.claude.json into shared volume
+    reset       Remove sandbox and refresh Claude credentials from host
 
 OPTIONS:
     -h, --help  Show this help message
@@ -75,8 +74,7 @@ EXAMPLES:
     ai-sandbox claude                   # Run Claude (builds image if needed)
     ai-sandbox shell                    # Open shell in sandbox
     ai-sandbox build                    # Build/rebuild the image
-    ai-sandbox delete                   # Remove sandbox for current directory
-    ai-sandbox refresh                  # Refresh Claude credentials from host
+    ai-sandbox reset                    # Reset sandbox and credentials
 
 EOF
 }
@@ -224,7 +222,7 @@ main() {
                 usage
                 exit 0
                 ;;
-            claude|codex|shell|delete|build|refresh)
+            claude|codex|shell|reset|build)
                 agent="$1"
                 shift
                 agent_args=("$@")
@@ -262,22 +260,18 @@ main() {
     local container_name
     container_name=$(container_name_from_dir "$work_dir")
 
-    if [[ "$agent" == "delete" ]]; then
-        remove_container "$container_name"
-        log_success "Sandbox deleted"
-        exit 0
-    fi
-
     if [[ "$agent" == "build" ]]; then
         ensure_system_running
         build_image true
         exit 0
     fi
 
-    if [[ "$agent" == "refresh" ]]; then
+    if [[ "$agent" == "reset" ]]; then
         ensure_system_running
         build_image
+        remove_container "$container_name"
         refresh_claude_config
+        log_success "Sandbox reset"
         exit 0
     fi
 

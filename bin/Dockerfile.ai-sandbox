@@ -30,7 +30,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install Claude Code CLI
 RUN curl -fsSL https://claude.ai/install.sh | bash \
-    && ln -s /root/.claude/bin/claude /usr/local/bin/claude
+    && mv /root/.local/bin/claude /usr/local/bin/claude \
+    && chmod 755 /usr/local/bin/claude
 
 # Install mise system-wide
 RUN curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
