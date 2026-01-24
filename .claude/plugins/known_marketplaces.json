@@ -5,7 +5,7 @@
       "repo": "obra/superpowers-marketplace"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/superpowers-marketplace",
-    "lastUpdated": "2026-01-11T21:22:45.898Z"
+    "lastUpdated": "2026-01-23T23:16:28.905Z"
   },
   "nixpowers-marketplace": {
     "source": {
@@ -21,7 +21,7 @@
       "repo": "anthropics/claude-plugins-official"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/claude-plugins-official",
-    "lastUpdated": "2026-01-23T04:53:14.879Z"
+    "lastUpdated": "2026-01-23T23:52:15.320Z"
   },
   "anthropic-agent-skills": {
     "source": {

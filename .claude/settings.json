@@ -45,7 +45,7 @@
   },
   "enabledPlugins": {
     "frontend-design@claude-code-plugins": false,
-    "superpowers@superpowers-marketplace": false,
+    "superpowers@superpowers-marketplace": true,
     "elements-of-style@superpowers-marketplace": true,
     "nixpowers@nixpowers-marketplace": true,
     "ralph-wiggum@claude-plugins-official": true,
