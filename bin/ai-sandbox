@@ -37,6 +37,7 @@ refresh_claude_config() {
 
     log_info "Refreshing Claude credentials in volume..."
 
+    # shellcheck disable=SC2016 # Variables intentionally expand inside the container, not on the host
     container run --rm \
         -e "HOST_UID=${host_uid}" \
         -e "HOST_GID=${host_gid}" \
@@ -126,6 +127,30 @@ volume_name_from_dir() {
     echo "claude-config-$(echo "$dir" | md5 | cut -c1-12)"
 }
 
+resolve_git_common_dir() {
+    local work_dir="$1"
+    local git_path="${work_dir}/.git"
+
+    # Only relevant if .git is a file (worktree indicator)
+    [[ -f "$git_path" ]] || return 0
+
+    local gitdir
+    gitdir=$(sed -n 's/^gitdir: //p' "$git_path")
+
+    # Resolve relative paths
+    if [[ "$gitdir" != /* ]]; then
+        gitdir=$(cd "$work_dir" && cd "$(dirname "$gitdir")" && pwd)/$(basename "$gitdir")
+    fi
+
+    # Find the common git dir (the main repo's .git)
+    if [[ -f "${gitdir}/commondir" ]]; then
+        (cd "$gitdir" && cd "$(cat commondir)" && pwd)
+    else
+        # Fallback: .git/worktrees/<name> -> .git
+        (cd "$gitdir/../.." && pwd)
+    fi
+}
+
 container_exists() {
     local name="$1"
     container list -a 2>/dev/null | grep -q "$name"
@@ -150,6 +175,8 @@ run_sandbox() {
 
     # Use absolute path
     work_dir=$(cd "$work_dir" && pwd)
+    local git_common_dir
+    git_common_dir=$(resolve_git_common_dir "$work_dir")
     local container_home="${HOME}"
     local host_uid host_gid
     host_uid=$(id -u)
@@ -211,6 +238,9 @@ EOF
     fi
     if [[ -n "$cpus" ]]; then
         run_args+=("--cpus" "$cpus")
+    fi
+    if [[ -n "$git_common_dir" ]]; then
+        run_args+=("--mount" "type=bind,source=${git_common_dir},target=${git_common_dir},readonly")
     fi
     # Determine what to run
     local cmd=()
