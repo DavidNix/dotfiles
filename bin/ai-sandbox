@@ -7,7 +7,6 @@ set -euo pipefail
 # Configuration
 SANDBOX_IMAGE="ai-sandbox:latest"
 DOCKERFILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLAUDE_VOLUME="claude-config"
 
 # Colors for output
 RED='\033[0;31m'
@@ -22,13 +21,15 @@ log_warn() { echo -e "${YELLOW}[WARN]${NC} $*"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $*" >&2; }
 
 ensure_volume() {
-    if ! container volume list 2>/dev/null | grep -q "$CLAUDE_VOLUME"; then
-        container volume create "$CLAUDE_VOLUME"
+    local vol="$1"
+    if ! container volume list 2>/dev/null | grep -q "$vol"; then
+        container volume create "$vol"
     fi
 }
 
 refresh_claude_config() {
-    ensure_volume
+    local vol="$1"
+    ensure_volume "$vol"
     local host_home="$HOME"
     local host_uid host_gid
     host_uid=$(id -u)
@@ -41,7 +42,7 @@ refresh_claude_config() {
         -e "HOST_GID=${host_gid}" \
         -e "HOST_HOME=${host_home}" \
         --mount "type=bind,source=${host_home},target=${host_home},readonly" \
-        --mount "type=volume,source=${CLAUDE_VOLUME},target=/claude-config" \
+        --mount "type=volume,source=${vol},target=/claude-config" \
         "$SANDBOX_IMAGE" \
         bash -c '
             set -e
@@ -120,6 +121,11 @@ container_name_from_dir() {
     echo "sandbox-$(echo "$dir" | md5 | cut -c1-12)"
 }
 
+volume_name_from_dir() {
+    local dir="$1"
+    echo "claude-config-$(echo "$dir" | md5 | cut -c1-12)"
+}
+
 container_exists() {
     local name="$1"
     container list -a 2>/dev/null | grep -q "$name"
@@ -137,8 +143,9 @@ remove_container() {
 run_sandbox() {
     local work_dir="$1"
     local container_name="$2"
-    local agent="$3"
-    shift 3
+    local volume_name="$3"
+    local agent="$4"
+    shift 4
     local -a agent_args=("$@")
 
     # Use absolute path
@@ -188,7 +195,7 @@ EOF
         "--uid" "$host_uid"
         "--gid" "$host_gid"
         "--mount" "type=bind,source=${work_dir},target=${work_dir}"
-        "--mount" "type=volume,source=${CLAUDE_VOLUME},target=${container_home}/.claude"
+        "--mount" "type=volume,source=${volume_name},target=${container_home}/.claude"
         "-w" "$work_dir"
         # "--ssh" # leaving out for now, don't want it comitting to remotes yet
         "-e" "HOME=${container_home}"
@@ -285,10 +292,11 @@ main() {
         exit 1
     fi
 
-    # Generate container name from directory
+    # Generate container and volume names from directory
     work_dir=$(cd "$work_dir" && pwd)
-    local container_name
+    local container_name volume_name
     container_name=$(container_name_from_dir "$work_dir")
+    volume_name=$(volume_name_from_dir "$work_dir")
 
     if [[ "$agent" == "build" ]]; then
         ensure_system_running
@@ -300,7 +308,7 @@ main() {
         ensure_system_running
         build_image
         remove_container "$container_name"
-        refresh_claude_config
+        refresh_claude_config "$volume_name"
         log_success "Sandbox reset"
         exit 0
     fi
@@ -309,7 +317,8 @@ main() {
 
     build_image
 
-    run_sandbox "$work_dir" "$container_name" "$agent" ${agent_args[@]+"${agent_args[@]}"}
+    refresh_claude_config "$volume_name"
+    run_sandbox "$work_dir" "$container_name" "$volume_name" "$agent" ${agent_args[@]+"${agent_args[@]}"}
 }
 
 main "$@"
