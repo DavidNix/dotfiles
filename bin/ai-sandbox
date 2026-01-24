@@ -35,7 +35,7 @@ refresh_claude_config() {
     host_uid=$(id -u)
     host_gid=$(id -g)
 
-    log_info "Refreshing Claude credentials in volume..."
+    log_info "Refreshing Claude config volume..."
 
     # shellcheck disable=SC2016 # Variables in bash -c expand inside the container, not on the host
     container run --rm \
@@ -47,15 +47,37 @@ refresh_claude_config() {
         "$SANDBOX_IMAGE" \
         bash -c '
             set -e
-            rm -rf /claude-config/*
-            cp -RLf "$HOST_HOME/.claude/." /claude-config/
+            # -L dereferences symlinks (needed for dotfile-managed configs) but errors on
+            # dangling symlinks like debug/latest; cp still copies all other files.
+            cp -RLf "$HOST_HOME/.claude/." /claude-config/ 2>/dev/null || true
             cp "$HOST_HOME/.claude.json" /claude-config/_claude.json
             chown -R "${HOST_UID}:${HOST_GID}" /claude-config
             chmod -R 700 /claude-config
-            echo "Credentials refreshed"
+            echo "Config initialized"
         '
 
-    log_success "Claude credentials updated"
+    log_success "Claude config refreshed"
+}
+
+inject_credentials() {
+    local vol="$1"
+    ensure_volume "$vol"
+    local host_uid host_gid
+    host_uid=$(id -u)
+    host_gid=$(id -g)
+
+    local creds
+    creds=$(security find-generic-password -s "Claude Code-credentials" -a "$(whoami)" -w 2>/dev/null) || {
+        log_warn "No Claude credentials found in Keychain — skipping, you will need to login before using claude code"
+        return 0
+    }
+
+    printf '%s' "$creds" | container run --rm -i \
+        --mount "type=volume,source=${vol},target=/claude-config" \
+        "$SANDBOX_IMAGE" \
+        bash -c "cat > /claude-config/.credentials.json && chown ${host_uid}:${host_gid} /claude-config/.credentials.json && chmod 600 /claude-config/.credentials.json"
+
+    log_success "Claude credentials injected from Keychain"
 }
 
 # Show usage
@@ -79,6 +101,7 @@ EXAMPLES:
     ai-sandbox claude                   # Run Claude (builds image if needed)
     ai-sandbox shell                    # Open shell in sandbox
     ai-sandbox build                    # Build/rebuild the image
+    ai-sandbox build --no-cache         # Rebuild from scratch (update deps)
     ai-sandbox reset                    # Reset sandbox and credentials
 
 EOF
@@ -95,6 +118,7 @@ ensure_system_running() {
 # Build the sandbox image if it doesn't exist
 build_image() {
     local force="${1:-}"
+    local no_cache="${2:-}"
     if [[ -z "$force" ]] && container image list 2>/dev/null | grep -q "$SANDBOX_IMAGE"; then
         return 0
     fi
@@ -106,13 +130,19 @@ build_image() {
 
     log_info "Building sandbox image..."
 
-    container build \
-        -f "${DOCKERFILE_DIR}/Dockerfile.ai-sandbox" \
-        -t "$SANDBOX_IMAGE" \
-        --build-arg "HOST_HOME=${host_home}" \
-        --build-arg "HOST_UID=${host_uid}" \
-        --build-arg "HOST_GID=${host_gid}" \
-        "${DOCKERFILE_DIR}"
+    local build_args=(
+        -f "${DOCKERFILE_DIR}/Dockerfile.ai-sandbox"
+        -t "$SANDBOX_IMAGE"
+        --build-arg "HOST_HOME=${host_home}"
+        --build-arg "HOST_UID=${host_uid}"
+        --build-arg "HOST_GID=${host_gid}"
+    )
+    if [[ -n "$no_cache" ]]; then
+        build_args+=(--no-cache)
+    fi
+    build_args+=("${DOCKERFILE_DIR}")
+
+    container build "${build_args[@]}"
 
     log_success "Image built successfully"
 }
@@ -330,7 +360,11 @@ main() {
 
     if [[ "$agent" == "build" ]]; then
         ensure_system_running
-        build_image true
+        local no_cache=""
+        for arg in "${agent_args[@]}"; do
+            [[ "$arg" == "--no-cache" ]] && no_cache=true
+        done
+        build_image true "$no_cache"
         exit 0
     fi
 
@@ -338,7 +372,9 @@ main() {
         ensure_system_running
         build_image
         remove_container "$container_name"
+        container volume delete "$volume_name" 2>/dev/null || true
         refresh_claude_config "$volume_name"
+        inject_credentials "$volume_name"
         log_success "Sandbox reset"
         exit 0
     fi
@@ -348,6 +384,7 @@ main() {
     build_image
 
     refresh_claude_config "$volume_name"
+    inject_credentials "$volume_name"
     run_sandbox "$work_dir" "$container_name" "$volume_name" "$agent" ${agent_args[@]+"${agent_args[@]}"}
 }
 

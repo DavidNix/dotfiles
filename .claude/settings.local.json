@@ -8,7 +8,8 @@
       "Skill(elements-of-style:writing-clearly-and-concisely)",
       "Bash(wc:*)",
       "Bash(bin/ai-sandbox build:*)",
-      "Bash(shellcheck:*)"
+      "Bash(shellcheck:*)",
+      "Bash(container --help:*)"
     ],
     "deny": [],
     "ask": []
