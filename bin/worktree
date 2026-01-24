@@ -1,21 +1,45 @@
 #!/bin/bash
 # Create a git worktree for isolated feature work
-# Usage: worktree <branch-name>
+# Usage: worktree <branch-name> [--main]
 
 set -euo pipefail
 
+# Check if last arg is --main
+use_main=false
+if [[ $# -gt 0 && "${!#}" == "--main" ]]; then
+    use_main=true
+    set -- "${@:1:$#-1}"
+fi
+
 # Require branch name argument
 if [[ $# -lt 1 ]]; then
-    echo "Usage: -worktree <branch-name>"
+    echo "Usage: worktree <branch-name> [--main]"
     exit 1
 fi
 
 branch_name="$1"
 worktree_path="../worktrees/${branch_name}"
 
+# Determine base branch if --main
+start_point=""
+if [[ "$use_main" == true ]]; then
+    if git show-ref --verify --quiet refs/heads/main; then
+        start_point="main"
+    elif git show-ref --verify --quiet refs/heads/master; then
+        start_point="master"
+    else
+        echo "Error: neither 'main' nor 'master' branch exists"
+        exit 1
+    fi
+fi
+
 mkdir -p ../worktrees
 
-git worktree add "$worktree_path" -b "$branch_name"
+if [[ -n "$start_point" ]]; then
+    git worktree add "$worktree_path" -b "$branch_name" "$start_point"
+else
+    git worktree add "$worktree_path" -b "$branch_name"
+fi
 
 if [[ -f .env ]]; then
     cp .env "$worktree_path/"
