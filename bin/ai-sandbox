@@ -37,7 +37,7 @@ refresh_claude_config() {
 
     log_info "Refreshing Claude credentials in volume..."
 
-    # shellcheck disable=SC2016 # Variables intentionally expand inside the container, not on the host
+    # shellcheck disable=SC2016 # Variables in bash -c expand inside the container, not on the host
     container run --rm \
         -e "HOST_UID=${host_uid}" \
         -e "HOST_GID=${host_gid}" \
