@@ -8,11 +8,12 @@
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
   "file_finder": {
-    "include_ignored": "smart"
+    "include_ignored": "smart",
   },
+  "load_direnv": "shell_hook",
   "telemetry": {
     "metrics": false,
-    "diagnostics": false
+    "diagnostics": false,
   },
   "show_completions_on_input": true,
   "show_edit_predictions": true,
@@ -35,8 +36,8 @@
       "**/id_dsa",
       "**/.ssh/id_*",
       "**/.envrc",
-      "**/.envrc.*"
-    ]
+      "**/.envrc.*",
+    ],
   },
   "base_keymap": "VSCode",
   "search": {
@@ -49,7 +50,7 @@
     // Includes ignored files and directories in search results.
     "include_ignored": true,
     // Allows regular expression searches, which can be powerful but may also be complex.
-    "regex": true
+    "regex": true,
   },
   "relative_line_numbers": "disabled",
   "file_types": {
@@ -59,53 +60,53 @@
       "**/templates/**/*.yml",
       "**/helmfile.d/**/*.yaml",
       "**/helmfile.d/**/*.yml",
-      "**/values*.yaml"
-    ]
+      "**/values*.yaml",
+    ],
   },
   "gutter": {
-    "line_numbers": true
+    "line_numbers": true,
   },
   "minimap": {
-    "show": "never"
+    "show": "never",
   },
   "toolbar": {
     "breadcrumbs": true,
     "quick_actions": false,
-    "selections_menu": false
+    "selections_menu": false,
   },
   "features": {
-    "edit_prediction_provider": "zed"
+    "edit_prediction_provider": "zed",
   },
   "hide_mouse": "on_typing_and_movement",
   "inlay_hints": {
-    "enabled": true
+    "enabled": true,
   },
   "agent": {
     "default_profile": "ask",
     "inline_assistant_model": {
       "provider": "zed.dev",
-      "model": "claude-opus-4-5"
+      "model": "claude-opus-4-5",
     },
     "default_model": {
       "provider": "zed.dev",
-      "model": "grok-4-fast-non-reasoning"
-    }
+      "model": "grok-4-fast-non-reasoning",
+    },
   },
   "indent_guides": {
     "enabled": true,
-    "coloring": "indent_aware"
+    "coloring": "indent_aware",
   },
   "git": {
     "git_gutter": "tracked_files",
     "inline_blame": {
-      "enabled": true
-    }
+      "enabled": true,
+    },
   },
   "tab_bar": {
-    "show": true
+    "show": true,
   },
   "scrollbar": {
-    "show": "never"
+    "show": "never",
   },
   "icon_theme": "Colored Zed Icons Theme Dark",
   "vim_mode": true,
@@ -114,8 +115,8 @@
   "theme": {
     "mode": "system",
     "light": "One Light",
-    "dark": "Ayu Dark"
+    "dark": "Ayu Dark",
   },
   "buffer_font_family": "FiraCode Nerd Font Mono",
-  "autosave": "on_focus_change"
+  "autosave": "on_focus_change",
 }
