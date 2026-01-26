@@ -383,8 +383,18 @@ main() {
 
     if [[ "$agent" == "prune" ]]; then
         ensure_system_running
+        # Remove sandbox containers first
+        local containers
+        containers=$(container list -a 2>/dev/null | grep -E '^sandbox-' | awk '{print $1}' || true)
+        if [[ -n "$containers" ]]; then
+            log_info "Removing sandbox containers..."
+            while IFS= read -r ctr; do
+                remove_container "$ctr"
+            done <<< "$containers"
+        fi
+        # Then delete volumes
         local volumes
-        volumes=$(container volume list 2>/dev/null | grep -E '^claude-config' || true)
+        volumes=$(container volume list 2>/dev/null | grep -E '^claude-config' | awk '{print $1}' || true)
         if [[ -z "$volumes" ]]; then
             log_info "No ai-sandbox volumes found"
             exit 0
