@@ -93,6 +93,7 @@ COMMANDS:
     shell       Open interactive shell
     build       Build/rebuild the sandbox image
     reset       Remove sandbox and refresh Claude credentials from host
+    prune       Delete all ai-sandbox volumes
 
 OPTIONS:
     -h, --help  Show this help message
@@ -320,7 +321,7 @@ main() {
                 usage
                 exit 0
                 ;;
-            claude|codex|shell|reset|build)
+            claude|codex|shell|reset|build|prune)
                 agent="$1"
                 shift
                 agent_args=("$@")
@@ -377,6 +378,22 @@ main() {
         refresh_claude_config "$volume_name"
         inject_credentials "$volume_name"
         log_success "Sandbox reset"
+        exit 0
+    fi
+
+    if [[ "$agent" == "prune" ]]; then
+        ensure_system_running
+        local volumes
+        volumes=$(container volume list 2>/dev/null | grep -E '^claude-config' || true)
+        if [[ -z "$volumes" ]]; then
+            log_info "No ai-sandbox volumes found"
+            exit 0
+        fi
+        log_info "Deleting ai-sandbox volumes..."
+        while IFS= read -r vol; do
+            container volume delete "$vol" && log_success "Deleted: $vol"
+        done <<< "$volumes"
+        log_success "Prune complete"
         exit 0
     fi
 
