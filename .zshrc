@@ -81,7 +81,8 @@ autoload bashcompinit && bashcompinit
 # Environment Variables
 # ==============================================================================
 # Point to Colima's docker socket
-export DOCKER_HOST="unix://${HOME}/.colima/default/docker.sock"
+# Aaaaand back to Docker Desktop. Was getting perf issues with KinD using colima.
+# export DOCKER_HOST="unix://${HOME}/.colima/default/docker.sock"
 
 # Make neovim default editor
 export VISUAL=nvim
