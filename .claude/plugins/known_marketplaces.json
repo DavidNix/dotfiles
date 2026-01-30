@@ -1,19 +1,11 @@
 {
-  "superpowers-marketplace": {
-    "source": {
-      "source": "github",
-      "repo": "obra/superpowers-marketplace"
-    },
-    "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/superpowers-marketplace",
-    "lastUpdated": "2026-01-23T23:16:28.905Z"
-  },
   "nixpowers-marketplace": {
     "source": {
       "source": "git",
       "url": "git@github.com:DavidNix/nixpowers.git"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/nixpowers-marketplace",
-    "lastUpdated": "2026-01-18T15:44:07.881Z"
+    "lastUpdated": "2026-01-30T21:52:09.096Z"
   },
   "claude-plugins-official": {
     "source": {
@@ -21,7 +13,7 @@
       "repo": "anthropics/claude-plugins-official"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/claude-plugins-official",
-    "lastUpdated": "2026-01-29T19:28:55.829Z"
+    "lastUpdated": "2026-01-30T21:52:10.387Z"
   },
   "anthropic-agent-skills": {
     "source": {
@@ -30,13 +22,5 @@
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/anthropic-agent-skills",
     "lastUpdated": "2026-01-08T14:12:22.043Z"
-  },
-  "n8n-mcp-skills": {
-    "source": {
-      "source": "github",
-      "repo": "czlonkowski/n8n-skills"
-    },
-    "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/n8n-mcp-skills",
-    "lastUpdated": "2026-01-22T15:07:52.594Z"
   }
 }

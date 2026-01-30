@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Install Claude Code and setup plugins
+# Install Claude Code, skills, and plugins
 # Works on macOS and Linux
-# Usage: claude-init
+# Usage: agent-init
 # This script is idempotent - safe to run multiple times
 
 set -euo pipefail
@@ -12,8 +12,8 @@ GREEN='\033[0;32m'
 GRAY='\033[0;90m'
 NC='\033[0m' # No Color
 
-echo "Claude Code Initialization"
-echo "=========================="
+echo "Agent Initialization"
+echo "===================="
 
 # Helper: run command, warn on failure with error output
 try_or_warn() {
@@ -41,19 +41,37 @@ install_claude() {
     echo -e "${GREEN}Claude Code installed${NC}"
 }
 
-# Check for SSH access to GitHub (needed for nixpowers private repo)
-check_github_ssh() {
+# Install a skill via npx skills
+install_skill() {
+    local repo="$1"
+    local skill="$2"
+    echo -e "  Installing ${skill}..."
+    try_or_warn "install $skill" npx skills add "$repo" --skill "$skill" -g -y -a "claude-code" -a "opencode" -a "codex"
+}
+
+# Install skills via npx
+install_skills() {
     echo ""
-    echo "Checking GitHub SSH authentication..."
-    if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
-        echo -e "${GREEN}GitHub SSH authentication successful${NC}"
-        return 0
-    else
-        echo -e "${YELLOW}Warning: GitHub SSH authentication failed${NC}"
-        echo -e "${YELLOW}  nixpowers (private repo) will be skipped.${NC}"
-        echo -e "${YELLOW}  To enable: add SSH key to GitHub (https://github.com/settings/keys)${NC}"
-        return 1
-    fi
+    echo "Installing skills..."
+
+    # Vercel skills
+    install_skill "https://github.com/vercel-labs/skills" "find-skills"
+    install_skill "https://github.com/vercel-labs/agent-skills" "web-design-guidelines"
+
+    # Superpowers
+    install_skill "https://github.com/obra/superpowers" "brainstorming"
+    install_skill "https://github.com/obra/superpowers" "test-driven-development"
+
+    # Anthropic skills
+    install_skill "https://github.com/anthropics/skills" "pdf"
+    install_skill "https://github.com/anthropics/skills" "xlsx"
+    install_skill "https://github.com/anthropics/skills" "docx"
+    install_skill "https://github.com/anthropics/skills" "frontend-design"
+
+    # Snarktank
+    install_skill "https://github.com/snarktank/ralph" "prd"
+
+    echo -e "${GREEN}Skills installed${NC}"
 }
 
 # Check if marketplace is already added
@@ -95,16 +113,7 @@ install_plugin() {
 add_marketplaces() {
     echo ""
     echo "Adding marketplaces..."
-
-    # Public marketplaces
-    add_marketplace "superpowers-marketplace" "obra/superpowers-marketplace"
     add_marketplace "claude-plugins-official" "anthropics/claude-plugins-official"
-    add_marketplace "anthropic-agent-skills" "anthropics/skills"
-
-    # Private marketplace (nixpowers) - only if SSH auth works
-    if [[ "${SKIP_PRIVATE:-}" != "1" ]]; then
-        add_marketplace "nixpowers-marketplace" "git@github.com:DavidNix/nixpowers.git"
-    fi
 }
 
 # Install plugins
@@ -112,46 +121,25 @@ install_plugins() {
     echo ""
     echo "Installing plugins..."
 
-    # Superpowers marketplace
-    install_plugin "elements-of-style@superpowers-marketplace"
-
-    # Claude plugins official
-    install_plugin "code-simplifier@claude-plugins-official"
+    # Claude plugins official (LSPs, context7, playwright)
     install_plugin "context7@claude-plugins-official"
-    install_plugin "frontend-design@claude-plugins-official"
-    install_plugin "gopls-lsp@claude-plugins-official"
-    install_plugin "hookify@claude-plugins-official"
-    install_plugin "lua-lsp@claude-plugins-official"
     install_plugin "playwright@claude-plugins-official"
+    install_plugin "gopls-lsp@claude-plugins-official"
+    install_plugin "lua-lsp@claude-plugins-official"
     install_plugin "pyright-lsp@claude-plugins-official"
-    install_plugin "ralph-loop@claude-plugins-official"
     install_plugin "rust-analyzer-lsp@claude-plugins-official"
-    install_plugin "superpowers@claude-plugins-official"
     install_plugin "swift-lsp@claude-plugins-official"
     install_plugin "typescript-lsp@claude-plugins-official"
-
-    # Anthropic agent skills
-    install_plugin "document-skills@anthropic-agent-skills"
-
-    # Nixpowers (private)
-    if [[ "${SKIP_PRIVATE:-}" != "1" ]]; then
-        install_plugin "nixpowers@nixpowers-marketplace"
-    fi
 }
 
 main() {
     install_claude
-
-    # Check SSH auth for nixpowers (non-fatal)
-    if ! check_github_ssh; then
-        export SKIP_PRIVATE=1
-    fi
-
+    install_skills
     add_marketplaces
     install_plugins
 
     echo ""
-    echo -e "${GREEN}Done!${NC} Run 'claude plugin list' to verify."
+    echo -e "${GREEN}Done!${NC} Run 'claude plugin list' to verify plugins."
 }
 
 main

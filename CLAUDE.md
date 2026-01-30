@@ -27,7 +27,7 @@ make pkgs      # Install Homebrew packages
 | `.claude/` | Claude Code settings |
 | `.config/zed/` | Zed editor config |
 | `.config/nvim/` | Neovim config (LazyVim) |
-| `bin/claude-init` | Claude Code plugin installer |
+| `bin/agent-init` | Claude Code skills/plugin installer |
 
 Read these files directly for details.
 
@@ -39,6 +39,6 @@ Read these files directly for details.
 
 **Shell changes:** Edit `.zshrc`, reload with `source ~/.zshrc`.
 
-## Claude Plugin Maintenance
+## Agent Skills/Plugin Maintenance
 
-When adding, removing, or updating Claude Code plugins, update `bin/claude-init` to match. This script installs plugins on new machines and must stay in sync.
+When adding, removing, or updating Claude Code skills or plugins, update `bin/agent-init` to match. This script installs skills (via `npx skills`) and plugins on new machines and must stay in sync.
