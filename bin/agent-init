@@ -46,7 +46,9 @@ install_skill() {
     local repo="$1"
     local skill="$2"
     echo -e "  Installing ${skill}..."
-    try_or_warn "install $skill" npx skills add "$repo" --skill "$skill" -g -y -a "claude-code" -a "opencode" -a "codex"
+    # To add codex support in the future: -a "codex". codex does not handle skills as well as claude code and
+    # I use codex more for code review vs. implementation
+    try_or_warn "install $skill" npx skills add "$repo" --skill "$skill" -g -y -a "claude-code" -a "opencode"
 }
 
 # Install skills via npx
