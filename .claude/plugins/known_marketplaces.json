@@ -1,19 +1,11 @@
 {
-  "nixpowers-marketplace": {
-    "source": {
-      "source": "git",
-      "url": "git@github.com:DavidNix/nixpowers.git"
-    },
-    "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/nixpowers-marketplace",
-    "lastUpdated": "2026-01-30T21:52:09.096Z"
-  },
   "claude-plugins-official": {
     "source": {
       "source": "github",
       "repo": "anthropics/claude-plugins-official"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/claude-plugins-official",
-    "lastUpdated": "2026-01-30T21:52:10.387Z"
+    "lastUpdated": "2026-02-02T16:06:13.443Z"
   },
   "anthropic-agent-skills": {
     "source": {
@@ -21,6 +13,6 @@
       "repo": "anthropics/skills"
     },
     "installLocation": "/Users/davidnix/.claude/plugins/marketplaces/anthropic-agent-skills",
-    "lastUpdated": "2026-01-08T14:12:22.043Z"
+    "lastUpdated": "2026-01-30T21:58:10.667Z"
   }
 }
