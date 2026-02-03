@@ -9,7 +9,9 @@
       "Bash(wc:*)",
       "Bash(bin/ai-sandbox build:*)",
       "Bash(shellcheck:*)",
-      "Bash(container --help:*)"
+      "Bash(agent-init)",
+      "Bash(bin/agent-init)",
+      "Bash(container *)"
     ],
     "deny": [],
     "ask": []
