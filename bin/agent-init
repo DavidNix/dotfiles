@@ -69,6 +69,7 @@ install_skills() {
     install_skill "https://github.com/anthropics/skills" "xlsx"
     install_skill "https://github.com/anthropics/skills" "docx"
     install_skill "https://github.com/anthropics/skills" "frontend-design"
+    install_skill "https://github.com/anthropics/skills" "skill-creator"
 
     # Snarktank
     install_skill "https://github.com/snarktank/ralph" "prd"
