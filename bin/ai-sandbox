@@ -247,6 +247,7 @@ EOF
 
     # Build run command
     local run_args=(
+        "--rm"
         "--interactive"
         "--tty"
         "--name" "$container_name"
