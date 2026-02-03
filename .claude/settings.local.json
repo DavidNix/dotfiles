@@ -9,7 +9,7 @@
       "Bash(wc:*)",
       "Bash(bin/ai-sandbox build:*)",
       "Bash(shellcheck:*)",
-      "Bash(container --help:*)"
+      "Bash(container *)"
     ],
     "deny": [],
     "ask": []
