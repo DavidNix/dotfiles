@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(shellcheck:*)"
+      "Bash(shellcheck:*)",
+      "Bash(codex exec review:*)"
     ]
   }
 }
