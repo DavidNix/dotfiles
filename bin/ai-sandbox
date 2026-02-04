@@ -306,7 +306,7 @@ EOF
     fi
 
     # Cleanup trap for interrupted runs (Ctrl+C, terminal close, etc.)
-    trap 'remove_container "$container_name" 2>/dev/null' EXIT INT TERM
+    trap "remove_container '$container_name' 2>/dev/null" EXIT INT TERM
 
     log_info "Creating sandbox: $container_name"
     container run "${run_args[@]}" "$SANDBOX_IMAGE" "${cmd[@]}"
