@@ -28,14 +28,21 @@ Run in parallel:
 
 ## Output
 
-Present results under clear headers:
+Combine findings from both reviewers into a single unified table grouped by severity. Include a "Reviewer" column showing which reviewer(s) found each issue. If both reviewers found the same or similar issue, show "Claude, Codex" in the Reviewer column.
 
+Example format:
 ```
-## Claude Review (Opus)
-[claude-reviewer output]
+## High Severity
+┌────────────────────────────┬──────────────────┬───────────────────────────────────────────────────────────┬───────────────┐
+│           Issue            │     Location     │                        Description                        │   Reviewer    │
+├────────────────────────────┼──────────────────┼───────────────────────────────────────────────────────────┼───────────────┤
+│ Missing CSRF protection    │ login.go:102     │ Callback should validate OAuth state parameter.           │ Codex         │
+├────────────────────────────┼──────────────────┼───────────────────────────────────────────────────────────┼───────────────┤
+│ Hardcoded callback port    │ login.go:329     │ Port 8085 hardcoded with no fallback.                     │ Claude, Codex │
+└────────────────────────────┴──────────────────┴───────────────────────────────────────────────────────────┴───────────────┘
 
-## Codex Review
-[codex output]
+## Medium Severity
+...
 ```
 
 If both find no issues, state the code looks solid.
