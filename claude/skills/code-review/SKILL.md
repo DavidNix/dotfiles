@@ -1,34 +1,29 @@
 ---
 name: code-review
-description: "Launch parallel code reviews using both claude-reviewer (Opus) and codex-reviewer (Codex CLI) agents. Only invoke when the user explicitly requests code review."
+description: "Launch parallel code reviews using claude-reviewer (Opus) and codex exec review. Only invoke when the user explicitly requests code review."
 disable-model-invocation: true
 ---
 
-Launch both reviewer agents in parallel for comprehensive code review.
+Launch both reviewers in parallel for comprehensive code review.
 
 ## Usage
 
 ```
-/code-review [PR#] [uncommitted]
+/code-review [uncommitted]
 ```
 
 - No args: Review committed changes against upstream (origin/main or origin/master)
-- `PR#` or URL: Review a specific pull request
-- `uncommitted`: Include uncommitted/staged changes
+- `uncommitted`: Review uncommitted/staged changes
 
 ## Execution
 
-Launch both agents in parallel using the Task tool:
+Run in parallel:
 
-1. **claude-reviewer** (subagent_type: `claude-reviewer`)
-   - Uses Opus model
-   - Reads code directly with Glob/Grep/Read tools
+1. **claude-reviewer** (Task tool, subagent_type: `claude-reviewer`)
+   - Pass `$ARGUMENTS` verbatim
 
-2. **codex-reviewer** (subagent_type: `codex-reviewer`)
-   - Uses Codex CLI with gpt-5.2-codex
-   - Extended reasoning (xhigh)
-
-Pass `$ARGUMENTS` to both agents verbatim.
+2. **codex-reviewer** (Task tool, subagent_type: `codex-reviewer`)
+   - Pass `$ARGUMENTS` verbatim
 
 ## Output
 
@@ -39,7 +34,7 @@ Present results under clear headers:
 [claude-reviewer output]
 
 ## Codex Review
-[codex-reviewer output]
+[codex output]
 ```
 
 If both find no issues, state the code looks solid.

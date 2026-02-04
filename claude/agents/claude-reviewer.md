@@ -21,9 +21,9 @@ Then read the PR description for context:
 gh pr view <PR_NUMBER>
 ```
 
-**Local Changes (default):** If no PR is specified, review committed changes against the upstream branch:
+**Local Changes (default):** If no PR is specified, review committed changes against the local base branch:
 ```bash
-git diff origin/main...HEAD   # or origin/master
+git diff main...HEAD   # or master
 ```
 If uncommitted changes should be included:
 ```bash
