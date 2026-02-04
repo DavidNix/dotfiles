@@ -2,6 +2,7 @@
 name: code-review
 description: "Launch parallel code reviews using claude-reviewer (Opus) and codex exec review. Only invoke when the user explicitly requests code review."
 disable-model-invocation: true
+argument-hint: [uncommitted]
 ---
 
 Launch both reviewers in parallel for comprehensive code review.
