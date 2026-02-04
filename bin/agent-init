@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 # Install Claude Code, skills, and plugins
 # Works on macOS and Linux
-# Usage: agent-init
+# Usage: agent-init [--reset]
 # This script is idempotent - safe to run multiple times
 
 set -euo pipefail
+
+# Parse arguments
+RESET_MODE=false
+if [[ "${1:-}" == "--reset" ]]; then
+    RESET_MODE=true
+fi
 
 # Colors (ANSI escape codes - work on both macOS and Linux)
 YELLOW='\033[1;33m'
@@ -27,6 +33,14 @@ try_or_warn() {
         echo -e "${YELLOW}  ${output}${NC}"
         return 0  # Continue anyway
     fi
+}
+
+# Reset skills by removing all globally installed skills
+reset_skills() {
+    echo ""
+    echo "Resetting skills..."
+    npx skills remove -g --all
+    echo -e "${GREEN}Skills reset${NC}"
 }
 
 # Install Claude Code via official installer (if not already installed)
@@ -137,6 +151,9 @@ install_plugins() {
 
 main() {
     install_claude
+    if [[ "$RESET_MODE" == "true" ]]; then
+        reset_skills
+    fi
     install_skills
     add_marketplaces
     install_plugins
