@@ -261,6 +261,9 @@ EOF
         "-e" "GIT_AUTHOR_EMAIL=${git_email}"
         "-e" "GIT_COMMITTER_EMAIL=${git_email}"
         "-e" "COLORTERM=truecolor"
+        # BatchMode=yes makes SSH fail silently instead of prompting for host key verification,
+        # preventing terminal input disruption when git touches SSH remotes.
+        "-e" "GIT_SSH_COMMAND=ssh -o BatchMode=yes"
     )
     if [[ -n "$memory" ]]; then
         run_args+=("--memory" "$memory")

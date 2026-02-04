@@ -39,6 +39,8 @@ Read these files directly for details.
 
 **Shell changes:** Edit `.zshrc`, reload with `source ~/.zshrc`.
 
+**Script changes:** After modifying bash/zsh scripts, run `shellcheck <file>` to catch errors.
+
 ## Agent Skills/Plugin Maintenance
 
 When adding, removing, or updating Claude Code skills or plugins, update `bin/agent-init` to match. This script installs skills (via `npx skills`) and plugins on new machines and must stay in sync.
