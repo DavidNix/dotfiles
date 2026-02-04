@@ -24,7 +24,7 @@ make pkgs      # Install Homebrew packages
 | `Brewfile` | Homebrew packages |
 | `.zshrc` | Shell config (plugins, aliases, vi-mode) |
 | `.cursor/rules/` | Cursor editor rules |
-| `.claude/` | Claude Code settings |
+| `claude/` | Claude Code settings, skills, agents |
 | `.config/zed/` | Zed editor config |
 | `.config/nvim/` | Neovim config (LazyVim) |
 | `bin/agent-init` | Claude Code skills/plugin installer |

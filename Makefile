@@ -27,9 +27,12 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	ln -sf $$PWD/.config/*/ ~/.config
 	ln -sf $$PWD/.config/* ~/.config
 	@#Claude Code
-	mkdir -p ~/.claude/commands
-	ln -sf $$PWD/.claude/settings.json ~/.claude/settings.json
-	ln -sf $$PWD/.claude/plugins/* ~/.claude/plugins
+	mkdir -p ~/.claude/commands ~/.claude/skills ~/.claude/agents ~/.claude/plugins
+	ln -sf $$PWD/claude/settings.json ~/.claude/settings.json
+	ln -sf $$PWD/claude/settings.local.json ~/.claude/settings.local.json
+	ln -sf $$PWD/claude/skills/* ~/.claude/skills/
+	ln -sf $$PWD/claude/agents/* ~/.claude/agents/
+	ln -sf $$PWD/claude/plugins/* ~/.claude/plugins/
 
 .PHONY: defaults
 defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.
