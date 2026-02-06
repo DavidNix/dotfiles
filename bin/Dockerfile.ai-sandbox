@@ -1,12 +1,22 @@
+# syntax=docker/dockerfile:1
 # AI Sandbox Image for Apple Container
 # Designed to run AI coding agents (Claude, Codex, etc.) in an isolated environment
+
+# Apple Containers builder mounts /etc/resolv.conf read-only with a non-functional
+# nameserver. Create our own resolv.conf and bind-mount it over the broken one.
+FROM scratch AS dns
+COPY <<EOF /resolv.conf
+nameserver 8.8.8.8
+EOF
+
 FROM docker.io/ubuntu:24.04
 
 # Avoid prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install base dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
+    apt-get update && apt-get install -y --no-install-recommends \
     # Core tools
     ca-certificates \
     curl \
@@ -49,15 +59,18 @@ ENV HOME=$HOST_HOME
 ENV PATH=$HOST_HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Install Claude Code CLI
-RUN curl -fsSL https://claude.ai/install.sh | bash \
+RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
+    curl -fsSL https://claude.ai/install.sh | bash \
     && install -m 755 "$(readlink -f "$HOME/.local/bin/claude")" /usr/local/bin/claude \
     && chown -R "$HOST_UID":"$HOST_GID" "$HOME"
 
 # Install mise system-wide
-RUN curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
+RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
+    curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
 
 # Install Node.js and Codex CLI
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/* \
     && npm i -g @openai/codex

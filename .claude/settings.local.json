@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(shellcheck:*)",
-      "Bash(codex exec review:*)"
+      "Bash(codex exec review:*)",
+      "Bash(ai-sandbox build:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh api:*)"
     ]
   }
 }
