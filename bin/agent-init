@@ -88,6 +88,9 @@ install_skills() {
     # Snarktank
     install_skill "https://github.com/snarktank/ralph" "prd"
 
+    # Frontend slides
+    install_skill "https://github.com/zarazhangrui/frontend-slides" "frontend-slides"
+
     echo -e "${GREEN}Skills installed${NC}"
 }
 
