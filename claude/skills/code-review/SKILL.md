@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: "Launch parallel code reviews using claude-reviewer (Opus) and codex exec review. Only invoke when the user explicitly requests code review."
+description: "Launch parallel code reviews using claude-reviewer (Opus) and other models. Only invoke when the user explicitly requests code review."
 disable-model-invocation: true
 argument-hint: [uncommitted]
 ---
@@ -23,12 +23,12 @@ Run in parallel:
 1. **claude-reviewer** (Task tool, subagent_type: `claude-reviewer`)
    - Pass `$ARGUMENTS` verbatim
 
-2. **codex-reviewer** (Task tool, subagent_type: `codex-reviewer`)
-   - Pass `$ARGUMENTS` verbatim
+<!--2. **codex-reviewer** (Task tool, subagent_type: `codex-reviewer`)
+   - Pass `$ARGUMENTS` verbatim-->
 
 ## Output
 
-Combine findings from both reviewers into a single unified table grouped by severity. Include a "Reviewer" column showing which reviewer(s) found each issue. If both reviewers found the same or similar issue, show "Claude, Codex" in the Reviewer column.
+If more than one agent, combine findings from both reviewers into a single unified table grouped by severity. Include a "Reviewer" column showing which reviewer(s) found each issue. If both reviewers found the same or similar issue, e.g. "Claude, Codex" in the Reviewer column.
 
 Example format:
 ```
