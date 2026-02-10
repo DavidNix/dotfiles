@@ -75,7 +75,7 @@ Primary endpoint for all metric queries. Supports multi-node, multi-context quer
 | `scope_contexts` | `*` | Limit scope (checked before `contexts` filter) |
 | `timeout` | `0` | Query timeout in milliseconds |
 
-Simple pattern syntax: `*` wildcard, space-separated OR, `!` prefix for negation. e.g. `disk.* !disk.inodes`
+Simple pattern syntax: `*` wildcard, space-separated OR, prefix with exclamation mark for negation. e.g. `disk.* \!disk.inodes`
 
 ### `/api/v3/alerts` — Current Alert Status
 
@@ -142,7 +142,7 @@ Use `GET /api/v3/functions` to discover available functions on the agent.
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `format` | `shell` | `shell` (bash vars), `json`, `prometheus`, `prometheus_all_hosts` |
-| `filter` | — | Simple pattern for charts. e.g. `system.*`, `disk.* net.*` |
+| `filter` | — | Simple pattern for charts. e.g. `system.*` or `disk.* net.*` |
 
 ## Context Names
 
