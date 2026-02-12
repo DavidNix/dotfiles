@@ -1,5 +1,5 @@
 ---
-name: review-annotations
+name: review-atodo
 description: "Process ATODO (Agent TODO) comments from code review. Finds comments like `// ATODO: refactor this` or `# ATODO: add error handling`, executes the instructions, and removes the comments."
 ---
 
