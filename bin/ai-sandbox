@@ -212,7 +212,7 @@ run_sandbox() {
     if [[ -n "${AI_SANDBOX_MEMORY+x}" ]]; then
         memory="${AI_SANDBOX_MEMORY}"
     else
-        memory="4G"
+        memory="6G"
     fi
     local cpus="${AI_SANDBOX_CPUS:-}"
     local prep_cmd
