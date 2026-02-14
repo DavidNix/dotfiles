@@ -76,7 +76,7 @@ install_skills() {
 
     # Superpowers
     install_skill "https://github.com/obra/superpowers" "brainstorming"
-    install_skill "https://github.com/obra/superpowers" "test-driven-development"
+    # install_skill "https://github.com/obra/superpowers" "test-driven-development" # Trying out my own tdd skill
 
     # Anthropic skills
     install_skill "https://github.com/anthropics/skills" "pdf"
