@@ -75,6 +75,30 @@ prepare_claude_volume() {
     fi
 }
 
+prepare_writable_volume() {
+    local vol="$1"
+    local host_uid="$2"
+    local host_gid="$3"
+
+    ensure_volume "$vol"
+
+    # shellcheck disable=SC2016 # Variables in bash -c expand inside the container, not on the host
+    container run --rm \
+        --memory 128m \
+        -e "HOST_UID=${host_uid}" \
+        -e "HOST_GID=${host_gid}" \
+        --mount "type=volume,source=${vol},target=/writable-volume" \
+        "$SANDBOX_IMAGE" \
+        bash -c '
+            set -e
+            mkdir -p /writable-volume
+            current_owner=$(stat -c "%u:%g" /writable-volume 2>/dev/null || true)
+            if [ "$current_owner" != "${HOST_UID}:${HOST_GID}" ]; then
+                chown -R "${HOST_UID}:${HOST_GID}" /writable-volume
+            fi
+        '
+}
+
 # Show usage
 usage() {
     cat <<EOF
@@ -145,12 +169,18 @@ build_image() {
 
 container_name_from_dir() {
     local dir="$1"
-    echo "sandbox-$(echo "$dir" | md5 | cut -c1-12)"
+    echo "ai-sandbox-$(echo "$dir" | md5 | cut -c1-12)"
 }
 
 volume_name_from_dir() {
     local dir="$1"
-    echo "claude-config-$(echo "$dir" | md5 | cut -c1-12)"
+    echo "ai-sandbox-claude-config-$(echo "$dir" | md5 | cut -c1-12)"
+}
+
+cache_volume_name_from_dir() {
+    local dir="$1"
+    local kind="$2"
+    echo "ai-sandbox-${kind}-$(echo "$dir" | md5 | cut -c1-12)"
 }
 
 resolve_git_common_dir() {
@@ -215,6 +245,18 @@ run_sandbox() {
         memory="6G"
     fi
     local cpus="${AI_SANDBOX_CPUS:-}"
+    local go_mod_volume
+    go_mod_volume=$(cache_volume_name_from_dir "$work_dir" "go-mod")
+    local mise_data_volume
+    mise_data_volume=$(cache_volume_name_from_dir "$work_dir" "mise-data")
+    local go_path="${container_home}/go"
+    local go_modcache="${go_path}/pkg/mod"
+    local mise_data_dir="${container_home}/.local/share/mise"
+
+    log_info "Preparing writable cache volumes..."
+    prepare_writable_volume "$go_mod_volume" "$host_uid" "$host_gid"
+    prepare_writable_volume "$mise_data_volume" "$host_uid" "$host_gid"
+
     local prep_cmd
 prep_cmd=$(cat <<'EOF'
 : "${XDG_CONFIG_HOME:=$HOME/.config}"
@@ -250,6 +292,8 @@ EOF
         "--uid" "$host_uid"
         "--gid" "$host_gid"
         "--mount" "type=bind,source=${work_dir},target=${work_dir}"
+        "--mount" "type=volume,source=${go_mod_volume},target=${go_modcache}"
+        "--mount" "type=volume,source=${mise_data_volume},target=${mise_data_dir}"
         "--mount" "type=volume,source=${volume_name},target=${container_home}/.claude"
         "-w" "$work_dir"
         # "--ssh" # leaving out for now, don't want it comitting to remotes yet
@@ -387,7 +431,7 @@ main() {
         ensure_system_running
         # Remove sandbox containers first
         local containers
-        containers=$(container list -a 2>/dev/null | grep -E '^sandbox-' | awk '{print $1}' || true)
+        containers=$(container list -a 2>/dev/null | grep -E '^ai-sandbox-' | awk '{print $1}' || true)
         if [[ -n "$containers" ]]; then
             log_info "Removing sandbox containers..."
             while IFS= read -r ctr; do
@@ -396,7 +440,7 @@ main() {
         fi
         # Then delete volumes
         local volumes
-        volumes=$(container volume list 2>/dev/null | grep -E '^claude-config' | awk '{print $1}' || true)
+        volumes=$(container volume list 2>/dev/null | grep -E '^ai-sandbox-' | awk '{print $1}' || true)
         if [[ -z "$volumes" ]]; then
             log_info "No ai-sandbox volumes found"
             exit 0
