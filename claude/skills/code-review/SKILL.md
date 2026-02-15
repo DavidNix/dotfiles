@@ -30,19 +30,24 @@ Run in parallel:
 
 If more than one agent, combine findings from both reviewers into a single unified table grouped by severity. Include a "Reviewer" column showing which reviewer(s) found each issue. If both reviewers found the same or similar issue, e.g. "Claude, Codex" in the Reviewer column.
 
+Number issues sequentially starting from 1 across all severity groups (not restarting per group).
+
 Example format:
 ```
 ## High Severity
-┌────────────────────────────┬──────────────────┬───────────────────────────────────────────────────────────┬───────────────┐
-│           Issue            │     Location     │                        Description                        │   Reviewer    │
-├────────────────────────────┼──────────────────┼───────────────────────────────────────────────────────────┼───────────────┤
-│ Missing CSRF protection    │ login.go:102     │ Callback should validate OAuth state parameter.           │ Codex         │
-├────────────────────────────┼──────────────────┼───────────────────────────────────────────────────────────┼───────────────┤
-│ Hardcoded callback port    │ login.go:329     │ Port 8085 hardcoded with no fallback.                     │ Claude, Codex │
-└────────────────────────────┴──────────────────┴───────────────────────────────────────────────────────────┴───────────────┘
+┌───┬────────────────────────────┬──────────────────┬───────────────────────────────────────────────────────────┬───────────────┐
+│ # │           Issue            │     Location     │                        Description                        │   Reviewer    │
+├───┼────────────────────────────┼──────────────────┼───────────────────────────────────────────────────────────┼───────────────┤
+│ 1 │ Missing CSRF protection    │ login.go:102     │ Callback should validate OAuth state parameter.           │ Codex         │
+├───┼────────────────────────────┼──────────────────┼───────────────────────────────────────────────────────────┼───────────────┤
+│ 2 │ Hardcoded callback port    │ login.go:329     │ Port 8085 hardcoded with no fallback.                     │ Claude, Codex │
+└───┴────────────────────────────┴──────────────────┴───────────────────────────────────────────────────────────┴───────────────┘
 
 ## Medium Severity
-...
+┌───┬─────────────...
+│ # │    Issue    ...
+├───┼─────────────...
+│ 3 │ ...
 ```
 
 If both find no issues, state the code looks solid.
