@@ -14,7 +14,7 @@ Launch both reviewers in parallel for comprehensive code review.
 ```
 
 - No args: Review committed changes against upstream (origin/main or origin/master)
-- `uncommitted`: Review uncommitted/staged changes
+- `uncommitted`: Review uncommitted/staged changes only
 
 ## Execution
 
