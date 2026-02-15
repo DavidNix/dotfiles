@@ -107,6 +107,24 @@ has_plugin() {
     claude plugin list 2>/dev/null | grep -q "$name"
 }
 
+# Check if MCP server is already configured
+has_mcp_server() {
+    local name="$1"
+    claude mcp list 2>/dev/null | grep -q "$name"
+}
+
+# Install MCP server if not already configured
+install_mcp_server() {
+    local name="$1"
+    shift
+    if has_mcp_server "$name"; then
+        echo -e "${GRAY}  $name MCP server already configured${NC}"
+    else
+        try_or_warn "add MCP server $name" claude mcp add "$name" --scope user -- "$@"
+        echo -e "${GREEN}  $name MCP server added${NC}"
+    fi
+}
+
 # Add marketplace if not already added
 add_marketplace() {
     local name="$1"
@@ -153,6 +171,13 @@ install_plugins() {
     install_plugin "typescript-lsp@claude-plugins-official"
 }
 
+# Install MCP servers
+install_mcp_servers() {
+    echo ""
+    echo "Installing MCP servers..."
+    install_mcp_server "codex" codex mcp-server
+}
+
 main() {
     install_claude
     if [[ "$RESET_MODE" == "true" ]]; then
@@ -161,6 +186,7 @@ main() {
     install_skills
     add_marketplaces
     install_plugins
+    install_mcp_servers
 
     echo ""
     echo -e "${GREEN}Done!${NC} Run 'claude plugin list' to verify plugins."
