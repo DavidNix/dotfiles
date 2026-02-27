@@ -30,6 +30,7 @@
     "codesearch": "allow",
     "bash": {
       "*": "ask",
+      "file *": "allow",
       "find *": "allow",
       "git diff *": "allow",
       "git log *": "allow",
@@ -44,8 +45,8 @@
       "make lint": "allow",
       "make test": "allow",
       "make vet": "allow",
-      "rg *": "allow",
       "pwd *": "allow",
+      "rg *": "allow",
       "ripgrep *": "allow",
       "stat *": "allow",
       "tail *": "allow",
