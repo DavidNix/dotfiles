@@ -43,6 +43,6 @@ Read these files directly for details.
 
 ## Agent Skills/Plugin Maintenance
 
-Custom skills live in `claude/skills/` (not `~/.claude/skills/`). After adding or modifying skills, the user must run `make relink` to update symlinks from `~/.claude/skills/` into this repo.
+Custom skills live in `skills` and are installed with https://github.com/vercel-labs/skills. E.g. `npx skills add -g ./skills/` 
 
-When adding, removing, or updating Claude Code skills or plugins, update `bin/agent-init` to match. This script installs skills (via `npx skills`) and plugins on new machines and must stay in sync.
+When adding, removing, or updating skills, update `bin/agent-init` to match.

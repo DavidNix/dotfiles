@@ -70,6 +70,9 @@ install_skills() {
     echo ""
     echo "Installing skills..."
 
+    echo -e "  Installing local skills..."
+    try_or_warn "Installing local skills" npx skills add "/Users/davidnix/src/dotfiles/skills" -g -y -a "claude-code" -a "opencode"
+
     # Vercel skills
     install_skill "https://github.com/vercel-labs/skills" "find-skills"
     install_skill "https://github.com/vercel-labs/agent-skills" "web-design-guidelines"
