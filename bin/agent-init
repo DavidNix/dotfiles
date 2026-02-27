@@ -79,6 +79,7 @@ install_skills() {
 
     # Superpowers
     install_skill "https://github.com/obra/superpowers" "brainstorming"
+    install_skill "https://github.com/obra/the-elements-of-style" "writing-clearly-and-concisely"
     # install_skill "https://github.com/obra/superpowers" "test-driven-development" # Trying out my own tdd skill
 
     # Anthropic skills
