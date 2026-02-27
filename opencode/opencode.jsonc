@@ -59,7 +59,10 @@
       "web-design-guidelines": "allow",
       "xlsx": "allow",
     },
-    "task": "ask",
+    "task": {
+      "*": "ask",
+      "Explore": "allow",
+    },
     "websearch": "ask",
     "question": "allow",
     "doom_loop": "ask",
