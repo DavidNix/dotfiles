@@ -76,6 +76,7 @@
     "task": {
       "*": "ask",
       "explore": "allow",
+      "code-review": "allow",
     },
     "websearch": "ask",
     "question": "allow",
