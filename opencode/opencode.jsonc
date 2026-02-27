@@ -54,6 +54,7 @@
       "ripgrep *": "allow",
       "stat *": "allow",
       "tail *": "allow",
+      "terraform init *": "allow",
       "terraform plan *": "allow",
       "terraform state list *": "allow",
       "terraform validate *": "allow",
