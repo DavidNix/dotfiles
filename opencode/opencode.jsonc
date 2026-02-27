@@ -49,6 +49,7 @@
       "make lint": "allow",
       "make test": "allow",
       "make vet": "allow",
+      "mkdir *": "allow",
       "pwd *": "allow",
       "rg *": "allow",
       "ripgrep *": "allow",
