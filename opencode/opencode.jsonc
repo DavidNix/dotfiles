@@ -34,7 +34,11 @@
       "grep *": "allow",
       "find *": "allow",
     },
-    "skill": "ask",
+    "skill": {
+      "*": "ask",
+      "test-driven-development": "allow",
+      "review-atodo": "allow",
+    },
     "task": "ask",
     "websearch": "ask",
     "question": "allow",
