@@ -41,6 +41,7 @@
       "ls *": "allow",
       "make dev": "allow",
       "make fmt": "allow",
+      "make lint": "allow",
       "make test": "allow",
       "make vet": "allow",
       "rg *": "allow",
