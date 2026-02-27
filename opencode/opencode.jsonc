@@ -31,6 +31,12 @@
     "codesearch": "allow",
     "bash": {
       "*": "ask",
+      "make fmt": "allow",
+      "make test": "allow",
+      "make vet": "allow",
+      "make dev": "allow",
+      "go build *": "allow",
+      "go test *": "allow",
       "grep *": "allow",
       "find *": "allow",
     },
