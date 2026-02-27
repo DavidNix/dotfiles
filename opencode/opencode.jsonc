@@ -71,6 +71,7 @@
       "review-atodo": "allow",
       "test-driven-development": "allow",
       "web-design-guidelines": "allow",
+      "writing-skills": "allow",
       "xlsx": "allow",
     },
     "task": {
