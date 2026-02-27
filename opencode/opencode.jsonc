@@ -52,6 +52,7 @@
       "terraform plan *": "allow",
       "terraform state list *": "allow",
       "terraform validate *": "allow",
+      "wc *": "allow",
     },
     "skill": {
       "*": "ask",
