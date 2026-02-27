@@ -1,6 +1,6 @@
 ---
 description: Research agent for gathering information from the web. Use when you need to research topics, find documentation, explore technologies, or gather information without modifying files.
-mode: general
+mode: primary
 model: opencode/kimi-k2.5
 permission:
   edit: deny
