@@ -26,6 +26,8 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	mkdir -p ~/.config
 	ln -sf $$PWD/.config/*/ ~/.config
 	ln -sf $$PWD/.config/* ~/.config
+	@# opencode (separate from .config/* to avoid conflicts)
+	ln -sf $$PWD/opencode/* ~/.config/opencode
 	@#Claude Code
 	mkdir -p ~/.claude/commands ~/.claude/skills ~/.claude/agents ~/.claude/plugins
 	ln -sf $$PWD/claude/settings.json ~/.claude/settings.json
@@ -115,4 +117,3 @@ pr: check-clean ## Mimic a local PR from a branch into upstream
 	fi
 	@git checkout master
 	@git merge --squash $(FEAT_BRANCH)
-
