@@ -54,6 +54,7 @@ brew "make"
 brew "mise" # asdf replacement
 brew "neovim"
 brew "opencode"
+brew "oven-sh/bun/bun"
 brew "procs"
 brew "rename"
 brew "ripgrep"
