@@ -43,8 +43,11 @@
       "make fmt": "allow",
       "make test": "allow",
       "make vet": "allow",
+      "rg *": "allow",
+      "ripgrep *": "allow",
       "stat *": "allow",
       "terraform plan *": "allow",
+      "terraform state list *": "allow",
       "terraform validate *": "allow",
     },
     "skill": {
