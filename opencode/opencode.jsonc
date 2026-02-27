@@ -39,6 +39,7 @@
       "go test *": "allow",
       "grep *": "allow",
       "find *": "allow",
+      "ls *": "allow",
     },
     "skill": {
       "*": "ask",
