@@ -1,6 +1,5 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "theme": "ayu",
   "default_agent": "plan",
   "share": "disabled",
   "autoupdate": "notify",
@@ -46,6 +45,7 @@
       "make test": "allow",
       "make vet": "allow",
       "rg *": "allow",
+      "pwd *": "allow",
       "ripgrep *": "allow",
       "stat *": "allow",
       "tail *": "allow",
