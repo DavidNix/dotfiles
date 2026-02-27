@@ -44,6 +44,8 @@
       "make test": "allow",
       "make vet": "allow",
       "stat *": "allow",
+      "terraform plan *": "allow",
+      "terraform validate *": "allow",
     },
     "skill": {
       "*": "ask",
