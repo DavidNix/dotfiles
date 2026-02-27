@@ -73,7 +73,7 @@
     },
     "task": {
       "*": "ask",
-      "Explore": "allow",
+      "explore": "allow",
     },
     "websearch": "ask",
     "question": "allow",
