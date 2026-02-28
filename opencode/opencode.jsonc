@@ -66,6 +66,8 @@
       "docx": "allow",
       "frontend-design": "allow",
       "frontend-slides": "allow",
+      "opencode-config": "allow",
+      "opencode-plugin": "allow",
       "pdf": "allow",
       "prd": "allow",
       "review-atodo": "allow",
