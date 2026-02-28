@@ -30,6 +30,7 @@
     "codesearch": "allow",
     "bash": {
       "*": "ask",
+      "cp *": "allow",
       "file *": "allow",
       "find *": "allow",
       "git diff *": "allow",
@@ -50,6 +51,7 @@
       "make test": "allow",
       "make vet": "allow",
       "mkdir *": "allow",
+      "mv *": "allow",
       "pwd *": "allow",
       "rg *": "allow",
       "ripgrep *": "allow",
