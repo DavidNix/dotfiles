@@ -68,6 +68,7 @@
     },
     "skill": {
       "*": "ask",
+      "ai-tdd": "allow",
       "docx": "allow",
       "frontend-design": "allow",
       "frontend-slides": "allow",
@@ -76,7 +77,6 @@
       "pdf": "allow",
       "prd": "allow",
       "review-atodo": "allow",
-      "test-driven-development": "allow",
       "web-design-guidelines": "allow",
       "writing-skills": "allow",
       "xlsx": "allow",
