@@ -12,6 +12,16 @@ if [[ "${1:-}" == "--reset" ]]; then
     RESET_MODE=true
 fi
 
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -L "$SOURCE" ]]; do
+    SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ "$SOURCE" != /* ]] && SOURCE="$SCRIPT_DIR/$SOURCE"
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+DOTFILES_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+LOCAL_SKILLS_SOURCE="${DOTFILES_ROOT}/skills"
+
 # Colors (ANSI escape codes - work on both macOS and Linux)
 YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
@@ -21,16 +31,37 @@ NC='\033[0m' # No Color
 echo "Agent Initialization"
 echo "===================="
 
-# Helper: run command, warn on failure with error output
+# Helper: run command, warn on failure while continuing
 try_or_warn() {
     local desc="$1"
     shift
-    local output
-    if output=$("$@" 2>&1); then
+    if "$@"; then
         return 0
     else
+        local exit_code=$?
         echo -e "${YELLOW}Warning: Failed: ${desc}${NC}"
-        echo -e "${YELLOW}  ${output}${NC}"
+        echo -e "${YELLOW}  Exit code: ${exit_code}${NC}"
+        return 0  # Continue anyway
+    fi
+}
+
+# Helper: suppress command output unless it fails
+try_or_warn_quiet() {
+    local desc="$1"
+    shift
+    local log_file
+    log_file="$(mktemp)"
+    if "$@" >"$log_file" 2>&1; then
+        rm -f "$log_file"
+        return 0
+    else
+        local exit_code=$?
+        echo -e "${YELLOW}Warning: Failed: ${desc}${NC}"
+        echo -e "${YELLOW}  Exit code: ${exit_code}${NC}"
+        while IFS= read -r line; do
+            echo -e "${YELLOW}  ${line}${NC}"
+        done <"$log_file"
+        rm -f "$log_file"
         return 0  # Continue anyway
     fi
 }
@@ -39,7 +70,7 @@ try_or_warn() {
 reset_skills() {
     echo ""
     echo "Resetting skills..."
-    npx skills remove -g --all
+    try_or_warn_quiet "reset skills" npx --yes skills remove -g --all
     echo -e "${GREEN}Skills reset${NC}"
 }
 
@@ -62,7 +93,7 @@ install_skill() {
     echo -e "  Installing ${skill}..."
     # To add codex support in the future: -a "codex". codex does not handle skills as well as claude code and
     # I use codex more for code review vs. implementation
-    try_or_warn "install $skill" npx skills add "$repo" --skill "$skill" -g -y -a "claude-code" -a "opencode"
+    try_or_warn_quiet "install $skill" npx --yes skills add "$repo" --skill "$skill" -g -y -a "claude-code" -a "opencode"
 }
 
 # Install skills via npx
@@ -71,10 +102,10 @@ install_skills() {
     echo "Installing skills..."
 
     echo -e "  Installing local skills..."
-    try_or_warn "Installing local skills" npx skills add "/Users/davidnix/src/dotfiles/skills" -g -y -a "claude-code" -a "opencode"
+    try_or_warn_quiet "Installing local skills" npx --yes skills add "$LOCAL_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode"
 
     # Vercel skills
-    install_skill "https://github.com/vercel-labs/skills" "find-skills"
+    # install_skill "https://github.com/vercel-labs/skills" "find-skills" # I don't use this, preferring skills.sh
     install_skill "https://github.com/vercel-labs/agent-skills" "web-design-guidelines"
 
     # Superpowers

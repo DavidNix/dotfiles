@@ -55,6 +55,7 @@
       "pwd *": "allow",
       "rg *": "allow",
       "ripgrep *": "allow",
+      "shellcheck *": "allow",
       "stat *": "allow",
       "tail *": "allow",
       "terraform init *": "allow",
