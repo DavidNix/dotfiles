@@ -1,13 +1,22 @@
 ---
-name: test-driven-development
+name: ai-tdd
 description: Use when implementing any feature or bugfix, before writing implementation code
 ---
 
-# Test-Driven Development (TDD)
+# AI-Assisted Test-Driven Development (AI-TDD)
 
 ## Overview
 
 **Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
+
+Unlike classic TDD, AI agents can write tests and implementation code simultaneously. However, you must verify every test actually fails when the implementation is removed. This prevents evergreen tests that pass regardless of implementation.
+
+**A "bad failing test" is one that:**
+- Doesn't compile (compile errors don't prove behavior)
+- References a method that doesn't exist yet
+- Fails for the wrong reason (setup error, not assertion failure)
+
+**Good failing test:** Fails at runtime with an assertion error (`expected X, got Y`).
 
 Two modes depending on the task:
 
@@ -38,7 +47,7 @@ EVERY TEST MUST BE PROVEN TO FAIL
 ```
 
 - **Bug fixes:** The bug makes the test fail naturally. Write the test, run it, watch it fail.
-- **Features:** No natural failing state. Write tests and implementation, then comment out implementation to prove each test fails without it.
+- **Features:** No natural failing state. Write tests and implementation together, then do a **Red-Green-Refactor verification pass**: comment out implementation, see it fail, restore it, see it pass.
 
 Either way, every test must demonstrate it catches the problem it's designed to catch.
 
@@ -48,14 +57,14 @@ Either way, every test must demonstrate it catches the problem it's designed to 
 
 For new features, refactoring, and behavior changes.
 
-There's no natural failing state — the code doesn't exist yet or you're changing existing behavior. Write tests and implementation together, then verify via comment-out.
+Unlike classic TDD, you can write tests and implementation code simultaneously. After both are written, perform a **Red-Green-Refactor verification pass** to ensure tests actually validate the implementation.
 
 ### Flow
 
 ```dot
 digraph feature_mode {
     rankdir=TB;
-    write [label="1. WRITE\nTests + implementation", shape=box, style=filled, fillcolor="#ccccff"];
+    write [label="1. WRITE\nTests + implementation\n(simultaneously)", shape=box, style=filled, fillcolor="#ccccff"];
     pass [label="2. PASS\nRun tests, fix until green", shape=box, style=filled, fillcolor="#ccffcc"];
     verify [label="3. VERIFY (RED)\nComment out implementation\nRun tests → must fail", shape=box, style=filled, fillcolor="#ffcccc"];
     check [label="Fails at runtime?", shape=diamond];
@@ -76,14 +85,16 @@ digraph feature_mode {
 
 ### Steps
 
-#### 1. WRITE — Tests and Implementation
+#### 1. WRITE — Tests and Implementation (Simultaneously)
 
-Write both the test and the implementation code. Any order is fine — you'll verify correctness in the next steps.
+Write both the test and the implementation code together. Unlike classic TDD, you don't need to write the test first and watch it fail with compile errors. Write them both, then verify correctness in the next steps.
+
+**Why:** AI agents can efficiently write coherent test-implementation pairs. The critical part is the verification pass that follows.
 
 #### 2. PASS — Run Tests, Fix Until Green
 
 ```bash
-npm test path/to/test.test.ts  # or equivalent
+go test ./...
 ```
 
 Fix until all tests pass. This is your baseline.
@@ -94,23 +105,23 @@ For each test case, comment out the related implementation code and run the test
 
 **The test must fail at runtime.** Not a compile error, not an import error — a runtime assertion failure.
 
-For compiled languages: leave stubs or zero values so code compiles but the test fails at runtime (see [Compiled Languages](#compiled-languages)).
+For compiled languages: leave stubs or zero values so code compiles but the test fails at runtime (see [Stub Patterns for Verification](#stub-patterns-for-verification)).
 
 ```bash
-npm test path/to/test.test.ts
-# FAIL: Expected 'success', received undefined
+go test ./...
+# FAIL: expected "success", got ""
 ```
 
-**Test still passes?** The test doesn't actually test the implementation. Fix the test.
+**Test still passes?** The test doesn't actually test the implementation. Fix the test. This catches **evergreen tests** — tests that pass regardless of implementation.
 
-**Compile error?** Add a stub return value so it compiles. The test must fail at the assertion, not the compiler.
+**Compile error?** Add a stub return value so it compiles. The test must fail at the assertion (`expected X, got Y`), not the compiler. Compile errors don't prove behavior.
 
 #### 4. RESTORE (GREEN) — Uncomment and Verify
 
 Uncomment the implementation. Run tests. All green.
 
 ```bash
-npm test path/to/test.test.ts
+go test ./...
 # PASS
 ```
 
@@ -123,63 +134,7 @@ After green only:
 
 Keep tests green. Don't add behavior.
 
-### TypeScript Example
-
-**WRITE** — Test and implementation together:
-
-```typescript
-// retry.test.ts
-test('retries failed operations 3 times', async () => {
-  let attempts = 0;
-  const operation = () => {
-    attempts++;
-    if (attempts < 3) throw new Error('fail');
-    return 'success';
-  };
-
-  const result = await retryOperation(operation);
-
-  expect(result).toBe('success');
-  expect(attempts).toBe(3);
-});
-```
-
-```typescript
-// retry.ts
-async function retryOperation<T>(fn: () => T): Promise<T> {
-  for (let i = 0; i < 3; i++) {
-    try {
-      return fn();
-    } catch (e) {
-      if (i === 2) throw e;
-    }
-  }
-  throw new Error('unreachable');
-}
-```
-
-**PASS** — Run tests, all green.
-
-**VERIFY (RED)** — Comment out the retry loop:
-
-```typescript
-async function retryOperation<T>(fn: () => T): Promise<T> {
-  // for (let i = 0; i < 3; i++) {
-  //   try {
-  //     return fn();
-  //   } catch (e) {
-  //     if (i === 2) throw e;
-  //   }
-  // }
-  return undefined as T;
-}
-```
-
-Run tests → fails: `Expected 'success', received undefined`. Good — test catches missing implementation.
-
-**RESTORE (GREEN)** — Uncomment, run tests → pass.
-
-### Go Example
+### Example
 
 **WRITE** — Test and implementation:
 
@@ -238,6 +193,8 @@ func RetryOperation[T any](fn func() (T, error)) (T, error) {
 
 For bug fixes. The bug provides the natural failing state — no comment-out needed. This is traditional red-green-refactor.
 
+**Important:** Always write the test FIRST, before any fix. The test must fail at runtime with an assertion error (`expected X, got Y`), not a compile error.
+
 ### Flow
 
 ```dot
@@ -261,23 +218,29 @@ digraph bugfix_mode {
 
 ### Steps
 
-#### 1. RED — Write Test Reproducing the Bug
+#### 1. RED — Write Test Reproducing the Bug (FIRST, before any fix)
 
-Write a test that triggers the bug. Run it. It must fail.
+**Write the test before touching the implementation.** This is non-negotiable.
+
+Write a test that triggers the bug. Run it. It must fail at runtime with an assertion error.
 
 ```bash
-npm test path/to/test.test.ts
-# FAIL: expected 'Email required', got undefined
+go test ./...
+# FAIL: expected "email required", got ""
 ```
 
 **Test passes?** You haven't reproduced the bug. Fix the test.
+
+**Compile error?** Add a stub return value so it compiles. The test must fail at the assertion, not the compiler.
+
+**Wrong error type?** The test must fail with an assertion failure (`expected X, got Y`), not a setup error or exception.
 
 #### 2. GREEN — Fix the Bug
 
 Write the minimal fix. Run tests. They pass.
 
 ```bash
-npm test path/to/test.test.ts
+go test ./...
 # PASS
 ```
 
@@ -287,56 +250,61 @@ npm test path/to/test.test.ts
 
 Clean up the fix. Keep tests green.
 
-### Example: Empty Email Accepted
+### Example
 
-**Bug:** Empty email accepted by form.
+**Bug:** Empty email accepted by form validation.
 
-**RED:**
-```typescript
-test('rejects empty email', async () => {
-  const result = await submitForm({ email: '' });
-  expect(result.error).toBe('Email required');
-});
+**RED:** Write test first (add stub so it compiles):
+```go
+func TestValidateEmail_RejectsEmpty(t *testing.T) {
+    err := ValidateEmail("")
+    assert.Equal(t, "email required", err.Error())
+}
 ```
 
-```bash
-$ npm test
-FAIL: expected 'Email required', got undefined
-```
-
-**GREEN:**
-```typescript
-function submitForm(data: FormData) {
-  if (!data.email?.trim()) {
-    return { error: 'Email required' };
-  }
-  // ...existing code
+```go
+// Stub so test compiles (returns empty error, not nil)
+func ValidateEmail(email string) error {
+    return errors.New("")
 }
 ```
 
 ```bash
-$ npm test
+$ go test ./...
+FAIL: expected "email required", got ""
+```
+
+**GREEN:** Fix the bug:
+```go
+func ValidateEmail(email string) error {
+    if strings.TrimSpace(email) == "" {
+        return errors.New("email required")
+    }
+    return nil
+}
+```
+
+```bash
+$ go test ./...
 PASS
 ```
 
-**REFACTOR:** Extract validation for multiple fields if needed.
+**REFACTOR:** Extract validation helpers if needed.
 
 ---
 
-## Compiled Languages
+## Stub Patterns for Verification
 
-Compiler errors are not failing tests. A test that doesn't compile proves nothing about behavior.
+When commenting out implementation for Feature Mode verification, use zero-value stubs so code compiles but tests fail at runtime:
 
-**The rule:** Code must compile first, then fail at runtime.
-
-When commenting out implementation for verification (Feature Mode), replace with stubs or zero values:
-
-| Language | Stub pattern |
-|----------|-------------|
-| Go | `var zero T; return zero, nil` |
-| Rust | `Default::default()` or `todo!()` for panics |
-| Java | `return null;` or `return 0;` |
-| C# | `return default;` |
+| Type | Stub Pattern |
+|------|-------------|
+| `T` (generic) | `var zero T; return zero, nil` |
+| `error` | `return errors.New("")` or `nil` (whichever makes test fail) |
+| `bool` | `return false` |
+| `int` | `return 0` |
+| `string` | `return ""` |
+| `slice` | `return nil` |
 
 The test must fail at the assertion (`expected X, got Y`), not at the compiler.
 
@@ -344,8 +312,8 @@ The test must fail at the assertion (`expected X, got Y`), not at the compiler.
 
 | Quality | Good | Bad |
 |---------|------|-----|
-| **Minimal** | One thing. "and" in name? Split it. | `test('validates email and domain and whitespace')` |
-| **Clear** | Name describes behavior | `test('test1')` |
+| **Minimal** | One thing. "and" in name? Split it. | `TestValidateEmail_DomainAndWhitespace()` |
+| **Clear** | Name describes behavior | `TestValidateEmail()` |
 | **Shows intent** | Demonstrates desired API | Obscures what code should do |
 
 ## Common Rationalizations
@@ -359,7 +327,8 @@ The test must fail at the assertion (`expected X, got Y`), not at the compiler.
 | "Need to explore first" | Fine. Throw away exploration, start with TDD. |
 | "Test hard = design unclear" | Listen to test. Hard to test = hard to use. |
 | "TDD will slow me down" | TDD faster than debugging. Pragmatic = test-first. |
-| "The compile error proves it" | Compile errors prove syntax, not behavior. Tests must fail at runtime. |
+| "The compile error proves it" | Compile errors prove syntax, not behavior. Tests must fail at runtime with assertion errors. |
+| "I wrote test and code together, no need to verify" | Skipping verification creates evergreen tests. Always do the Red-Green-Refactor pass. |
 | "Existing code has no tests" | You're improving it. Add tests for the code you're changing. |
 
 ## Red Flags — STOP and Reassess
@@ -376,9 +345,11 @@ The test must fail at the assertion (`expected X, got Y`), not at the compiler.
 - Compiler error instead of runtime failure during verification
 
 **Bug Fix Mode:**
-- Wrote the fix before writing the test
-- Test was written after confirming the fix works
+- Wrote the fix before writing the test (write test FIRST)
+- Test was written after confirming the fix works (write test FIRST)
 - Can't reproduce the bug in a test
+- Test fails with compile error instead of assertion (add stub, make it compile)
+- Test fails with wrong error (setup error instead of assertion failure)
 
 **All of these mean: Stop. Go back to the correct step in the flow.**
 
@@ -390,8 +361,10 @@ Before marking work complete:
 
 - [ ] Every new function/method has a test
 - [ ] All tests pass (GREEN baseline)
-- [ ] For each test: commented out implementation and watched test fail at runtime (VERIFY RED)
-- [ ] Restored implementation and confirmed all tests pass (RESTORE GREEN)
+- [ ] Red-Green-Refactor verification pass completed for each test:
+  - [ ] Commented out implementation (VERIFY RED)
+  - [ ] Watched test fail at runtime with assertion error (not compile error)
+  - [ ] Restored implementation and confirmed test passes (RESTORE GREEN)
 - [ ] Tests use real code (mocks only if unavoidable)
 - [ ] Edge cases and errors covered
 
