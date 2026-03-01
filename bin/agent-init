@@ -78,9 +78,9 @@ install_skills() {
     install_skill "https://github.com/vercel-labs/agent-skills" "web-design-guidelines"
 
     # Superpowers
-    install_skill "https://github.com/obra/superpowers" "brainstorming"
+    # install_skill "https://github.com/obra/superpowers" "brainstorming" # Using my own variation
     install_skill "https://github.com/obra/the-elements-of-style" "writing-clearly-and-concisely"
-    # install_skill "https://github.com/obra/superpowers" "test-driven-development" # Trying out my own tdd skill
+    # install_skill "https://github.com/obra/superpowers" "test-driven-development" # Using my own version
 
     # Anthropic skills
     install_skill "https://github.com/anthropics/skills" "pdf"
