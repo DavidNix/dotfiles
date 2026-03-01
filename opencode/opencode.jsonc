@@ -37,6 +37,7 @@
       "git log *": "allow",
       "git status *": "allow",
       "go build *": "allow",
+      "go doc *": "allow",
       "go env *": "allow",
       "go fmt *": "allow",
       "go test *": "allow",
