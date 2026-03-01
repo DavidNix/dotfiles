@@ -35,6 +35,7 @@
       "find *": "allow",
       "git diff *": "allow",
       "git log *": "allow",
+      "git show *": "allow",
       "git status *": "allow",
       "go build *": "allow",
       "go doc *": "allow",
