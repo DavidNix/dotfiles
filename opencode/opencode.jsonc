@@ -33,6 +33,7 @@
       "cp *": "allow",
       "file *": "allow",
       "find *": "allow",
+      "git blame *": "allow",
       "git diff *": "allow",
       "git log *": "allow",
       "git rev-parse *": "allow",
