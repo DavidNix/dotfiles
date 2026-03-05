@@ -71,7 +71,7 @@
     "skill": {
       "*": "ask",
       "ai-tdd": "allow",
-      "brainstorm": "ask", // some harnesses are too eager to use this one, so set to 'ask'
+      "brainstorm": "allow",
       "docx": "allow",
       "frontend-design": "allow",
       "frontend-slides": "allow",
