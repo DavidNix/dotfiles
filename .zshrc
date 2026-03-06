@@ -189,6 +189,10 @@ ai() {
   print -z "$(claude -p --model haiku --system-prompt "Output only shell commands. No explanations, no questions, no markdown formatting. Just the raw command(s) ready to copy and execute." "$*")"
 }
 
+# Opencode settings
+# Disable Claude Code compatability
+export OPENCODE_DISABLE_CLAUDE_CODE=1
+
 # ==============================================================================
 # Google Cloud SDK
 # ==============================================================================
