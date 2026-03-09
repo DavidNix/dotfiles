@@ -62,5 +62,6 @@
   "alwaysThinkingEnabled": true,
   "promptSuggestionEnabled": false,
   "autoUpdatesChannel": "latest",
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "effortLevel": "high"
 }
