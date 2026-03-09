@@ -191,7 +191,7 @@ ai() {
 
 # Opencode settings
 # Disable Claude Code compatability
-export OPENCODE_DISABLE_CLAUDE_CODE=1
+# export OPENCODE_DISABLE_CLAUDE_CODE=1 # Unfortunately, disables all skill discovery
 
 # ==============================================================================
 # Google Cloud SDK
