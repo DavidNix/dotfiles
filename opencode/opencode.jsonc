@@ -30,6 +30,7 @@
     "codesearch": "allow",
     "bash": {
       "*": "ask",
+      "bash -n *": "allow",
       "cp *": "allow",
       "file *": "allow",
       "find *": "allow",
