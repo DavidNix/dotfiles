@@ -47,6 +47,7 @@
       "go test *": "allow",
       "gofmt *": "allow",
       "goimports *": "allow",
+      "golangci-lint *": "allow",
       "grep *": "allow",
       "head *": "allow",
       "ls *": "allow",
