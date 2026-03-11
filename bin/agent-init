@@ -70,7 +70,7 @@ try_or_warn_quiet() {
 reset_skills() {
     echo ""
     echo "Resetting skills..."
-    try_or_warn_quiet "reset skills" npx --yes skills remove -g --all
+    try_or_warn_quiet "reset skills" npx --yes skills remove -g --all --yes
     echo -e "${GREEN}Skills reset${NC}"
 }
 
