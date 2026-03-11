@@ -15,6 +15,7 @@ cask "git-credential-manager-core"
 cask "ksdiff"
 
 tap "anomalyco/tap"
+tap "buildpacks/tap"
 tap "cjbassi/ytop"
 tap "derailed/k9s"
 
@@ -55,6 +56,7 @@ brew "mise" # asdf replacement
 brew "neovim"
 brew "opencode"
 brew "oven-sh/bun/bun"
+brew "pack"
 brew "procs"
 brew "rdap"
 brew "rename"
