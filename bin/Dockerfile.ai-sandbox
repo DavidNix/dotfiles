@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # AI Sandbox Image for Apple Container
-# Designed to run AI coding agents (Claude, Codex, etc.) in an isolated environment
+# Designed to run AI coding agents in an isolated environment
 
 # Apple Containers builder mounts /etc/resolv.conf read-only with a non-functional
 # nameserver. Create our own resolv.conf and bind-mount it over the broken one.
@@ -68,12 +68,18 @@ RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
 RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
     curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
 
-# Install Node.js and Codex CLI
+# Install OpenCode CLI
+ARG OPENCODE_VERSION=1.2.20
 RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
-    curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
-    && apt-get install -y nodejs \
-    && rm -rf /var/lib/apt/lists/* \
-    && npm i -g @openai/codex
+    arch="$(dpkg --print-architecture)" \
+    && case "$arch" in \
+        amd64) opencode_arch="x64" ;; \
+        arm64) opencode_arch="arm64" ;; \
+        *) echo "Unsupported architecture: $arch" >&2; exit 1 ;; \
+    esac \
+    && curl -fsSL "https://github.com/anomalyco/opencode/releases/download/v${OPENCODE_VERSION}/opencode-linux-${opencode_arch}.tar.gz" \
+      | tar -xz -C /usr/local/bin opencode \
+    && chmod 755 /usr/local/bin/opencode
 
 # Minimal zshrc to suppress first-run prompt
 RUN mkdir -p /root \

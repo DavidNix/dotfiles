@@ -1,128 +1,65 @@
 #!/bin/bash
-# ai-sandbox - Run AI coding agents in an isolated Apple Container environment
-# Mimics Docker sandbox functionality using Apple's container tool
+# Note: upgrade the Apple container CLI with /usr/local/bin/update-container.sh
 
 set -euo pipefail
 
-# Configuration
 SANDBOX_IMAGE="ai-sandbox:latest"
 DOCKERFILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 log_info() { echo -e "${BLUE}[INFO]${NC} $*"; }
 log_success() { echo -e "${GREEN}[OK]${NC} $*"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $*"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $*" >&2; }
 
-ensure_volume() {
-    local vol="$1"
-    if ! container volume list 2>/dev/null | grep -q "$vol"; then
-        container volume create "$vol"
+sync_claude_credentials() {
+    local claude_dir creds tmp_file
+
+    claude_dir="$HOME/.claude"
+    mkdir -p "$claude_dir"
+
+    creds=$(security find-generic-password -s "Claude Code-credentials" -a "$(whoami)" -w 2>/dev/null || true)
+    if [[ -z "$creds" ]]; then
+        log_warn "No Claude credentials found in Keychain; using existing ~/.claude state"
+        return 0
     fi
+
+    tmp_file=$(mktemp "${claude_dir}/.credentials.json.tmp.XXXXXX")
+    chmod 600 "$tmp_file"
+    printf '%s' "$creds" > "$tmp_file"
+    mv "$tmp_file" "${claude_dir}/.credentials.json"
 }
 
-prepare_claude_volume() {
-    local vol="$1"
-    ensure_volume "$vol"
-    local host_home="$HOME"
-    local host_uid host_gid
-    host_uid=$(id -u)
-    host_gid=$(id -g)
-
-    log_info "Preparing Claude config volume..."
-
-    # Get credentials from Keychain (may be empty)
-    local creds=""
-    creds=$(security find-generic-password -s "Claude Code-credentials" -a "$(whoami)" -w 2>/dev/null) || true
-
-    # shellcheck disable=SC2016 # Variables in bash -c expand inside the container, not on the host
-    printf '%s' "$creds" | container run --rm -i \
-        --memory 128m \
-        -e "HOST_UID=${host_uid}" \
-        -e "HOST_GID=${host_gid}" \
-        -e "HOST_HOME=${host_home}" \
-        --mount "type=bind,source=${host_home},target=${host_home},readonly" \
-        --mount "type=volume,source=${vol},target=/claude-config" \
-        "$SANDBOX_IMAGE" \
-        bash -c '
-            set -e
-            # Copy config files (-L dereferences symlinks for dotfile-managed configs)
-            cp -RLf "$HOST_HOME/.claude/." /claude-config/ 2>/dev/null || true
-            cp "$HOST_HOME/.claude.json" /claude-config/_claude.json
-
-            # Inject credentials from stdin if available
-            creds=$(cat)
-            if [ -n "$creds" ]; then
-                printf "%s" "$creds" > /claude-config/.credentials.json
-                chmod 600 /claude-config/.credentials.json
-            fi
-
-            # Set ownership and permissions
-            chown -R "${HOST_UID}:${HOST_GID}" /claude-config
-            chmod 700 /claude-config
-        '
-
-    if [[ -n "$creds" ]]; then
-        log_success "Claude config and credentials ready"
-    else
-        log_warn "Claude config ready (no credentials in Keychain — login required)"
-    fi
-}
-
-prepare_writable_volume() {
-    local vol="$1"
-    local host_uid="$2"
-    local host_gid="$3"
-
-    ensure_volume "$vol"
-
-    # shellcheck disable=SC2016 # Variables in bash -c expand inside the container, not on the host
-    container run --rm \
-        --memory 128m \
-        -e "HOST_UID=${host_uid}" \
-        -e "HOST_GID=${host_gid}" \
-        --mount "type=volume,source=${vol},target=/writable-volume" \
-        "$SANDBOX_IMAGE" \
-        bash -c '
-            set -e
-            mkdir -p /writable-volume
-            current_owner=$(stat -c "%u:%g" /writable-volume 2>/dev/null || true)
-            if [ "$current_owner" != "${HOST_UID}:${HOST_GID}" ]; then
-                chown -R "${HOST_UID}:${HOST_GID}" /writable-volume
-            fi
-        '
-}
-
-# Show usage
 usage() {
     cat <<EOF
-Usage: ai-sandbox [OPTIONS] [AGENT] [AGENT_ARGS...]
+Usage: ai-sandbox [build|reset|prune]
 
-Run AI coding agents in an isolated container environment.
+Run a persistent AI sandbox in Apple Containers.
 
 COMMANDS:
-    claude      Run Claude Code
-    codex       Run OpenAI Codex
-    shell       Open interactive shell
     build       Build/rebuild the sandbox image
-    reset       Remove sandbox and refresh Claude credentials from host
-    prune       Delete all ai-sandbox volumes
+    reset       Remove the sandbox for the current directory
+    prune       Delete all ai-sandbox containers and volumes
+
+With no arguments, ai-sandbox starts or reuses the sandbox for the current
+directory and opens an interactive shell inside it.
 
 OPTIONS:
     -h, --help  Show this help message
 
 EXAMPLES:
-    ai-sandbox claude                   # Run Claude (builds image if needed)
-    ai-sandbox shell                    # Open shell in sandbox
-    ai-sandbox build                    # Build/rebuild the image
-    ai-sandbox build --no-cache         # Rebuild from scratch (update deps)
-    ai-sandbox reset                    # Reset sandbox and credentials
+    ai-sandbox                  # Open a shell in the sandbox
+    ai-sandbox build            # Build/rebuild the image
+    ai-sandbox build --no-cache # Rebuild from scratch
+    ai-sandbox reset            # Remove the current sandbox
+
+NOTES:
+    Upgrade the Apple container CLI with /usr/local/bin/update-container.sh
 
 EOF
 }
@@ -135,18 +72,23 @@ ensure_system_running() {
     fi
 }
 
-# Build the sandbox image if it doesn't exist
 build_image() {
     local force="${1:-}"
     local no_cache="${2:-}"
+
     if [[ -z "$force" ]] && container image list 2>/dev/null | grep -q "$SANDBOX_IMAGE"; then
         return 0
     fi
 
-    local host_home host_uid host_gid
+    local host_home host_uid host_gid opencode_version
     host_home="$HOME"
     host_uid=$(id -u)
     host_gid=$(id -g)
+    opencode_version=$(opencode --version 2>/dev/null || true)
+    if [[ -z "$opencode_version" ]]; then
+        log_error "Could not detect host opencode version"
+        exit 1
+    fi
 
     log_info "Building sandbox image..."
 
@@ -157,108 +99,227 @@ build_image() {
         --build-arg "HOST_UID=${host_uid}"
         --build-arg "HOST_GID=${host_gid}"
     )
+    build_args+=(--build-arg "OPENCODE_VERSION=${opencode_version}")
     if [[ -n "$no_cache" ]]; then
         build_args+=(--no-cache)
     fi
     build_args+=("${DOCKERFILE_DIR}")
 
     container build "${build_args[@]}"
-
     log_success "Image built successfully"
 }
 
 container_name_from_dir() {
     local dir="$1"
-    echo "ai-sandbox-$(echo "$dir" | md5 | cut -c1-12)"
-}
-
-volume_name_from_dir() {
-    local dir="$1"
-    echo "ai-sandbox-claude-config-$(echo "$dir" | md5 | cut -c1-12)"
-}
-
-cache_volume_name_from_dir() {
-    local dir="$1"
-    local kind="$2"
-    echo "ai-sandbox-${kind}-$(echo "$dir" | md5 | cut -c1-12)"
+    local base_name safe_name hash
+    base_name=$(basename "$dir")
+    safe_name=$(printf '%s' "$base_name" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-')
+    safe_name=${safe_name#-}
+    safe_name=${safe_name%-}
+    [[ -n "$safe_name" ]] || safe_name="dir"
+    hash=$(echo "$dir" | md5 | cut -c1-12)
+    echo "ai-sandbox-${safe_name}-${hash}"
 }
 
 resolve_git_common_dir() {
     local work_dir="$1"
     local git_path="${work_dir}/.git"
 
-    # Only relevant if .git is a file (worktree indicator)
     [[ -f "$git_path" ]] || return 0
 
     local gitdir
-    gitdir=$(sed -n 's/^gitdir: //p' "$git_path")
+    gitdir=$(python3 - <<'PY' "$git_path"
+import os
+import sys
 
-    # Resolve relative paths
-    if [[ "$gitdir" != /* ]]; then
-        gitdir=$(cd "$work_dir" && cd "$(dirname "$gitdir")" && pwd)/$(basename "$gitdir")
-    fi
+git_path = sys.argv[1]
+with open(git_path, encoding="utf-8") as fh:
+    for line in fh:
+        if line.startswith("gitdir: "):
+            gitdir = line[len("gitdir: "):].strip()
+            if not os.path.isabs(gitdir):
+                gitdir = os.path.normpath(os.path.join(os.path.dirname(git_path), gitdir))
+            print(gitdir)
+            break
+PY
+)
 
-    # Find the common git dir (the main repo's .git)
+    [[ -n "$gitdir" ]] || return 0
+
     if [[ -f "${gitdir}/commondir" ]]; then
-        (cd "$gitdir" && cd "$(cat commondir)" && pwd)
+        python3 - <<'PY' "$gitdir"
+import os
+import sys
+
+gitdir = sys.argv[1]
+with open(os.path.join(gitdir, "commondir"), encoding="utf-8") as fh:
+    commondir = fh.read().strip()
+print(os.path.normpath(os.path.join(gitdir, commondir)))
+PY
     else
-        # Fallback: .git/worktrees/<name> -> .git
-        (cd "$gitdir/../.." && pwd)
+        python3 - <<'PY' "$gitdir"
+import os
+import sys
+
+gitdir = sys.argv[1]
+print(os.path.normpath(os.path.join(gitdir, "..", "..")))
+PY
     fi
 }
 
 container_exists() {
     local name="$1"
-    container list -a 2>/dev/null | grep -q "$name"
+    container list -a 2>/dev/null | awk 'NR>1 {print $1}' | grep -qx "$name"
+}
+
+container_running() {
+    local name="$1"
+    container list 2>/dev/null | awk 'NR>1 {print $1}' | grep -qx "$name"
 }
 
 remove_container() {
     local name="$1"
     if container_exists "$name"; then
-        log_info "Removing existing container: $name"
-        container stop "$name"
-        container rm "$name"
+        log_info "Removing container: $name"
+        container rm --force "$name"
     fi
 }
 
-run_sandbox() {
+ensure_host_mount_sources() {
+    local work_dir="$1"
+    local worktrees_dir="$2"
+
+    mkdir -p "$HOME/.claude"
+    mkdir -p "$HOME/.config/opencode"
+    mkdir -p "$HOME/.local/share/opencode"
+    mkdir -p "$HOME/.cache/opencode"
+    mkdir -p "$worktrees_dir"
+
+    if [[ -d "$work_dir/.git" ]]; then
+        mkdir -p "$work_dir/.git"
+    fi
+
+    if [[ -d "$HOME/src/dotfiles" ]]; then
+        mkdir -p "$HOME/src/dotfiles/claude"
+        mkdir -p "$HOME/src/dotfiles/opencode"
+    fi
+}
+
+append_mount_if_exists() {
+    local -n target_ref=$1
+    local source="$2"
+    local dest="$3"
+    local readonly="${4:-}"
+
+    [[ -e "$source" ]] || return 0
+
+    local mount="type=bind,source=${source},target=${dest}"
+    if [[ "$readonly" == "readonly" ]]; then
+        mount+=",readonly"
+    fi
+    target_ref+=("--mount" "$mount")
+}
+
+create_container() {
     local work_dir="$1"
     local container_name="$2"
-    local volume_name="$3"
-    local agent="$4"
-    shift 4
-    local -a agent_args=("$@")
 
-    # Use absolute path
     work_dir=$(cd "$work_dir" && pwd)
-    local git_common_dir
-    git_common_dir=$(resolve_git_common_dir "$work_dir")
-    # HOME in container MUST match host HOME because Claude uses absolute paths for config
-    local container_home="${HOME}"
-    local host_uid host_gid
+
+    local container_home host_uid host_gid memory cpus
+    local git_common_dir worktrees_dir
+    local git_name git_email home_dotfiles
+
+    container_home="$HOME"
     host_uid=$(id -u)
     host_gid=$(id -g)
-    local memory
-    if [[ -n "${AI_SANDBOX_MEMORY+x}" ]]; then
-        memory="${AI_SANDBOX_MEMORY}"
-    else
-        memory="6G"
-    fi
-    local cpus="${AI_SANDBOX_CPUS:-}"
-    local go_mod_volume
-    go_mod_volume=$(cache_volume_name_from_dir "$work_dir" "go-mod")
-    local mise_data_volume
-    mise_data_volume=$(cache_volume_name_from_dir "$work_dir" "mise-data")
-    local go_path="${container_home}/go"
-    local go_modcache="${go_path}/pkg/mod"
-    local mise_data_dir="${container_home}/.local/share/mise"
+    memory="${AI_SANDBOX_MEMORY:-8G}"
+    cpus="${AI_SANDBOX_CPUS:-}"
+    git_common_dir=$(resolve_git_common_dir "$work_dir")
+    worktrees_dir="$(cd "$work_dir/.." && pwd)/worktrees"
+    git_name=$(git config --global user.name 2>/dev/null || true)
+    git_email=$(git config --global user.email 2>/dev/null || true)
+    home_dotfiles="${HOME}/src/dotfiles"
 
-    log_info "Preparing writable cache volumes..."
-    prepare_writable_volume "$go_mod_volume" "$host_uid" "$host_gid"
-    prepare_writable_volume "$mise_data_volume" "$host_uid" "$host_gid"
+    ensure_host_mount_sources "$work_dir" "$worktrees_dir"
+
+    local idle_cmd
+    idle_cmd=$(cat <<'EOF'
+set -e
+trap 'exit 0' INT TERM
+while :; do
+  sleep 3600 &
+  wait $!
+done
+EOF
+)
+
+    local create_args=(
+        "--name" "$container_name"
+        "--interactive"
+        "--tty"
+        "--uid" "$host_uid"
+        "--gid" "$host_gid"
+        "--memory" "$memory"
+        "--mount" "type=bind,source=${container_home},target=${container_home},readonly"
+        "-e" "HOME=${container_home}"
+        "-e" "PATH=${container_home}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        "-e" "ZDOTDIR=/root"
+        "-e" "COLORTERM=truecolor"
+        "-e" "GIT_SSH_COMMAND=ssh -o BatchMode=yes"
+    )
+
+    if [[ -n "$git_name" ]]; then
+        create_args+=("-e" "GIT_AUTHOR_NAME=${git_name}" "-e" "GIT_COMMITTER_NAME=${git_name}")
+    fi
+    if [[ -n "$git_email" ]]; then
+        create_args+=("-e" "GIT_AUTHOR_EMAIL=${git_email}" "-e" "GIT_COMMITTER_EMAIL=${git_email}")
+    fi
+    if [[ -n "$cpus" ]]; then
+        create_args+=("--cpus" "$cpus")
+    fi
+
+    append_mount_if_exists create_args "$work_dir" "$work_dir"
+    append_mount_if_exists create_args "$worktrees_dir" "$worktrees_dir"
+    append_mount_if_exists create_args "$HOME/.claude" "$HOME/.claude"
+    append_mount_if_exists create_args "$HOME/.config/opencode" "$HOME/.config/opencode"
+    append_mount_if_exists create_args "$HOME/.local/share/opencode" "$HOME/.local/share/opencode"
+    append_mount_if_exists create_args "$HOME/.cache/opencode" "$HOME/.cache/opencode"
+
+    if [[ -n "$git_common_dir" ]]; then
+        append_mount_if_exists create_args "$git_common_dir" "$git_common_dir"
+    fi
+
+    if [[ -d "$home_dotfiles" ]]; then
+        append_mount_if_exists create_args "$home_dotfiles" "$home_dotfiles" readonly
+        append_mount_if_exists create_args "$home_dotfiles/claude" "$home_dotfiles/claude"
+        append_mount_if_exists create_args "$home_dotfiles/opencode" "$home_dotfiles/opencode"
+    fi
+
+    log_info "Creating sandbox: $container_name"
+    container create "${create_args[@]}" "$SANDBOX_IMAGE" /bin/bash -lc "$idle_cmd"
+}
+
+ensure_container_running() {
+    local work_dir="$1"
+    local container_name="$2"
+
+    if ! container_exists "$container_name"; then
+        create_container "$work_dir" "$container_name"
+    fi
+
+    if ! container_running "$container_name"; then
+        log_info "Starting sandbox: $container_name"
+        container start "$container_name"
+    fi
+}
+
+exec_shell() {
+    local work_dir="$1"
+    local container_name="$2"
 
     local prep_cmd
-prep_cmd=$(cat <<'EOF'
+    prep_cmd=$(cat <<'EOF'
 : "${XDG_CONFIG_HOME:=$HOME/.config}"
 : "${XDG_CACHE_HOME:=$HOME/.cache}"
 : "${XDG_DATA_HOME:=$HOME/.local/share}"
@@ -268,197 +329,129 @@ mkdir -p "$HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" \
 if [ ! -x "$HOME/.local/bin/claude" ] && [ -x /usr/local/bin/claude ]; then
   ln -sf /usr/local/bin/claude "$HOME/.local/bin/claude"
 fi
-cp "$HOME/.claude/_claude.json" "$HOME/.claude.json"
+if [ ! -x "$HOME/.local/bin/opencode" ] && [ -x /usr/local/bin/opencode ]; then
+  ln -sf /usr/local/bin/opencode "$HOME/.local/bin/opencode"
+fi
 if [ -f .tool-versions ] || [ -f .mise.toml ] || [ -f mise.toml ]; then
   /usr/local/bin/mise install --yes 2>&1 | tail -5
   eval "$(/usr/local/bin/mise activate bash)"
 fi
+exec /bin/zsh
 EOF
 )
 
-    log_info "Starting sandbox for: $work_dir"
+    container exec \
+        --interactive \
+        --tty \
+        --workdir "$work_dir" \
+        "$container_name" \
+        /bin/bash -lc "$prep_cmd"
+}
 
-    # Get git config for env vars (can't mount files, only directories)
-    local git_name git_email
-    git_name=$(git config --global user.name)
-    git_email=$(git config --global user.email)
+reset_sandbox() {
+    local _work_dir="$1"
+    local container_name="$2"
 
-    # Build run command
-    local run_args=(
-        "--rm"
-        "--interactive"
-        "--tty"
-        "--name" "$container_name"
-        "--uid" "$host_uid"
-        "--gid" "$host_gid"
-        "--mount" "type=bind,source=${work_dir},target=${work_dir}"
-        "--mount" "type=volume,source=${go_mod_volume},target=${go_modcache}"
-        "--mount" "type=volume,source=${mise_data_volume},target=${mise_data_dir}"
-        "--mount" "type=volume,source=${volume_name},target=${container_home}/.claude"
-        "-w" "$work_dir"
-        # "--ssh" # leaving out for now, don't want it comitting to remotes yet
-        "-e" "HOME=${container_home}"
-        "-e" "PATH=${container_home}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-        "-e" "ZDOTDIR=/root" # prevents zsh warnings
-        "-e" "GIT_AUTHOR_NAME=${git_name}"
-        "-e" "GIT_COMMITTER_NAME=${git_name}"
-        "-e" "GIT_AUTHOR_EMAIL=${git_email}"
-        "-e" "GIT_COMMITTER_EMAIL=${git_email}"
-        "-e" "COLORTERM=truecolor"
-        # BatchMode=yes makes SSH fail silently instead of prompting for host key verification,
-        # preventing terminal input disruption when git touches SSH remotes.
-        "-e" "GIT_SSH_COMMAND=ssh -o BatchMode=yes"
-    )
-    if [[ -n "$memory" ]]; then
-        run_args+=("--memory" "$memory")
-    fi
-    if [[ -n "$cpus" ]]; then
-        run_args+=("--cpus" "$cpus")
-    fi
-    if [[ -n "$git_common_dir" ]]; then
-        run_args+=("--mount" "type=bind,source=${git_common_dir},target=${git_common_dir},readonly")
-    fi
-    # Determine what to run
-    local cmd=()
-    case "$agent" in
-        claude)
-            cmd=("/bin/bash" "-lc" "${prep_cmd}; exec \"\$@\"" "bash" "claude" "--dangerously-skip-permissions" "--no-chrome")
-            if ((${#agent_args[@]})); then
-                cmd+=("${agent_args[@]}")
-            fi
-            ;;
-        codex)
-            cmd=("/bin/bash" "-lc" "${prep_cmd}; exec \"\$@\"" "bash" "codex" "--dangerously-bypass-approvals-and-sandbox")
-            if ((${#agent_args[@]})); then
-                cmd+=("${agent_args[@]}")
-            fi
-            ;;
-        shell)
-            cmd=("/bin/bash" "-lc" "${prep_cmd}; exec /bin/zsh")
-            ;;
-        *)
-            cmd=("/bin/bash" "-lc" "${prep_cmd}; exec \"\$@\"" "bash" "$agent")
-            if ((${#agent_args[@]})); then
-                cmd+=("${agent_args[@]}")
-            fi
-            ;;
-    esac
+    remove_container "$container_name"
+    log_success "Sandbox reset"
+}
 
-    # Container names are deterministic; remove stale ones so `container run` succeeds.
-    if container_exists "$container_name"; then
-        remove_container "$container_name"
+prune_sandboxes() {
+    local containers volumes
+
+    containers=$(container list -a 2>/dev/null | awk 'NR>1 && $1 ~ /^ai-sandbox-/ {print $1}')
+    if [[ -n "$containers" ]]; then
+        log_info "Removing sandbox containers..."
+        while IFS= read -r ctr; do
+            [[ -n "$ctr" ]] || continue
+            remove_container "$ctr"
+        done <<< "$containers"
     fi
 
-    # Cleanup trap for interrupted runs (Ctrl+C, terminal close, etc.)
-    trap "remove_container '$container_name' 2>/dev/null" EXIT INT TERM
+    volumes=$(container volume list 2>/dev/null | awk '/^ai-sandbox-/ {print $1}')
+    if [[ -z "$volumes" ]]; then
+        log_info "No ai-sandbox volumes found"
+        return 0
+    fi
 
-    log_info "Creating sandbox: $container_name"
-    container run "${run_args[@]}" "$SANDBOX_IMAGE" "${cmd[@]}"
+    log_info "Deleting ai-sandbox volumes..."
+    while IFS= read -r vol; do
+        [[ -n "$vol" ]] || continue
+        container volume delete "$vol" && log_success "Deleted: $vol"
+    done <<< "$volumes"
+
+    log_success "Prune complete"
 }
 
 main() {
     local work_dir="."
-    local agent=""
-    local agent_args=()
+    local command="shell"
+    local -a command_args=()
 
-    # Parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
             -h|--help)
                 usage
                 exit 0
                 ;;
-            claude|codex|shell|reset|build|prune)
-                agent="$1"
+            build|reset|prune)
+                command="$1"
                 shift
-                agent_args=("$@")
+                command_args=("$@")
                 break
-                ;;
-            -*)
-                log_error "Unknown option: $1"
-                usage
-                exit 1
                 ;;
             *)
-                agent="$1"
-                shift
-                agent_args=("$@")
-                break
+                log_error "Unknown argument: $1"
+                usage
+                exit 1
                 ;;
         esac
     done
 
-    # Require a command
-    if [[ -z "$agent" ]]; then
-        log_error "Command required"
-        usage
-        exit 1
-    fi
-
-    # Validate working directory
+    work_dir=$(cd "$work_dir" && pwd)
     if [[ ! -d "$work_dir" ]]; then
         log_error "Directory does not exist: $work_dir"
         exit 1
     fi
 
-    # Generate container and volume names from directory
-    work_dir=$(cd "$work_dir" && pwd)
-    local container_name volume_name
+    local container_name
     container_name=$(container_name_from_dir "$work_dir")
-    volume_name=$(volume_name_from_dir "$work_dir")
-
-    if [[ "$agent" == "build" ]]; then
-        ensure_system_running
-        local no_cache=""
-        for arg in "${agent_args[@]}"; do
-            [[ "$arg" == "--no-cache" ]] && no_cache=true
-        done
-        build_image true "$no_cache"
-        exit 0
-    fi
-
-    if [[ "$agent" == "reset" ]]; then
-        ensure_system_running
-        build_image
-        remove_container "$container_name"
-        container volume delete "$volume_name" 2>/dev/null || true
-        prepare_claude_volume "$volume_name"
-        log_success "Sandbox reset"
-        exit 0
-    fi
-
-    if [[ "$agent" == "prune" ]]; then
-        ensure_system_running
-        # Remove sandbox containers first
-        local containers
-        containers=$(container list -a 2>/dev/null | grep -E '^ai-sandbox-' | awk '{print $1}' || true)
-        if [[ -n "$containers" ]]; then
-            log_info "Removing sandbox containers..."
-            while IFS= read -r ctr; do
-                remove_container "$ctr"
-            done <<< "$containers"
-        fi
-        # Then delete volumes
-        local volumes
-        volumes=$(container volume list 2>/dev/null | grep -E '^ai-sandbox-' | awk '{print $1}' || true)
-        if [[ -z "$volumes" ]]; then
-            log_info "No ai-sandbox volumes found"
-            exit 0
-        fi
-        log_info "Deleting ai-sandbox volumes..."
-        while IFS= read -r vol; do
-            container volume delete "$vol" && log_success "Deleted: $vol"
-        done <<< "$volumes"
-        log_success "Prune complete"
-        exit 0
-    fi
 
     ensure_system_running
 
-    build_image
-
-    prepare_claude_volume "$volume_name"
-    run_sandbox "$work_dir" "$container_name" "$volume_name" "$agent" ${agent_args[@]+"${agent_args[@]}"}
+    case "$command" in
+        build)
+            local no_cache=""
+            if ((${#command_args[@]})); then
+                for arg in "${command_args[@]}"; do
+                    if [[ "$arg" == "--no-cache" ]]; then
+                        no_cache=true
+                    else
+                        log_error "Unknown build option: $arg"
+                        exit 1
+                    fi
+                done
+            fi
+            build_image true "$no_cache"
+            ;;
+        reset)
+            build_image
+            reset_sandbox "$work_dir" "$container_name"
+            ;;
+        prune)
+            prune_sandboxes
+            ;;
+        shell)
+            build_image
+            sync_claude_credentials
+            ensure_container_running "$work_dir" "$container_name"
+            exec_shell "$work_dir" "$container_name"
+            ;;
+        *)
+            log_error "Unsupported command: $command"
+            exit 1
+            ;;
+    esac
 }
 
 main "$@"
