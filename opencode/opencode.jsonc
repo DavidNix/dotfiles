@@ -58,6 +58,7 @@
       "make vet *": "allow",
       "mkdir *": "allow",
       "mv *": "allow",
+      "pack *": "allow",
       "pwd *": "allow",
       "rg *": "allow",
       "ripgrep *": "allow",
