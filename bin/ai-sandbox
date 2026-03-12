@@ -44,7 +44,7 @@ Run a persistent AI sandbox in Apple Containers.
 COMMANDS:
     build       Build/rebuild the sandbox image
     reset       Remove the sandbox for the current directory
-    prune       Delete all ai-sandbox containers and volumes
+    prune       Delete all ai-sandbox containers
 
 With no arguments, ai-sandbox starts or reuses the sandbox for the current
 directory and opens an interactive shell inside it.
@@ -368,7 +368,7 @@ reset_sandbox() {
 }
 
 prune_sandboxes() {
-    local containers volumes
+    local containers
 
     containers=$(container list -a 2>/dev/null | awk 'NR>1 && $1 ~ /^ai-sandbox-/ {print $1}')
     if [[ -n "$containers" ]]; then
@@ -378,18 +378,6 @@ prune_sandboxes() {
             remove_container "$ctr"
         done <<< "$containers"
     fi
-
-    volumes=$(container volume list 2>/dev/null | awk '/^ai-sandbox-/ {print $1}')
-    if [[ -z "$volumes" ]]; then
-        log_info "No ai-sandbox volumes found"
-        return 0
-    fi
-
-    log_info "Deleting ai-sandbox volumes..."
-    while IFS= read -r vol; do
-        [[ -n "$vol" ]] || continue
-        container volume delete "$vol" && log_success "Deleted: $vol"
-    done <<< "$volumes"
 
     log_success "Prune complete"
 }
