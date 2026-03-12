@@ -191,8 +191,11 @@ ensure_host_mount_sources() {
 
     mkdir -p "$HOME/.claude"
     mkdir -p "$HOME/.config/opencode"
+    mkdir -p "$HOME/.local/bin"
     mkdir -p "$HOME/.local/share/opencode"
+    mkdir -p "$HOME/.local/share/mise"
     mkdir -p "$HOME/.cache/opencode"
+    mkdir -p "$HOME/.cache/mise"
     mkdir -p "$worktrees_dir"
 
     if [[ -d "$work_dir/.git" ]]; then
@@ -206,7 +209,7 @@ ensure_host_mount_sources() {
 }
 
 append_mount_if_exists() {
-    local -n target_ref=$1
+    local target_var_name="$1"
     local source="$2"
     local dest="$3"
     local readonly="${4:-}"
@@ -217,7 +220,16 @@ append_mount_if_exists() {
     if [[ "$readonly" == "readonly" ]]; then
         mount+=",readonly"
     fi
-    target_ref+=("--mount" "$mount")
+
+    local quoted_mount
+    quoted_mount=$(printf '%q' "$mount")
+    eval "$target_var_name+=(\"--mount\" $quoted_mount)"
+}
+
+paths_equal() {
+    local left="$1"
+    local right="$2"
+    [[ "$(cd "$left" && pwd)" == "$(cd "$right" && pwd)" ]]
 }
 
 create_container() {
@@ -283,15 +295,20 @@ EOF
     append_mount_if_exists create_args "$worktrees_dir" "$worktrees_dir"
     append_mount_if_exists create_args "$HOME/.claude" "$HOME/.claude"
     append_mount_if_exists create_args "$HOME/.config/opencode" "$HOME/.config/opencode"
+    append_mount_if_exists create_args "$HOME/.local/bin" "$HOME/.local/bin"
     append_mount_if_exists create_args "$HOME/.local/share/opencode" "$HOME/.local/share/opencode"
+    append_mount_if_exists create_args "$HOME/.local/share/mise" "$HOME/.local/share/mise"
     append_mount_if_exists create_args "$HOME/.cache/opencode" "$HOME/.cache/opencode"
+    append_mount_if_exists create_args "$HOME/.cache/mise" "$HOME/.cache/mise"
 
     if [[ -n "$git_common_dir" ]]; then
         append_mount_if_exists create_args "$git_common_dir" "$git_common_dir"
     fi
 
     if [[ -d "$home_dotfiles" ]]; then
-        append_mount_if_exists create_args "$home_dotfiles" "$home_dotfiles" readonly
+        if ! paths_equal "$home_dotfiles" "$work_dir"; then
+            append_mount_if_exists create_args "$home_dotfiles" "$home_dotfiles" readonly
+        fi
         append_mount_if_exists create_args "$home_dotfiles/claude" "$home_dotfiles/claude"
         append_mount_if_exists create_args "$home_dotfiles/opencode" "$home_dotfiles/opencode"
     fi
@@ -325,13 +342,7 @@ exec_shell() {
 : "${XDG_DATA_HOME:=$HOME/.local/share}"
 : "${XDG_STATE_HOME:=$HOME/.local/state}"
 mkdir -p "$HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" \
-  "$XDG_STATE_HOME" "$HOME/.local/bin" "$HOME/.local/home"
-if [ ! -x "$HOME/.local/bin/claude" ] && [ -x /usr/local/bin/claude ]; then
-  ln -sf /usr/local/bin/claude "$HOME/.local/bin/claude"
-fi
-if [ ! -x "$HOME/.local/bin/opencode" ] && [ -x /usr/local/bin/opencode ]; then
-  ln -sf /usr/local/bin/opencode "$HOME/.local/bin/opencode"
-fi
+  "$XDG_STATE_HOME" "$HOME/.local/bin"
 if [ -f .tool-versions ] || [ -f .mise.toml ] || [ -f mise.toml ]; then
   /usr/local/bin/mise install --yes 2>&1 | tail -5
   eval "$(/usr/local/bin/mise activate bash)"
@@ -345,7 +356,7 @@ EOF
         --tty \
         --workdir "$work_dir" \
         "$container_name" \
-        /bin/bash -lc "$prep_cmd"
+        /bin/bash --noprofile --norc -lc "$prep_cmd"
 }
 
 reset_sandbox() {
