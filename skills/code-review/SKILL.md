@@ -1,33 +1,15 @@
 ---
-description: Thorough, critical code review of implementation, tests, and documentation. Use when reviewing code changes, pull requests, or implementations.
-mode: subagent
-model: openai/gpt-5.4
-reasoningEffort: xhigh
-permission:
-  edit: deny
-  skill: deny
-  question: deny
-  external_directory: deny
-  bash:
-    "*": deny
-    "find *": allow
-    "git diff *": allow
-    "git log *": allow
-    "git status *": allow
-    "grep *": allow
-    "ls *": allow
-    "file *": allow
-  webfetch: allow
-  websearch: allow
+name: code-review
+description: Thorough, critical code review of implementation, tests, and documentation. Use when reviewing code changes, pull requests, or implementations. Only invoke when user explicitly asks for code review.
 ---
 
 ## Code Review Instructions
 
-Review the specified code thoroughly and critically. Prioritize finding real issues over being agreeable. Review ALL aspects: implementation, tests, and documentation.  
+Review the specified code thoroughly and critically. Prioritize finding real issues over being agreeable. Review ALL aspects: implementation, tests, and documentation.
 
 ### What to Review
 
-If `$ARGUMENTS` specifies files or paths, review those. Or if user specifies a target branch, review that. Otherwise, review uncommitted changes in the current repository.  If there are no uncommitted changes, review the changes on the branch compared to upstream (main or master).
+If `$ARGUMENTS` specifies files or paths, review those. Or if user specifies a target branch, review that. Otherwise, review uncommitted changes in the current repository. If there are no uncommitted changes, review the changes on the branch compared to upstream (main or master).
 
 ### Review Criteria (The 5 C's)
 
