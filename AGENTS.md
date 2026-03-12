@@ -14,6 +14,7 @@ make relink    # Symlink dotfiles to ~/
 make setup     # Full new Mac setup (NOT idempotent)
 make defaults  # Apply macOS preferences (requires reboot)
 make pkgs      # Install Homebrew packages
+make bash-check FILE=bin/script # Validate a bash script
 ```
 
 ## Key Files
@@ -39,7 +40,7 @@ Read these files directly for details.
 
 **Shell changes:** Edit `.zshrc`, reload with `source ~/.zshrc`.
 
-**Script changes:** After modifying bash/zsh scripts, run `shellcheck <file>` to catch errors.
+**Script changes:** After modifying bash/zsh scripts, run `make bash-check FILE=<file>` instead of invoking `shellcheck` and `bash -n` separately.
 
 ## Agent Skills/Plugin Maintenance
 

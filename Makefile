@@ -106,6 +106,16 @@ agent: ## Install Claude Code and setup skills/plugins
 check-clean: ## Check if git state is clean
 	@git diff-index --quiet HEAD -- || { echo "Error: Git is dirty."; exit 1; }
 
+.PHONY: bash-check
+bash-check: ## Run shellcheck and bash -n on FILE=<path>
+	@if [ -z "$(FILE)" ]; then \
+		echo "Usage: make bash-check FILE=path/to/script"; \
+		exit 1; \
+	fi
+	@shellcheck "$(FILE)"
+	@bash -n "$(FILE)"
+	@echo "bash-check passed: $(FILE)"
+
 FEAT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 .PHONY: pr
 pr: check-clean ## Mimic a local PR from a branch into upstream
