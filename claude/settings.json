@@ -57,8 +57,9 @@
     "hookify@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
   "promptSuggestionEnabled": false,
   "autoUpdatesChannel": "latest",
-  "skipDangerousModePermissionPrompt": true,
-  "effortLevel": "high"
+  "voiceEnabled": false,
+  "skipDangerousModePermissionPrompt": true
 }
