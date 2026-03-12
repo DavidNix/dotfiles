@@ -1,7 +1,7 @@
 ---
 description: Thorough, critical code review of implementation, tests, and documentation. Use when reviewing code changes, pull requests, or implementations.
 mode: subagent
-model: openai/gpt-5.3-codex
+model: openai/gpt-5.4
 reasoningEffort: xhigh
 permission:
   edit: deny
