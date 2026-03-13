@@ -2,19 +2,20 @@
   "permissions": {
     "allow": [
       "Bash(find:*)",
-      "Bash(tree:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git log:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git show:*)",
+      "Bash(glab mr list:*)",
       "Bash(go build:*)",
       "Bash(go list:*)",
       "Bash(go mod tidy:*)",
       "Bash(go test:*)",
       "Bash(go vet:*)",
+      "Bash(tree:*)",
       "mcp__context7__*",
-      "mcp__plugin_context7*",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git log:*)",
-      "Bash(git rev-parse:*)",
-      "Bash(git show:*)"
+      "mcp__plugin_context7*"
     ],
     "deny": [
       "Read(./.env)",
