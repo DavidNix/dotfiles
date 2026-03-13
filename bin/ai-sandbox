@@ -35,6 +35,21 @@ sync_claude_credentials() {
     mv "$tmp_file" "${claude_dir}/.credentials.json"
 }
 
+sync_claude_config() {
+    local source_file target_file tmp_file
+
+    source_file="$HOME/.claude.json"
+    target_file="$HOME/.claude/_claude.json"
+
+    if [[ ! -f "$source_file" ]]; then
+        return 0
+    fi
+
+    tmp_file=$(mktemp "${target_file}.tmp.XXXXXX")
+    cp "$source_file" "$tmp_file"
+    mv "$tmp_file" "$target_file"
+}
+
 usage() {
     cat <<EOF
 Usage: ai-sandbox [build|reset|prune]
@@ -121,52 +136,6 @@ container_name_from_dir() {
     echo "ai-sandbox-${safe_name}-${hash}"
 }
 
-resolve_git_common_dir() {
-    local work_dir="$1"
-    local git_path="${work_dir}/.git"
-
-    [[ -f "$git_path" ]] || return 0
-
-    local gitdir
-    gitdir=$(python3 - <<'PY' "$git_path"
-import os
-import sys
-
-git_path = sys.argv[1]
-with open(git_path, encoding="utf-8") as fh:
-    for line in fh:
-        if line.startswith("gitdir: "):
-            gitdir = line[len("gitdir: "):].strip()
-            if not os.path.isabs(gitdir):
-                gitdir = os.path.normpath(os.path.join(os.path.dirname(git_path), gitdir))
-            print(gitdir)
-            break
-PY
-)
-
-    [[ -n "$gitdir" ]] || return 0
-
-    if [[ -f "${gitdir}/commondir" ]]; then
-        python3 - <<'PY' "$gitdir"
-import os
-import sys
-
-gitdir = sys.argv[1]
-with open(os.path.join(gitdir, "commondir"), encoding="utf-8") as fh:
-    commondir = fh.read().strip()
-print(os.path.normpath(os.path.join(gitdir, commondir)))
-PY
-    else
-        python3 - <<'PY' "$gitdir"
-import os
-import sys
-
-gitdir = sys.argv[1]
-print(os.path.normpath(os.path.join(gitdir, "..", "..")))
-PY
-    fi
-}
-
 container_exists() {
     local name="$1"
     container list -a 2>/dev/null | awk 'NR>1 {print $1}' | grep -qx "$name"
@@ -186,21 +155,11 @@ remove_container() {
 }
 
 ensure_host_mount_sources() {
-    local work_dir="$1"
-    local worktrees_dir="$2"
-
     mkdir -p "$HOME/.claude"
     mkdir -p "$HOME/.config/opencode"
-    mkdir -p "$HOME/.local/bin"
     mkdir -p "$HOME/.local/share/opencode"
-    mkdir -p "$HOME/.local/share/mise"
     mkdir -p "$HOME/.cache/opencode"
-    mkdir -p "$HOME/.cache/mise"
-    mkdir -p "$worktrees_dir"
-
-    if [[ -d "$work_dir/.git" ]]; then
-        mkdir -p "$work_dir/.git"
-    fi
+    mkdir -p "$HOME/.agents"
 
     if [[ -d "$HOME/src/dotfiles" ]]; then
         mkdir -p "$HOME/src/dotfiles/claude"
@@ -239,7 +198,6 @@ create_container() {
     work_dir=$(cd "$work_dir" && pwd)
 
     local container_home host_uid host_gid memory cpus
-    local git_common_dir worktrees_dir
     local git_name git_email home_dotfiles
 
     container_home="$HOME"
@@ -247,13 +205,11 @@ create_container() {
     host_gid=$(id -g)
     memory="${AI_SANDBOX_MEMORY:-8G}"
     cpus="${AI_SANDBOX_CPUS:-}"
-    git_common_dir=$(resolve_git_common_dir "$work_dir")
-    worktrees_dir="$(cd "$work_dir/.." && pwd)/worktrees"
     git_name=$(git config --global user.name 2>/dev/null || true)
     git_email=$(git config --global user.email 2>/dev/null || true)
     home_dotfiles="${HOME}/src/dotfiles"
 
-    ensure_host_mount_sources "$work_dir" "$worktrees_dir"
+    ensure_host_mount_sources
 
     local idle_cmd
     idle_cmd=$(cat <<'EOF'
@@ -273,9 +229,8 @@ EOF
         "--uid" "$host_uid"
         "--gid" "$host_gid"
         "--memory" "$memory"
-        "--mount" "type=bind,source=${container_home},target=${container_home},readonly"
         "-e" "HOME=${container_home}"
-        "-e" "PATH=${container_home}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        "-e" "PATH=/usr/local/sbin:/usr/local/bin:${container_home}/.local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         "-e" "ZDOTDIR=/root"
         "-e" "COLORTERM=truecolor"
         "-e" "GIT_SSH_COMMAND=ssh -o BatchMode=yes"
@@ -292,25 +247,19 @@ EOF
     fi
 
     append_mount_if_exists create_args "$work_dir" "$work_dir"
-    append_mount_if_exists create_args "$worktrees_dir" "$worktrees_dir"
     append_mount_if_exists create_args "$HOME/.claude" "$HOME/.claude"
     append_mount_if_exists create_args "$HOME/.config/opencode" "$HOME/.config/opencode"
-    append_mount_if_exists create_args "$HOME/.local/bin" "$HOME/.local/bin"
     append_mount_if_exists create_args "$HOME/.local/share/opencode" "$HOME/.local/share/opencode"
-    append_mount_if_exists create_args "$HOME/.local/share/mise" "$HOME/.local/share/mise"
     append_mount_if_exists create_args "$HOME/.cache/opencode" "$HOME/.cache/opencode"
-    append_mount_if_exists create_args "$HOME/.cache/mise" "$HOME/.cache/mise"
-
-    if [[ -n "$git_common_dir" ]]; then
-        append_mount_if_exists create_args "$git_common_dir" "$git_common_dir"
-    fi
+    append_mount_if_exists create_args "$HOME/.agents" "$HOME/.agents" readonly
 
     if [[ -d "$home_dotfiles" ]]; then
-        if ! paths_equal "$home_dotfiles" "$work_dir"; then
-            append_mount_if_exists create_args "$home_dotfiles" "$home_dotfiles" readonly
+        if [[ ! -d "$work_dir/claude" ]] || ! paths_equal "$home_dotfiles/claude" "$work_dir/claude"; then
+            append_mount_if_exists create_args "$home_dotfiles/claude" "$home_dotfiles/claude"
         fi
-        append_mount_if_exists create_args "$home_dotfiles/claude" "$home_dotfiles/claude"
-        append_mount_if_exists create_args "$home_dotfiles/opencode" "$home_dotfiles/opencode"
+        if [[ ! -d "$work_dir/opencode" ]] || ! paths_equal "$home_dotfiles/opencode" "$work_dir/opencode"; then
+            append_mount_if_exists create_args "$home_dotfiles/opencode" "$home_dotfiles/opencode"
+        fi
     fi
 
     log_info "Creating sandbox: $container_name"
@@ -343,6 +292,9 @@ exec_shell() {
 : "${XDG_STATE_HOME:=$HOME/.local/state}"
 mkdir -p "$HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" \
   "$XDG_STATE_HOME" "$HOME/.local/bin"
+if [ -f "$HOME/.claude/_claude.json" ]; then
+  cp "$HOME/.claude/_claude.json" "$HOME/.claude.json"
+fi
 if [ -f .tool-versions ] || [ -f .mise.toml ] || [ -f mise.toml ]; then
   /usr/local/bin/mise install --yes 2>&1 | tail -5
   eval "$(/usr/local/bin/mise activate bash)"
@@ -354,6 +306,7 @@ EOF
     container exec \
         --interactive \
         --tty \
+        --env "TERM=${TERM:-xterm-256color}" \
         --workdir "$work_dir" \
         "$container_name" \
         /bin/bash --noprofile --norc -lc "$prep_cmd"
@@ -443,6 +396,7 @@ main() {
         shell)
             build_image
             sync_claude_credentials
+            sync_claude_config
             ensure_container_running "$work_dir" "$container_name"
             exec_shell "$work_dir" "$container_name"
             ;;
