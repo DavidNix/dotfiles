@@ -104,28 +104,25 @@ install_skills() {
     echo -e "  Installing local skills..."
     try_or_warn_quiet "Installing local skills" npx --yes skills add "$LOCAL_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode"
 
-    # Vercel skills
-    # install_skill "https://github.com/vercel-labs/skills" "find-skills" # I don't use this, preferring skills.sh
-    install_skill "https://github.com/vercel-labs/agent-skills" "web-design-guidelines"
+    # Meta
+    install_skill "https://github.com/anthropics/skills" "skill-creator"
 
-    # Superpowers
-    # install_skill "https://github.com/obra/superpowers" "brainstorming" # Using my own variation
+    # Writing
     install_skill "https://github.com/obra/the-elements-of-style" "writing-clearly-and-concisely"
-    # install_skill "https://github.com/obra/superpowers" "test-driven-development" # Using my own version
 
-    # Anthropic skills
+    # Document
     install_skill "https://github.com/anthropics/skills" "pdf"
     install_skill "https://github.com/anthropics/skills" "xlsx"
     install_skill "https://github.com/anthropics/skills" "docx"
-    install_skill "https://github.com/anthropics/skills" "frontend-design"
-    # install_skill "https://github.com/obra/superpowers" "writing-skills"
-    install_skill "https://github.com/anthropics/skills" "skill-creator"
 
-    # Snarktank
+    # Product Management
     install_skill "https://github.com/snarktank/ralph" "prd"
 
-    # Frontend slides
+    # Design
     install_skill "https://github.com/zarazhangrui/frontend-slides" "frontend-slides"
+    install_skill "https://github.com/vercel-labs/agent-skills" "web-design-guidelines"
+    install_skill "https://github.com/anthropics/skills" "frontend-design"
+    install_skill "https://github.com/rknall/claude-skills" "SVG Logo Designer"
 
     echo -e "${GREEN}Skills installed${NC}"
 }
