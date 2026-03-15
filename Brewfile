@@ -54,6 +54,7 @@ brew "lsd"
 brew "luarocks"
 brew "make"
 brew "mise" # asdf replacement
+brew "mole"
 brew "neovim"
 brew "opencode"
 brew "oven-sh/bun/bun"
