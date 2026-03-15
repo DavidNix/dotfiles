@@ -122,7 +122,6 @@ install_skills() {
     install_skill "https://github.com/zarazhangrui/frontend-slides" "frontend-slides"
     install_skill "https://github.com/vercel-labs/agent-skills" "web-design-guidelines"
     install_skill "https://github.com/anthropics/skills" "frontend-design"
-    install_skill "https://github.com/rknall/claude-skills" "SVG Logo Designer"
 
     echo -e "${GREEN}Skills installed${NC}"
 }
