@@ -79,6 +79,7 @@
       "shellcheck *": "allow",
       "stat *": "allow",
       "tail *": "allow",
+      "terraform fmt *": "allow",
       "terraform init *": "allow",
       "terraform plan *": "allow",
       "terraform state list *": "allow",
