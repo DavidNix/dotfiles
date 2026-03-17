@@ -210,8 +210,3 @@ if command -v starship &> /dev/null; then eval "$(starship init zsh)"; fi
 
 # atuin shell history
 eval "$(atuin init zsh --disable-up-arrow)"
-
-# ==============================================================================
-# Load Environment File
-# ==============================================================================
-source "$HOME/.envrc" || print -P "%F{yellow}%BFailed to source ~/.envrc%b%f"
