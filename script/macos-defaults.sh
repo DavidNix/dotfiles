@@ -32,7 +32,11 @@ defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 # Disable smart dashes (annoying when typing code)
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
-# Caps Lock -> Control: Set in System Settings > Keyboard > Keyboard Shortcuts > Modifier Keys
+# Caps Lock -> Control can't be set via defaults write
+echo ""
+echo "Manual keyboard setup required:"
+echo "  1. Caps Lock -> Control: System Settings > Keyboard > Keyboard Shortcuts > Modifier Keys"
+echo ""
 
 ###############################################################################
 # Dock                                                                         #
@@ -69,24 +73,16 @@ defaults write com.apple.dock mineffect -string "scale"
 # Safari                                                                       #
 ###############################################################################
 
-# Safari prefs are sandboxed; must use the full container plist path
-SAFARI_PLIST="$HOME/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari"
+# Safari prefs are sandboxed on modern macOS and can't be set via defaults write.
+echo ""
+echo "Manual Safari setup required:"
+echo "  1. Develop menu: Safari > Settings > Advanced > Show features for web developers"
+echo "  2. Disable password autofill: Safari > Settings > Passwords > uncheck AutoFill"
+echo "  3. Disable auto-open safe downloads: Safari > Settings > General > uncheck Open safe files"
+echo ""
 
-# Enable the Develop menu
-defaults write "$SAFARI_PLIST" IncludeDevelopMenu -bool true
-
-# Enable the Web Inspector
-defaults write "$SAFARI_PLIST" WebKitDeveloperExtrasEnabledPreferenceKey -bool true
-defaults write "$SAFARI_PLIST" "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" -bool true
-
-# Add Web Inspector context menu item to all web views
+# Add Web Inspector context menu item to all web views (this one is global, not sandboxed)
 defaults write NSGlobalDomain WebKitDeveloperExtras -bool true
-
-# Disable password autofill (keep credit card autofill)
-defaults write "$SAFARI_PLIST" AutoFillPasswords -bool false
-
-# Don't auto-open "safe" downloads
-defaults write "$SAFARI_PLIST" AutoOpenSafeDownloads -bool false
 
 ###############################################################################
 # Photos                                                                       #
@@ -123,12 +119,10 @@ defaults write com.google.Chrome PMPrintingExpandedStateForPrint2 -bool true
 # Accessibility                                                                #
 ###############################################################################
 
-# Use Ctrl+scroll to zoom
-defaults write com.apple.universalaccess closeViewScrollWheelToggle -bool true
-defaults write com.apple.universalaccess HIDScrollZoomModifierMask -int 262144
-
-# Follow keyboard focus while zoomed in
-defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
+# Accessibility prefs are sandboxed on modern macOS and can't be set via defaults write.
+echo "Manual accessibility setup required:"
+echo "  1. Ctrl+scroll zoom: System Settings > Accessibility > Zoom > Use scroll gesture with modifier keys"
+echo ""
 
 ###############################################################################
 # Energy                                                                       #
@@ -143,11 +137,12 @@ sudo pmset -a autorestart 1
 # Restart automatically if the computer freezes
 sudo systemsetup -setrestartfreeze on
 
-# Sleep the display after 15 minutes
-sudo pmset -a displaysleep 15
+# Sleep the display after 15 minutes (on AC)
+sudo pmset -c displaysleep 15
 
-# Set machine sleep to 5 minutes on battery
-sudo pmset -b sleep 5
+# On battery: display sleep after 5 minutes, machine sleep after 10
+sudo pmset -b displaysleep 5
+sudo pmset -b sleep 10
 
 # Set standby delay to 24 hours (default is 1 hour)
 sudo pmset -a standbydelay 86400
@@ -169,8 +164,8 @@ sudo pkill -HUP socketfilterfw
 defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
-# Disable remote login (SSH)
-sudo systemsetup -setremotelogin off
+# Disable remote login (SSH) — does not affect Tailscale SSH
+echo "yes" | sudo systemsetup -setremotelogin off
 
 # AirDrop: contacts only
 defaults write com.apple.sharingd DiscoverableMode -string "Contacts Only"
