@@ -27,6 +27,7 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	ln -sf $$PWD/.config/*/ ~/.config
 	ln -sf $$PWD/.config/* ~/.config
 	@# opencode (separate from .config/* to avoid conflicts)
+	mkdir -p ~/.config/opencode
 	ln -sf $$PWD/opencode/* ~/.config/opencode
 	@#Claude Code
 	mkdir -p ~/.claude/commands ~/.claude/agents
