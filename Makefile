@@ -39,8 +39,9 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.
 	@$$PWD/script/macos-defaults.sh
 
+
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git pkgs zsh superhuman krew npm agent ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git pkgs zsh tmux superhuman krew npm agent ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -93,6 +94,16 @@ krew: ## Installs kubectl krew plugins
 .PHONY: zsh
 zsh:  ~/.oh-my-zsh
 	 @$(SHELL) -c "source ~/.zshrc && zplug install"
+
+.PHONY: tmux
+tmux: ## Install tmux plugin manager
+	@echo "Installing tmux plugin manager..."
+	@mkdir -p ~/.tmux/plugins
+	@if [ ! -d ~/.tmux/plugins/tpm/.git ]; then \
+		git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm; \
+	else \
+		git -C ~/.tmux/plugins/tpm pull --ff-only; \
+	fi
 
 .PHONY: superhuman
 superhuman:
