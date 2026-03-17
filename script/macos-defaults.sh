@@ -69,21 +69,24 @@ defaults write com.apple.dock mineffect -string "scale"
 # Safari                                                                       #
 ###############################################################################
 
+# Safari prefs are sandboxed; must use the full container plist path
+SAFARI_PLIST="$HOME/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari"
+
 # Enable the Develop menu
-defaults write com.apple.Safari IncludeDevelopMenu -bool true
+defaults write "$SAFARI_PLIST" IncludeDevelopMenu -bool true
 
 # Enable the Web Inspector
-defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
-defaults write com.apple.Safari "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" -bool true
+defaults write "$SAFARI_PLIST" WebKitDeveloperExtrasEnabledPreferenceKey -bool true
+defaults write "$SAFARI_PLIST" "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" -bool true
 
 # Add Web Inspector context menu item to all web views
 defaults write NSGlobalDomain WebKitDeveloperExtras -bool true
 
 # Disable password autofill (keep credit card autofill)
-defaults write com.apple.Safari AutoFillPasswords -bool false
+defaults write "$SAFARI_PLIST" AutoFillPasswords -bool false
 
 # Don't auto-open "safe" downloads
-defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
+defaults write "$SAFARI_PLIST" AutoOpenSafeDownloads -bool false
 
 ###############################################################################
 # Photos                                                                       #
