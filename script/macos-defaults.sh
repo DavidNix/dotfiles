@@ -14,17 +14,17 @@ sudo -v
 # Keyboard                                                                     #
 ###############################################################################
 
-# Fastest possible key repeat rate (below what the UI allows)
-defaults write NSGlobalDomain KeyRepeat -int 0
+# Fast key repeat rate (2 = fast but not causing repeated characters)
+defaults write NSGlobalDomain KeyRepeat -int 1
 
-# Shortest delay before key repeat kicks in
-defaults write NSGlobalDomain InitialKeyRepeat -int 8
+# Short delay before key repeat kicks in (12 = responsive without typos)
+defaults write NSGlobalDomain InitialKeyRepeat -int 12
 
-# Max mouse tracking speed
-defaults write NSGlobalDomain com.apple.mouse.scaling -float 3.0
+# Mouse tracking speed (2.5 = fast but controllable)
+defaults write NSGlobalDomain com.apple.mouse.scaling -float 2.5
 
-# Max trackpad tracking speed
-defaults write NSGlobalDomain com.apple.trackpad.scaling -float 3.0
+# Trackpad tracking speed (2.0 = fast but precise)
+defaults write NSGlobalDomain com.apple.trackpad.scaling -float 2.0
 
 # Disable press-and-hold for keys in favor of key repeat
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
