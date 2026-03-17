@@ -117,7 +117,7 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH="$PATH:$HOME/.vim/pack/bundle/start/fzf/bin"
 
 # LM Studio CLI (lms)
-export PATH="$PATH:/Users/davidnix/.lmstudio/bin"
+export PATH="$PATH:$HOME/.lmstudio/bin"
 
 # ==============================================================================
 # Tool Initialization (using cache where possible)
@@ -197,10 +197,10 @@ ai() {
 # Google Cloud SDK
 # ==============================================================================
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/davidnix/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '/Users/davidnix/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/completion.zsh.inc'; fi
+if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
 
 # ==============================================================================
 # Prompt and History Tools
