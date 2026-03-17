@@ -14,11 +14,17 @@ sudo -v
 # Keyboard                                                                     #
 ###############################################################################
 
-# Blazingly fast key repeat rate
-defaults write NSGlobalDomain KeyRepeat -int 1
+# Fastest possible key repeat rate (below what the UI allows)
+defaults write NSGlobalDomain KeyRepeat -int 0
 
-# Short delay before key repeat kicks in
-defaults write NSGlobalDomain InitialKeyRepeat -int 10
+# Shortest delay before key repeat kicks in
+defaults write NSGlobalDomain InitialKeyRepeat -int 8
+
+# Max mouse tracking speed
+defaults write NSGlobalDomain com.apple.mouse.scaling -float 3.0
+
+# Max trackpad tracking speed
+defaults write NSGlobalDomain com.apple.trackpad.scaling -float 3.0
 
 # Disable press-and-hold for keys in favor of key repeat
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
@@ -134,18 +140,18 @@ sudo pmset -a lidwake 1
 # Restart automatically on power loss
 sudo pmset -a autorestart 1
 
-# Restart automatically if the computer freezes
-sudo systemsetup -setrestartfreeze on
-
-# Sleep the display after 15 minutes (on AC)
-sudo pmset -c displaysleep 15
-
 # On battery: display sleep after 5 minutes, machine sleep after 10
 sudo pmset -b displaysleep 5
 sudo pmset -b sleep 10
 
+# On AC: display sleep after 15 minutes
+sudo pmset -c displaysleep 15
+
 # Set standby delay to 24 hours (default is 1 hour)
 sudo pmset -a standbydelay 86400
+
+# Restart automatically if the computer freezes (must come after pmset to avoid warnings)
+sudo systemsetup -setrestartfreeze on
 
 ###############################################################################
 # Security & Privacy                                                           #
