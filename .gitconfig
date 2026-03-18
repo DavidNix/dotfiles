@@ -83,7 +83,6 @@
 	prompt = false
 [credential]
 	helper = osxkeychain
-	helper = /usr/local/bin/git-credential-manager
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
