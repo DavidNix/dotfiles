@@ -4,8 +4,9 @@
       "Bash(shellcheck:*)",
       "Bash(codex exec review:*)",
       "Bash(ai-sandbox build:*)",
-      "Bash(gh repo view:*)",
-      "Bash(gh api:*)"
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(find:*)"
     ]
   }
 }
