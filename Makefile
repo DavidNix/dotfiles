@@ -51,7 +51,7 @@ setup: relink ~/.ssh xcode homebrew git pkgs zsh tmux superhuman krew npm agent 
 .PHONY: xcode
 xcode:
 	@echo "Installing Xcode command line tools and such"
-	xcode-select --install
+	xcode-select --install || true
 
 .PHONY: homebrew
 homebrew:
