@@ -73,7 +73,7 @@ setopt share_history            # Share history between multiple shells
 zstyle ':completion*' completer _expand _complete
 
 # advanced completions
-autoload -Uz compinit && compinit
+autoload -Uz compinit && compinit -u
 # load bashcompinit for some old bash completions
 autoload bashcompinit && bashcompinit
 
