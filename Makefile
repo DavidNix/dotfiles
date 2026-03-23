@@ -96,7 +96,7 @@ zsh:  ~/.oh-my-zsh
 	 @$(SHELL) -c "source ~/.zshrc && zplug install"
 
 .PHONY: tmux
-tmux: ## Install tmux plugin manager
+tmux: ## Install tmux plugin manager and plugins
 	@echo "Installing tmux plugin manager..."
 	@mkdir -p ~/.tmux/plugins
 	@if [ ! -d ~/.tmux/plugins/tpm/.git ]; then \
@@ -104,6 +104,8 @@ tmux: ## Install tmux plugin manager
 	else \
 		git -C ~/.tmux/plugins/tpm pull --ff-only; \
 	fi
+	@echo "Installing tmux plugins..."
+	@~/.tmux/plugins/tpm/bin/install_plugins
 
 .PHONY: superhuman
 superhuman:
