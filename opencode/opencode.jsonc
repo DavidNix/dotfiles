@@ -110,7 +110,11 @@
     "websearch": "ask",
     "question": "allow",
     "doom_loop": "ask",
-    "external_directory": "ask",
+    "external_directory": {
+      "*": "ask",
+      "/Users/nix/go/pkg/mod/**": "allow",
+      "/Users/metarouter/go/pkg/mod/**": "allow",
+    },
     "context7*": "allow",
     "webfetch": "ask",
   },
