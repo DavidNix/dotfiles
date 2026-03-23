@@ -109,8 +109,7 @@
     },
     "external_directory": {
       "*": "ask",
-      "/Users/nix/go/pkg/mod/**": "allow",
-      "/Users/metarouter/go/pkg/mod/**": "allow",
+      "/Users/*/go/pkg/mod/**": "allow",
     },
     "websearch": "ask",
     "question": "allow",
