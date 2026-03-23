@@ -41,7 +41,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git pkgs zsh tmux superhuman krew npm agent ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git pkgs zsh tmux superhuman krew npm agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -127,6 +127,24 @@ bash-check: ## Run shellcheck and bash -n on FILE=<path>
 	@shellcheck "$(FILE)"
 	@bash -n "$(FILE)"
 	@echo "bash-check passed: $(FILE)"
+
+# Variable for users who need /opt access (space-separated)
+OPT_USERS ?= nix metarouter
+
+.PHONY: opt-perms
+opt-perms: ## Set up opt group and permissions for OPT_USERS (default: nix metarouter)
+	@echo "Setting up /opt permissions for users: $(OPT_USERS)"
+	@# Create opt group if it doesn't exist (idempotent)
+	@sudo dseditgroup -o read opt 2>/dev/null || sudo dseditgroup -o create opt
+	@# Add users to opt group (ignore errors if already member)
+	@for user in $(OPT_USERS); do \
+		echo "Adding $$user to opt group..."; \
+		sudo dseditgroup -o edit -a $$user opt 2>/dev/null || true; \
+	done
+	@# Set /opt group and permissions
+	@sudo chgrp opt /opt
+	@sudo chmod 775 /opt
+	@echo "✅ /opt is now writable by opt group members"
 
 FEAT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 .PHONY: pr
