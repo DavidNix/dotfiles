@@ -6,7 +6,8 @@
       "Bash(ai-sandbox build:*)",
       "Bash(ls:*)",
       "Bash(wc:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(make bash-check:*)"
     ]
   }
 }
