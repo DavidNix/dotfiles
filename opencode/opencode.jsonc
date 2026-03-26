@@ -64,6 +64,7 @@
       "golangci-lint *": "allow",
       "grep *": "allow",
       "head *": "allow",
+      "jq *": "allow",
       "ls *": "allow",
       "make dev *": "allow",
       "make fmt *": "allow",
