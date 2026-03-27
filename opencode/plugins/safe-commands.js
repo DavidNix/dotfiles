@@ -9,6 +9,7 @@ export const SafeCommandsPlugin = async () => {
       }
 
       const command = output.args.command || "";
+      const isGitPush = /\bgit\s+push\b/i.test(command);
 
       // Block terraform apply (any variant)
       if (/terraform\s+apply/i.test(command)) {
@@ -28,6 +29,19 @@ export const SafeCommandsPlugin = async () => {
       // Block exact 'env' command only
       if (/^\s*env\s*$/i.test(command) || /^\s*env\s+/.test(command)) {
         throw new Error("env command is blocked");
+      }
+
+      // Block force pushes
+      if (isGitPush && /(^|\s)(-f|--force|--force-with-lease)(\s|$)/i.test(command)) {
+        throw new Error("force pushes are blocked");
+      }
+
+      // Block pushes to main or master
+      if (
+        isGitPush &&
+        /(\s|:)(main|master)(?=\s|$)/i.test(command)
+      ) {
+        throw new Error("git push to main or master is blocked");
       }
     },
   };
