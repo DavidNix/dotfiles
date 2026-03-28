@@ -15,6 +15,11 @@
       "url": "https://mcp.context7.com/mcp",
       "enabled": false,
     },
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["npx", "-y", "chrome-devtools-mcp@latest"],
+      "enabled": false,
+    },
   },
   "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
   "permission": {
