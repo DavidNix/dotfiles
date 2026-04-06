@@ -3,7 +3,6 @@
     "allow": [
       "Bash(shellcheck:*)",
       "Bash(codex exec review:*)",
-      "Bash(ai-sandbox build:*)",
       "Bash(ls:*)",
       "Bash(wc:*)",
       "Bash(find:*)",

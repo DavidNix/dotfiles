@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC1091
+source "${SCRIPT_DIR}/_ai-sandbox-common.sh"
+
+_ai_sandbox_main \
+    opencode \
+    --harness-dir "$HOME/.config/opencode" \
+    --harness-dir "$HOME/.local/share/opencode" \
+    --env "OPENCODE_CONFIG=$HOME/.config/opencode/opencode-yolo.jsonc" \
+    --gocache-dir "$HOME/.local/share/opencode/go-build-cache" \
+    -- "$@"
