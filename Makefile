@@ -146,7 +146,13 @@ opt-perms: ## Set up opt group and permissions for OPT_USERS (default: nix metar
 	@# Set /opt group and permissions
 	@sudo chgrp opt /opt
 	@sudo chmod 775 /opt
-	@echo "✅ /opt is now writable by opt group members"
+	@# Fix /opt/homebrew ownership if it exists
+	@if [ -d /opt/homebrew ]; then \
+		echo "Fixing /opt/homebrew ownership..."; \
+		sudo chown -R $(USER):opt /opt/homebrew; \
+		sudo chmod -R g+w /opt/homebrew; \
+	fi
+	@echo "✅ /opt and /opt/homebrew are now writable by opt group members"
 
 FEAT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 .PHONY: pr
