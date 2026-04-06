@@ -30,6 +30,7 @@
       "*.env.example": "allow",
       "*.envrc.*": "deny",
       "*.envrc.example": "allow",
+      "*.vault-password": "deny",
     },
     "edit": "allow",
     "glob": "allow",
