@@ -126,6 +126,10 @@ install_skills() {
     install_skill "https://github.com/vercel-labs/agent-skills" "web-design-guidelines"
     install_skill "https://github.com/anthropics/skills" "frontend-design"
 
+    # Marketing
+    echo -e "Installing Corey Haynes marketing skills..."
+    try_or_warn_quiet "Installing Corey Haynes marketing skills" npx --yes skills add "coreyhaines31/marketingskills" -g -y -a "claude-code" -a "opencode"
+
     echo -e "${GREEN}Skills installed${NC}"
 }
 
