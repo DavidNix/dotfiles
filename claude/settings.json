@@ -76,6 +76,5 @@
   "promptSuggestionEnabled": false,
   "autoUpdatesChannel": "latest",
   "voiceEnabled": false,
-  "skipDangerousModePermissionPrompt": true,
-  "model": "opus"
+  "skipDangerousModePermissionPrompt": true
 }
