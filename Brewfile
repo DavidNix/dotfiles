@@ -56,7 +56,6 @@ brew "make"
 brew "mise" # asdf replacement
 brew "mole"
 brew "neovim"
-brew "opencode"
 brew "oven-sh/bun/bun"
 brew "procs"
 brew "rdap"
