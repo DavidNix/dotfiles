@@ -130,29 +130,17 @@ bash-check: ## Run shellcheck and bash -n on FILE=<path>
 	@bash -n "$(FILE)"
 	@echo "bash-check passed: $(FILE)"
 
-# Variable for users who need /opt access (space-separated)
-OPT_USERS ?= nix metarouter
+OPT_OWNER ?= nix
+OPT_GROUP ?= staff
 
 .PHONY: opt-perms
-opt-perms: ## Set up opt group and permissions for OPT_USERS (default: nix metarouter)
-	@echo "Setting up /opt permissions for users: $(OPT_USERS)"
-	@# Create opt group if it doesn't exist (idempotent)
-	@sudo dseditgroup -o read opt 2>/dev/null || sudo dseditgroup -o create opt
-	@# Add users to opt group (ignore errors if already member)
-	@for user in $(OPT_USERS); do \
-		echo "Adding $$user to opt group..."; \
-		sudo dseditgroup -o edit -a $$user opt 2>/dev/null || true; \
-	done
-	@# Set /opt group and permissions
-	@sudo chgrp opt /opt
-	@sudo chmod 775 /opt
-	@# Fix /opt/homebrew ownership if it exists
-	@if [ -d /opt/homebrew ]; then \
-		echo "Fixing /opt/homebrew ownership..."; \
-		sudo chown -R $(USER):opt /opt/homebrew; \
-		sudo chmod -R g+w /opt/homebrew; \
-	fi
-	@echo "✅ /opt and /opt/homebrew are now writable by opt group members"
+opt-perms: ## Make OPT_OWNER the owner of /opt and remove legacy metarouter opt access
+	@echo "Making $(OPT_OWNER):$(OPT_GROUP) the owner of /opt..."
+	@sudo chown -R $(OPT_OWNER):$(OPT_GROUP) /opt
+	@sudo chmod -R u+rwX,go-w /opt
+	@# Remove the old shared-access user from the legacy opt group if it exists.
+	@sudo dseditgroup -o read opt >/dev/null 2>&1 && sudo dseditgroup -o edit -d metarouter opt 2>/dev/null || true
+	@echo "/opt is now owned by $(OPT_OWNER):$(OPT_GROUP)"
 
 FEAT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 .PHONY: pr
