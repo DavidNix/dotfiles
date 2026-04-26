@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install Claude Code, skills, and plugins
+# Install Claude Code, OpenCode, skills, and plugins
 # Works on macOS and Linux
 # Usage: agent-init [--reset]
 # This script is idempotent - safe to run multiple times
@@ -84,6 +84,18 @@ install_claude() {
     echo "Installing Claude Code..."
     curl -fsSL https://claude.ai/install.sh | bash
     echo -e "${GREEN}Claude Code installed${NC}"
+}
+
+# Install OpenCode via official installer (if not already installed)
+install_opencode() {
+    echo ""
+    if command -v opencode &>/dev/null; then
+        echo -e "${GRAY}OpenCode already installed, skipping${NC}"
+        return 0
+    fi
+    echo "Installing OpenCode..."
+    curl -fsSL https://opencode.ai/install | bash
+    echo -e "${GREEN}OpenCode installed${NC}"
 }
 
 # Install a skill via npx skills
@@ -193,6 +205,7 @@ install_plugins() {
 
 main() {
     install_claude
+    install_opencode
     if [[ "$RESET_MODE" == "true" ]]; then
         reset_skills
     fi
