@@ -312,9 +312,30 @@ The test must fail at the assertion (`expected X, got Y`), not at the compiler.
 
 | Quality | Good | Bad |
 |---------|------|-----|
+| **Public interface only** | Tests public API, black-box behavior | Tests private methods or internal types |
 | **Minimal** | One thing. "and" in name? Split it. | `TestValidateEmail_DomainAndWhitespace()` |
 | **Clear** | Name describes behavior | `TestValidateEmail()` |
 | **Shows intent** | Demonstrates desired API | Obscures what code should do |
+
+### Test Only Public Interfaces
+
+**All tests must go through the public API.** Never test private methods, private state, or internal types directly — even if those types have public methods.
+
+```typescript
+// ❌ WRONG: Testing internal implementation
+const service = new UserService();
+expect((service as any).validateEmail('bad')).toBe(false);  // private method!
+
+// ❌ WRONG: Testing internal type directly
+const validator = new TokenValidator();  // internal type, not public API
+expect(validator.validate('token')).toBe(true);
+
+// ✅ RIGHT: Testing through public interface
+const service = new UserService();
+expect(() => service.createUser('bad', 'name')).toThrow('Invalid email');
+```
+
+**Why:** Private methods and internal types are implementation details. Testing them couples your tests to internal structure, making refactoring impossible. The public API is the contract — test that.
 
 ## Common Rationalizations
 
@@ -393,6 +414,7 @@ Can't check all boxes? You skipped a step. Go back.
 ## Testing Anti-Patterns
 
 When adding mocks or test utilities, read @testing-anti-patterns.md to avoid common pitfalls:
+- Testing private methods or internal types directly (always test through public interfaces)
 - Testing mock behavior instead of real behavior
 - Adding test-only methods to production classes
 - Mocking without understanding dependencies
