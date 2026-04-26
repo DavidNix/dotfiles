@@ -100,3 +100,5 @@
 	useHttpPath = true
 [http]
 	postBuffer = 524288000
+[safe]
+	directory = /opt/homebrew
