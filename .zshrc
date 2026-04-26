@@ -210,3 +210,6 @@ if command -v starship &> /dev/null; then eval "$(starship init zsh)"; fi
 
 # atuin shell history
 eval "$(atuin init zsh --disable-up-arrow)"
+
+# opencode
+export PATH=/Users/nix/.opencode/bin:$PATH
