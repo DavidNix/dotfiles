@@ -10,6 +10,7 @@ _ai_sandbox_main \
     opencode \
     --harness-dir "$HOME/.config/opencode" \
     --harness-dir "$HOME/.local/share/opencode" \
+    --deny-write-dir "$HOME/.config/opencode/plugins" \
     --env "OPENCODE_CONFIG=$HOME/.config/opencode/opencode-yolo.jsonc" \
     --gocache-dir "$HOME/.local/share/opencode/go-build-cache" \
     -- "$@"

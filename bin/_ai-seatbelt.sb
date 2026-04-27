@@ -30,14 +30,13 @@ __AI_SANDBOX_EXTRA_EXEC_RULES__
   (literal "/dev/tty")
   (literal "/dev/urandom")
   (literal "/dev/zero")
-  (subpath "/tmp")
-  (subpath "/private/tmp")
-  (subpath "/private/var/folders")
+  (subpath (param "TMP_DIR"))
 )
 
 (allow file-read* file-write* (subpath (param "PROJECT_DIR")))
 (allow file-read* file-write* (subpath (param "GOMODCACHE")))
 (allow file-read* file-write* (subpath (param "GOCACHE_DIR")))
 __AI_SANDBOX_HARNESS_RW_RULES__
+__AI_SANDBOX_DENY_RULES__
 
 (deny file-read* file-write* (subpath "/Users/Shared"))
