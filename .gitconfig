@@ -3,10 +3,9 @@
 	email = hello@davidnix.com
 	signingkey = A410043BEBF42A5E
 [core]
-	excludesfile = /Users/davidnix/.gitignore_global
+	excludesfile = ~/.gitignore_global
 [core]
 	pager = less -MFRSX
-	excludesfile = /Users/davidnix/.gitignore_global
 	editor = vim
 	# You may need to reset your tree: http://help.github.com/line-endings/
 	autocrlf = false
@@ -84,7 +83,6 @@
 	prompt = false
 [credential]
 	helper = osxkeychain
-	helper = /usr/local/bin/git-credential-manager
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
@@ -102,3 +100,5 @@
 	useHttpPath = true
 [http]
 	postBuffer = 524288000
+[safe]
+	directory = /opt/homebrew

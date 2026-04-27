@@ -16,9 +16,117 @@ Tests must verify real behavior, not mock behavior. Mocks are a means to isolate
 1. NEVER test mock behavior
 2. NEVER add test-only methods to production classes
 3. NEVER mock without understanding dependencies
+4. NEVER test private methods or types — only test through public interfaces
 ```
 
-## Anti-Pattern 1: Testing Mock Behavior
+## Anti-Pattern 1: Testing Private Methods or Types
+
+**The violation:**
+```typescript
+// ❌ BAD: Testing a private helper or internal type directly
+// Even if the type has public methods, it's not the public API
+class UserService {
+  private validateEmail(email: string): boolean {  // private helper
+    return email.includes('@');
+  }
+}
+
+// Test directly accesses internal behavior
+test('validateEmail rejects invalid', () => {
+  const service = new UserService();
+  expect((service as any).validateEmail('bad')).toBe(false);  // Testing private!
+});
+```
+
+```typescript
+// ❌ BAD: Testing an internal type that's not part of the public API
+// Even though TokenValidator has public methods, it's an implementation detail
+class AuthService {
+  private tokenValidator = new TokenValidator();  // internal type
+  
+  public login(credentials: Credentials): User {
+    // uses tokenValidator internally
+    return this.tokenValidator.validateAndGetUser(credentials);
+  }
+}
+
+// Testing the internal type directly — wrong!
+test('TokenValidator validates tokens', () => {
+  const validator = new TokenValidator();  // Testing internal type!
+  expect(validator.validate('token')).toBe(true);
+});
+```
+
+**Why this is wrong:**
+- Private methods and internal types are implementation details
+- Testing them couples tests to internal structure, not behavior
+- Refactoring becomes impossible — tests break when implementation changes
+- Doesn't prove the public API works correctly
+- **Even if a type has public methods, if it's not part of the public API, don't test it directly**
+
+**your human partner's correction:** "Is this testing behavior users actually see, or an internal detail?"
+
+**The fix:**
+```typescript
+// ✅ GOOD: Test through the public interface only
+class UserService {
+  private validateEmail(email: string): boolean {
+    return email.includes('@');
+  }
+  
+  public createUser(email: string, name: string): User {
+    if (!this.validateEmail(email)) {
+      throw new Error('Invalid email');
+    }
+    return new User(email, name);
+  }
+}
+
+// Test the public behavior, not the private helper
+test('createUser rejects invalid email', () => {
+  const service = new UserService();
+  expect(() => service.createUser('bad-email', 'John')).toThrow('Invalid email');
+});
+
+// The private validateEmail behavior is verified through the public API
+```
+
+```typescript
+// ✅ GOOD: Test AuthService through its public login method
+test('login validates credentials and returns user', () => {
+  const service = new AuthService();
+  const user = service.login({ email: 'test@example.com', password: 'pass' });
+  expect(user.email).toBe('test@example.com');
+});
+
+// TokenValidator behavior is tested indirectly through login()
+```
+
+### Gate Function
+
+```
+BEFORE writing any test:
+  Ask: "Am I testing a private method or internal type?"
+
+  IF testing private method:
+    STOP — Don't do it
+    Test the public method that calls it instead
+
+  IF testing an internal type (even with public methods):
+    Ask: "Is this type part of the public API?"
+    IF no:
+      STOP — Don't test it directly
+      Test through the public interface that uses it
+
+  IF unsure if something is public API:
+    Ask: "Would a user of this module call this directly?"
+    IF no:
+      It's internal — don't test it directly
+```
+
+---
+
+## Anti-Pattern 2: Testing Mock Behavior
 
 **The violation:**
 ```typescript
@@ -60,7 +168,7 @@ BEFORE asserting on any mock element:
   Test real behavior instead
 ```
 
-## Anti-Pattern 2: Test-Only Methods in Production
+## Anti-Pattern 3: Test-Only Methods in Production
 
 **The violation:**
 ```typescript
@@ -115,7 +223,7 @@ BEFORE adding any method to production class:
     STOP - Wrong class for this method
 ```
 
-## Anti-Pattern 3: Mocking Without Understanding
+## Anti-Pattern 4: Mocking Without Understanding
 
 **The violation:**
 ```typescript
@@ -174,7 +282,7 @@ BEFORE mocking any method:
     - Mocking without understanding the dependency chain
 ```
 
-## Anti-Pattern 4: Incomplete Mocks
+## Anti-Pattern 5: Incomplete Mocks
 
 **The violation:**
 ```typescript
@@ -225,7 +333,7 @@ BEFORE creating mock responses:
   If uncertain: Include all documented fields
 ```
 
-## Anti-Pattern 5: Integration Tests as Afterthought
+## Anti-Pattern 6: Integration Tests as Afterthought
 
 **The violation:**
 ```
@@ -274,6 +382,7 @@ TDD cycle:
 
 | Anti-Pattern | Fix |
 |--------------|-----|
+| Test private methods or internal types | Test through public interface only |
 | Assert on mock elements | Test real component or unmock it |
 | Test-only methods in production | Move to test utilities |
 | Mock without understanding | Understand dependencies first, mock minimally |
@@ -283,6 +392,9 @@ TDD cycle:
 
 ## Red Flags
 
+- Testing private methods or internal types directly
+- Using `(obj as any).privateMethod()` or `obj['_privateField']` in tests
+- Testing a type that's not exported from the module's public API
 - Assertion checks for `*-mock` test IDs
 - Methods only called in test files
 - Mock setup is >50% of test

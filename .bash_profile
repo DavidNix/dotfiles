@@ -88,14 +88,13 @@ export PS2="\[\033[35m\]→ \[\033[0m\]"
 export PATH="/usr/local/bin:/usr/local/sbin:$GOBIN:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin/flutter/bin"
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/davidnix/Downloads/google-cloud-sdk/path.bash.inc' ]; then . '/Users/davidnix/Downloads/google-cloud-sdk/path.bash.inc'; fi
+if [ -f "$HOME/Downloads/google-cloud-sdk/path.bash.inc" ]; then . "$HOME/Downloads/google-cloud-sdk/path.bash.inc"; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '/Users/davidnix/Downloads/google-cloud-sdk/completion.bash.inc' ]; then . '/Users/davidnix/Downloads/google-cloud-sdk/completion.bash.inc'; fi
+if [ -f "$HOME/Downloads/google-cloud-sdk/completion.bash.inc" ]; then . "$HOME/Downloads/google-cloud-sdk/completion.bash.inc"; fi
 
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/davidnix/.lmstudio/bin"
+export PATH="$PATH:$HOME/.lmstudio/bin"
 # End of LM Studio CLI section
-

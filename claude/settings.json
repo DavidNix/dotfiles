@@ -2,19 +2,26 @@
   "permissions": {
     "allow": [
       "Bash(find:*)",
-      "Bash(tree:*)",
+      "Bash(git add:*)",
+      "Bash(gh repo view:*)",
+      "Bash(git commit:*)",
+      "Bash(git log:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git show:*)",
+      "Bash(git diff:*)",
+      "Bash(glab ci status:*)",
+      "Bash(glab ci status:*)",
+      "Bash(glab mr list:*)",
+      "Bash(glab mr list:*)",
+      "Bash(glab mr view:*)",
       "Bash(go build:*)",
       "Bash(go list:*)",
       "Bash(go mod tidy:*)",
       "Bash(go test:*)",
       "Bash(go vet:*)",
+      "Bash(tree:*)",
       "mcp__context7__*",
-      "mcp__plugin_context7*",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git log:*)",
-      "Bash(git rev-parse:*)",
-      "Bash(git show:*)"
+      "mcp__plugin_context7*"
     ],
     "deny": [
       "Read(./.env)",
@@ -23,7 +30,7 @@
       "Read(./.envrc.*)",
       "Read(./.vault-password)"
     ],
-    "defaultMode": "plan"
+    "defaultMode": "auto"
   },
   "hooks": {
     "Notification": [
@@ -44,9 +51,6 @@
     "padding": 0
   },
   "enabledPlugins": {
-    "frontend-design@claude-code-plugins": false,
-    "nixpowers@nixpowers-marketplace": true,
-    "ralph-wiggum@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
     "ralph-wiggum@claude-code-plugins": false,
@@ -59,8 +63,19 @@
     "playwright@claude-plugins-official": true,
     "hookify@claude-plugins-official": true
   },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
+  },
   "alwaysThinkingEnabled": true,
+  "effortLevel": "xhigh",
   "promptSuggestionEnabled": false,
   "autoUpdatesChannel": "latest",
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true,
+  "voiceEnabled": false
 }

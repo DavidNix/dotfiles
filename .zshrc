@@ -73,7 +73,7 @@ setopt share_history            # Share history between multiple shells
 zstyle ':completion*' completer _expand _complete
 
 # advanced completions
-autoload -Uz compinit && compinit
+autoload -Uz compinit && compinit -u
 # load bashcompinit for some old bash completions
 autoload bashcompinit && bashcompinit
 
@@ -117,7 +117,7 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH="$PATH:$HOME/.vim/pack/bundle/start/fzf/bin"
 
 # LM Studio CLI (lms)
-export PATH="$PATH:/Users/davidnix/.lmstudio/bin"
+export PATH="$PATH:$HOME/.lmstudio/bin"
 
 # ==============================================================================
 # Tool Initialization (using cache where possible)
@@ -191,16 +191,16 @@ ai() {
 
 # Opencode settings
 # Disable Claude Code compatability
-export OPENCODE_DISABLE_CLAUDE_CODE=1
+# export OPENCODE_DISABLE_CLAUDE_CODE=1 # Unfortunately, disables all skill discovery
 
 # ==============================================================================
 # Google Cloud SDK
 # ==============================================================================
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/davidnix/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '/Users/davidnix/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/davidnix/google-cloud-sdk/completion.zsh.inc'; fi
+if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
 
 # ==============================================================================
 # Prompt and History Tools
@@ -211,7 +211,5 @@ if command -v starship &> /dev/null; then eval "$(starship init zsh)"; fi
 # atuin shell history
 eval "$(atuin init zsh --disable-up-arrow)"
 
-# ==============================================================================
-# Load Environment File
-# ==============================================================================
-source "$HOME/.envrc" || print -P "%F{yellow}%BFailed to source ~/.envrc%b%f"
+# opencode
+export PATH=/Users/nix/.opencode/bin:$PATH

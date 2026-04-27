@@ -27,6 +27,7 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	ln -sf $$PWD/.config/*/ ~/.config
 	ln -sf $$PWD/.config/* ~/.config
 	@# opencode (separate from .config/* to avoid conflicts)
+	mkdir -p ~/.config/opencode
 	ln -sf $$PWD/opencode/* ~/.config/opencode
 	@#Claude Code
 	mkdir -p ~/.claude/commands ~/.claude/agents
@@ -38,8 +39,9 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.
 	@$$PWD/script/macos-defaults.sh
 
+
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git pkgs zsh superhuman krew npm agent ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git pkgs zsh tmux superhuman krew npm agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -49,7 +51,7 @@ setup: relink ~/.ssh xcode homebrew git pkgs zsh superhuman krew npm agent ## NO
 .PHONY: xcode
 xcode:
 	@echo "Installing Xcode command line tools and such"
-	xcode-select --install
+	xcode-select --install || true
 
 .PHONY: homebrew
 homebrew:
@@ -93,6 +95,18 @@ krew: ## Installs kubectl krew plugins
 zsh:  ~/.oh-my-zsh
 	 @$(SHELL) -c "source ~/.zshrc && zplug install"
 
+.PHONY: tmux
+tmux: ## Install tmux plugin manager and plugins
+	@echo "Installing tmux plugin manager..."
+	@mkdir -p ~/.tmux/plugins
+	@if [ ! -d ~/.tmux/plugins/tpm/.git ]; then \
+		git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm; \
+	else \
+		git -C ~/.tmux/plugins/tpm pull --ff-only; \
+	fi
+	@echo "Installing tmux plugins..."
+	@~/.tmux/plugins/tpm/bin/install_plugins
+
 .PHONY: superhuman
 superhuman:
 	@echo "Download Superhuman at https://mail.superhuman.com"
@@ -105,6 +119,28 @@ agent: ## Install Claude Code and setup skills/plugins
 .PHONY: check-clean
 check-clean: ## Check if git state is clean
 	@git diff-index --quiet HEAD -- || { echo "Error: Git is dirty."; exit 1; }
+
+.PHONY: bash-check
+bash-check: ## Run shellcheck and bash -n on FILE=<path>
+	@if [ -z "$(FILE)" ]; then \
+		echo "Usage: make bash-check FILE=path/to/script"; \
+		exit 1; \
+	fi
+	@shellcheck "$(FILE)"
+	@bash -n "$(FILE)"
+	@echo "bash-check passed: $(FILE)"
+
+OPT_OWNER ?= nix
+OPT_GROUP ?= staff
+
+.PHONY: opt-perms
+opt-perms: ## Make OPT_OWNER the owner of /opt and remove legacy metarouter opt access
+	@echo "Making $(OPT_OWNER):$(OPT_GROUP) the owner of /opt..."
+	@sudo chown -R $(OPT_OWNER):$(OPT_GROUP) /opt
+	@sudo chmod -R u+rwX,go-w /opt
+	@# Remove the old shared-access user from the legacy opt group if it exists.
+	@sudo dseditgroup -o read opt >/dev/null 2>&1 && sudo dseditgroup -o edit -d metarouter opt 2>/dev/null || true
+	@echo "/opt is now owned by $(OPT_OWNER):$(OPT_GROUP)"
 
 FEAT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 .PHONY: pr
