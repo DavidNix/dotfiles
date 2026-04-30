@@ -11,6 +11,10 @@ export const SafeCommandsPlugin = async () => {
       const command = output.args.command || "";
       const isGitPush = /\bgit\s+push\b/i.test(command);
 
+      if (isGitPush) {
+        throw new Error("git push commands are blocked because AI agents are not permitted to publish local commits or modify remote refs.");
+      }
+
       const block = (pattern, message) => {
         if (pattern.test(command)) {
           throw new Error(message);
@@ -71,8 +75,6 @@ export const SafeCommandsPlugin = async () => {
       }
       block(/\bgit\s+checkout\b[^;&|]*\s--(?:\s|$)/i, "git checkout -- is blocked because it can discard local file changes.");
       block(/\bgit\s+restore\b[^;&|]*(?:\s\.|\s--worktree\b|\s--staged\s+\.)/i, "broad git restore operations are blocked because they can discard local file changes.");
-      block(/\bgit\s+push\b[^;&|]*\s(?:--delete|-d)\b/i, "git push --delete is blocked because it deletes remote branches.");
-      block(/\bgit\s+push\b[^;&|]*\s:[^\s]+/i, "git push ref deletion syntax is blocked because it deletes remote branches.");
       block(/\bgit\s+branch\b[^;&|]*\s-D\b/i, "git branch -D is blocked because it force-deletes local branches.");
 
       // Block broad destructive filesystem operations
@@ -93,19 +95,6 @@ export const SafeCommandsPlugin = async () => {
       block(/\bprofiles\s+(?:install|remove)\b/i, "profiles install/remove is blocked because it can change macOS configuration profiles.");
       block(/\bspctl\s+--master-disable\b/i, "spctl --master-disable is blocked because it disables Gatekeeper.");
       block(/\btccutil\s+reset\b/i, "tccutil reset is blocked because it resets macOS privacy permissions.");
-
-      // Block force pushes
-      if (isGitPush && /(^|\s)(-f|--force|--force-with-lease)(\s|$)/i.test(command)) {
-        throw new Error("force pushes are blocked because they can overwrite remote commits, destroy work by other developers, and cause irreversible data loss in the git history.");
-      }
-
-      // Block pushes to main or master
-      if (
-        isGitPush &&
-        /(\s|:)(main|master)(?=\s|$)/i.test(command)
-      ) {
-        throw new Error("git push to main or master is blocked because pushing directly to the default branch can bypass code review processes, introduce bugs to production code, and violates the workflow of using feature branches and pull requests.");
-      }
     },
   };
 };
