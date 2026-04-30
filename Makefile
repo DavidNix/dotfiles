@@ -130,6 +130,11 @@ bash-check: ## Run shellcheck and bash -n on FILE=<path>
 	@bash -n "$(FILE)"
 	@echo "bash-check passed: $(FILE)"
 
+.PHONY: opencode-check
+opencode-check: ## Run opencode plugin checks
+	node --check opencode/plugins/safe-commands.js
+	node --test opencode/test/safe-commands.test.js
+
 OPT_OWNER ?= nix
 OPT_GROUP ?= staff
 
