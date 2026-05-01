@@ -174,6 +174,7 @@ alias time="hyperfine"
 alias top="ytop"
 alias vi="nvim"
 alias vim="nvim"
+alias oc="opencode"
 alias ls="lsd"
 
 # M1 Terminal Helpers
