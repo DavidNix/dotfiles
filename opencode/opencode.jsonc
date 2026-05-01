@@ -44,6 +44,7 @@
       "*": "ask",
       "bash -n *": "allow",
       "cp *": "allow",
+      "container *": "allow",
       "file *": "allow",
       "find *": "allow",
       "git *": "allow", // plugin hook prevents dangerous commands
