@@ -57,7 +57,8 @@ Structure your review with clearly visible priority sections. Each issue gets a 
 ### C1: [Short descriptive title]
 **File**: `path/to/file.go:123`
 **Issue**: Clear description of the problem and its impact.
-**Solution**: Concrete suggestion for fixing the issue.
+**Possible solutions**: 1-3 concrete fixes, ordered by preference.
+**Example**: Optional. Include only for complex issues that span multiple files or several locations in one file.
 
 ---
 
@@ -70,7 +71,8 @@ Structure your review with clearly visible priority sections. Each issue gets a 
 ### H1: [Title]
 **File**: `path/to/file.go:456`
 **Issue**: Description of the problem.
-**Solution**: Recommended fix with rationale.
+**Possible solutions**: 1-3 concrete fixes, ordered by preference.
+**Example**: Optional. Include only for complex issues that span multiple files or several locations in one file.
 
 ---
 
@@ -80,7 +82,8 @@ Structure your review with clearly visible priority sections. Each issue gets a 
 ### M1: [Title]
 **File**: `path/to/file.go:789`
 **Issue**: What's suboptimal or unclear.
-**Solution**: How to improve it.
+**Possible solutions**: 1-3 concrete fixes, ordered by preference.
+**Example**: Optional. Include only for complex issues that span multiple files or several locations in one file.
 
 ---
 
@@ -90,7 +93,8 @@ Structure your review with clearly visible priority sections. Each issue gets a 
 ### L1: [Title]
 **File**: `path/to/file.go:101`
 **Issue**: Minor concern.
-**Solution**: Optional improvement.
+**Possible solutions**: 1-3 concrete fixes, ordered by preference.
+**Example**: Optional. Include only for complex issues that span multiple files or several locations in one file.
 
 ---
 
@@ -108,7 +112,7 @@ Context and what needs clarification.
 - Low: L1, L2, L3...
 - Questions: Q1, Q2, Q3...
 
-Include the **Solution** section for every issue. Be specific about what needs to change and why. Omit empty sections.
+Include **Possible solutions** for every issue. Give 1-3 concrete fixes, ordered by preference. Include **Example** only for complex issues, especially issues that span multiple files or several locations in one file. Omit empty sections.
 
 **Visibility Guidelines:**
 - Start with Critical issues - make them impossible to miss
