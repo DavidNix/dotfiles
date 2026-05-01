@@ -21,7 +21,7 @@
       "enabled": false,
     },
   },
-  "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+  "model": "openai/gpt-5.5",
   "permission": {
     "read": {
       "*": "allow",
