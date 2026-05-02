@@ -23,7 +23,6 @@ RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
     fzf \
     git \
     jq \
-    python3 \
     ripgrep \
     sudo \
     unzip \
@@ -32,26 +31,20 @@ RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
     zsh \
     && rm -rf /var/lib/apt/lists/*
 
-ARG HOST_HOME=/Users/sandbox
-ARG HOST_UID=1000
-ARG HOST_GID=1000
+ARG SANDBOX_UID=1000
+ARG SANDBOX_GID=1000
 
-RUN groupadd -g "$HOST_GID" sandbox 2>/dev/null || true \
-    && useradd -u "$HOST_UID" -g "$HOST_GID" -d "$HOST_HOME" -s /bin/zsh -M sandbox 2>/dev/null || true \
-    && mkdir -p "$(dirname "$HOST_HOME")" \
-    && mkdir -p "$HOST_HOME/.opencode/bin" \
-       "$HOST_HOME/.config/opencode" \
-       "$HOST_HOME/.cache/opencode" \
-       "$HOST_HOME/.local/share/opencode" \
-       "$HOST_HOME/.local/state/opencode" \
-    && chown -R "$HOST_UID":"$HOST_GID" "$HOST_HOME"
+RUN getent group "$SANDBOX_GID" >/dev/null || groupadd -g "$SANDBOX_GID" sandbox \
+    && useradd -u "$SANDBOX_UID" -g "$SANDBOX_GID" -d /home/sandbox -s /bin/zsh -m sandbox 2>/dev/null || true \
+    && mkdir -p /home/sandbox/.opencode/bin \
+       /home/sandbox/.config/opencode \
+       /home/sandbox/.cache/opencode \
+       /home/sandbox/.local/share/opencode \
+       /home/sandbox/.local/state/opencode \
+    && chown -R "$SANDBOX_UID":"$SANDBOX_GID" /home/sandbox
 
-ENV HOME=$HOST_HOME
-ENV PATH=$HOST_HOME/.opencode/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-
-RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
-    curl -fsSL https://opencode.ai/install | bash -s -- --no-modify-path \
-    && chown -R "$HOST_UID":"$HOST_GID" "$HOME/.opencode"
+ENV HOME=/home/sandbox
+ENV PATH=/home/sandbox/.opencode/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
     curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
@@ -60,5 +53,7 @@ RUN mkdir -p /root \
     && printf '%s\n' '# Minimal zshrc to suppress first-run prompt' > /root/.zshrc
 
 WORKDIR $HOME
+
+USER sandbox
 
 CMD ["/bin/zsh"]

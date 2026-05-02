@@ -3,7 +3,10 @@
 
 set -euo pipefail
 
-SANDBOX_IMAGE="ai-sandbox:latest"
+SANDBOX_LAYOUT_VERSION="home-v2"
+SANDBOX_IMAGE="ai-sandbox:${SANDBOX_LAYOUT_VERSION}"
+SANDBOX_HOME="/home/sandbox"
+SANDBOX_PATH="${SANDBOX_HOME}/.opencode/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 DOCKERFILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 RED='\033[0;31m'
@@ -65,8 +68,7 @@ build_image() {
         return 0
     fi
 
-    local host_home host_uid host_gid
-    host_home="$HOME"
+    local host_uid host_gid
     host_uid=$(id -u)
     host_gid=$(id -g)
 
@@ -75,9 +77,8 @@ build_image() {
     local build_args=(
         -f "${DOCKERFILE_DIR}/Dockerfile.ai-sandbox"
         -t "$SANDBOX_IMAGE"
-        --build-arg "HOST_HOME=${host_home}"
-        --build-arg "HOST_UID=${host_uid}"
-        --build-arg "HOST_GID=${host_gid}"
+        --build-arg "SANDBOX_UID=${host_uid}"
+        --build-arg "SANDBOX_GID=${host_gid}"
     )
     if [[ -n "$no_cache" ]]; then
         build_args+=(--no-cache)
@@ -138,42 +139,7 @@ container_name_from_dir() {
     safe_name=${safe_name%-}
     [[ -n "$safe_name" ]] || safe_name="dir"
     hash=$(printf '%s' "$dir" | md5 | cut -c1-12)
-    printf 'ai-sandbox-%s-%s\n' "$safe_name" "$hash"
-}
-
-resolve_git_common_dir() {
-    local work_dir="$1"
-    local git_path="${work_dir}/.git"
-
-    [[ -f "$git_path" ]] || return 0
-
-    /usr/bin/python3 - "$git_path" <<'PY'
-import os
-import sys
-
-git_path = sys.argv[1]
-gitdir = ""
-
-with open(git_path, encoding="utf-8") as fh:
-    for line in fh:
-        if line.startswith("gitdir: "):
-            gitdir = line[len("gitdir: "):].strip()
-            break
-
-if not gitdir:
-    sys.exit(0)
-
-if not os.path.isabs(gitdir):
-    gitdir = os.path.normpath(os.path.join(os.path.dirname(git_path), gitdir))
-
-commondir_path = os.path.join(gitdir, "commondir")
-if os.path.isfile(commondir_path):
-    with open(commondir_path, encoding="utf-8") as fh:
-        commondir = fh.read().strip()
-    print(os.path.normpath(os.path.join(gitdir, commondir)))
-else:
-    print(os.path.normpath(os.path.join(gitdir, "..", "..")))
-PY
+    printf 'ai-sandbox-%s-%s-%s\n' "$SANDBOX_LAYOUT_VERSION" "$safe_name" "$hash"
 }
 
 container_exists() {
@@ -196,19 +162,10 @@ remove_container() {
 }
 
 ensure_host_mount_sources() {
-    local worktrees_dir="$1"
-
     mkdir -p "$HOME/.config/opencode"
     mkdir -p "$HOME/.cache/opencode"
     mkdir -p "$HOME/.local/share/opencode"
     mkdir -p "$HOME/.local/state/opencode"
-    mkdir -p "$HOME/.local/share/mise"
-    mkdir -p "$HOME/.cache/mise"
-    mkdir -p "$worktrees_dir"
-
-    if [[ -d "$HOME/src/dotfiles" ]]; then
-        mkdir -p "$HOME/src/dotfiles/opencode"
-    fi
 }
 
 append_mount_if_exists() {
@@ -229,14 +186,6 @@ append_mount_if_exists() {
     eval "$target_var_name+=(\"--mount\" $quoted_mount)"
 }
 
-paths_equal() {
-    local left="$1"
-    local right="$2"
-
-    [[ -d "$left" && -d "$right" ]] || return 1
-    [[ "$(cd "$left" && pwd)" == "$(cd "$right" && pwd)" ]]
-}
-
 create_container() {
     local work_dir="$1"
     local container_name="$2"
@@ -244,20 +193,17 @@ create_container() {
     work_dir=$(cd "$work_dir" && pwd)
 
     local container_home host_uid host_gid memory cpus
-    local git_common_dir worktrees_dir git_name git_email home_dotfiles
+    local git_name git_email
 
-    container_home="$HOME"
+    container_home="$SANDBOX_HOME"
     host_uid=$(id -u)
     host_gid=$(id -g)
     memory="${AI_SANDBOX_MEMORY:-4G}"
     cpus="${AI_SANDBOX_CPUS:-}"
-    git_common_dir=$(resolve_git_common_dir "$work_dir")
-    worktrees_dir="$(cd "$work_dir/.." && pwd)/worktrees"
     git_name=$(git config --global user.name 2>/dev/null || true)
     git_email=$(git config --global user.email 2>/dev/null || true)
-    home_dotfiles="$HOME/src/dotfiles"
 
-    ensure_host_mount_sources "$worktrees_dir"
+    ensure_host_mount_sources
 
     local idle_cmd
     idle_cmd=$(cat <<'EOF'
@@ -278,7 +224,7 @@ EOF
         "--gid" "$host_gid"
         "--memory" "$memory"
         "-e" "HOME=${container_home}"
-        "-e" "PATH=${container_home}/.opencode/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        "-e" "PATH=${SANDBOX_PATH}"
         "-e" "OPENCODE_CONFIG=${container_home}/.config/opencode/opencode-yolo.jsonc"
         "-e" "ZDOTDIR=/root"
         "-e" "COLORTERM=truecolor"
@@ -296,22 +242,11 @@ EOF
     fi
 
     append_mount_if_exists create_args "$work_dir" "$work_dir"
-    append_mount_if_exists create_args "$worktrees_dir" "$worktrees_dir"
-    append_mount_if_exists create_args "$HOME/.config/opencode" "$HOME/.config/opencode"
-    append_mount_if_exists create_args "$HOME/.cache/opencode" "$HOME/.cache/opencode"
-    append_mount_if_exists create_args "$HOME/.local/share/opencode" "$HOME/.local/share/opencode"
-    append_mount_if_exists create_args "$HOME/.local/state/opencode" "$HOME/.local/state/opencode"
-    append_mount_if_exists create_args "$HOME/.local/share/mise" "$HOME/.local/share/mise"
-    append_mount_if_exists create_args "$HOME/.cache/mise" "$HOME/.cache/mise"
-    append_mount_if_exists create_args "$HOME/.agents" "$HOME/.agents" readonly
-
-    if [[ -n "$git_common_dir" ]]; then
-        append_mount_if_exists create_args "$git_common_dir" "$git_common_dir"
-    fi
-
-    if [[ -d "$home_dotfiles/opencode" ]] && ! paths_equal "$home_dotfiles/opencode" "$work_dir/opencode"; then
-        append_mount_if_exists create_args "$home_dotfiles/opencode" "$home_dotfiles/opencode"
-    fi
+    append_mount_if_exists create_args "$HOME/.config/opencode" "$container_home/.config/opencode"
+    append_mount_if_exists create_args "$HOME/.cache/opencode" "$container_home/.cache/opencode"
+    append_mount_if_exists create_args "$HOME/.local/share/opencode" "$container_home/.local/share/opencode"
+    append_mount_if_exists create_args "$HOME/.local/state/opencode" "$container_home/.local/state/opencode"
+    append_mount_if_exists create_args "$HOME/.agents" "$container_home/.agents" readonly
 
     log_info "Creating sandbox: $container_name"
     container create "${create_args[@]}" "$SANDBOX_IMAGE" /bin/bash -lc "$idle_cmd"
@@ -329,6 +264,27 @@ ensure_container_running() {
         log_info "Starting sandbox: $container_name"
         container start "$container_name"
     fi
+
+    ensure_opencode_installed "$container_name"
+}
+
+ensure_opencode_installed() {
+    local container_name="$1"
+
+    if container exec \
+        --env "HOME=${SANDBOX_HOME}" \
+        --env "PATH=${SANDBOX_PATH}" \
+        "$container_name" \
+        /bin/bash -lc 'command -v opencode >/dev/null 2>&1'; then
+        return 0
+    fi
+
+    log_info "Installing OpenCode in sandbox..."
+    container exec \
+        --env "HOME=${SANDBOX_HOME}" \
+        --env "PATH=${SANDBOX_PATH}" \
+        "$container_name" \
+        /bin/bash -lc 'curl -fsSL https://opencode.ai/install | bash -s -- --no-modify-path'
 }
 
 exec_in_sandbox() {
@@ -371,6 +327,10 @@ EOF
     esac
 
     local -a exec_args=(
+        --env "HOME=${SANDBOX_HOME}"
+        --env "PATH=${SANDBOX_PATH}"
+        --env "OPENCODE_CONFIG=${SANDBOX_HOME}/.config/opencode/opencode-yolo.jsonc"
+        --env "GIT_SSH_COMMAND=false"
         --env "TERM=${TERM:-xterm-256color}"
         --workdir "$work_dir"
     )
