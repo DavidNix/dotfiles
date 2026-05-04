@@ -2,8 +2,6 @@
 // Blocks dangerous shell commands, secret access, and destructive macOS operations.
 
 const secretPatterns = [
-  /\.ssh\//i,
-  /\b(?:id_rsa|id_ed25519)\b/i,
   /\.(?:pem|key|p12)\b/i,
   /\.aws\/credentials\b/i,
   /\.npmrc\b/i,
@@ -100,7 +98,7 @@ export const getUnsafeCommandReason = (command) => {
   }
 
   if (secretPatterns.some((pattern) => pattern.test(command))) {
-    return "Access denied: Commands referencing SSH keys, cloud credentials, package tokens, kube configs, Docker auth, GitHub auth, GPG data, or Vault tokens are blocked because they can expose sensitive secrets.";
+    return "Access denied: Commands referencing cloud credentials, package tokens, kube configs, Docker auth, GitHub auth, GPG data, or Vault tokens are blocked because they can expose sensitive secrets.";
   }
 
   for (const segment of commandSegments(command)) {
