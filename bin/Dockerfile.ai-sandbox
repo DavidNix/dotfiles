@@ -16,18 +16,43 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
     apt-get update && apt-get install -y --no-install-recommends \
     bash \
+    bc \
     build-essential \
     ca-certificates \
+    colordiff \
     curl \
+    dnsutils \
+    dos2unix \
+    entr \
     fd-find \
+    file \
     fzf \
     git \
+    graphviz \
+    htop \
+    html2text \
+    iproute2 \
+    iputils-ping \
     jq \
+    less \
+    lsof \
+    moreutils \
+    mtr \
+    netcat-openbsd \
+    pandoc \
+    pv \
     ripgrep \
+    sqlite3 \
+    strace \
     sudo \
+    traceroute \
+    tree \
     unzip \
     vim \
     wget \
+    whois \
+    xxd \
+    zip \
     zsh \
     && rm -rf /var/lib/apt/lists/*
 
@@ -37,10 +62,17 @@ ARG SANDBOX_GID=1000
 RUN getent group "$SANDBOX_GID" >/dev/null || groupadd -g "$SANDBOX_GID" sandbox \
     && useradd -u "$SANDBOX_UID" -g "$SANDBOX_GID" -d /home/sandbox -s /bin/zsh -m sandbox 2>/dev/null || true \
     && mkdir -p /home/sandbox/.opencode/bin \
+       /home/sandbox/.config/ai-sandbox \
        /home/sandbox/.config/opencode \
        /home/sandbox/.cache/opencode \
        /home/sandbox/.local/share/opencode \
        /home/sandbox/.local/state/opencode \
+    && printf '%s\n' \
+       '{' \
+       '  "$schema": "https://opencode.ai/config.json",' \
+       '  "permission": "allow",' \
+       '}' \
+       > /home/sandbox/.config/ai-sandbox/opencode-yolo.jsonc \
     && chown -R "$SANDBOX_UID":"$SANDBOX_GID" /home/sandbox
 
 ENV HOME=/home/sandbox
@@ -55,5 +87,8 @@ RUN mkdir -p /root \
 WORKDIR $HOME
 
 USER sandbox
+
+RUN --mount=type=bind,from=dns,source=/resolv.conf,target=/etc/resolv.conf \
+    curl -fsSL https://opencode.ai/install | bash -s -- --no-modify-path
 
 CMD ["/bin/zsh"]

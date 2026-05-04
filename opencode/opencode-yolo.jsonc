@@ -1,5 +1,0 @@
-// This is used in a sandbox
-{
-  "$schema": "https://opencode.ai/config.json",
-  "permission": "allow",
-}
