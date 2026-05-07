@@ -113,7 +113,7 @@ install_skills() {
     echo ""
     echo "Installing skills..."
 
-    echo -e "  Installing local skills..."
+    echo -e "  Installing local repo skills from ${LOCAL_SKILLS_SOURCE}..."
     try_or_warn_quiet "Installing local skills" npx --yes skills add "$LOCAL_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode"
 
     echo -e "  Installing nixpowers skills..."

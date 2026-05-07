@@ -1,0 +1,23 @@
+{
+  "skill_name": "1-3-1",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Give me a 1-3-1 for choosing how we should improve onboarding for new hires.",
+      "expected_output": "A 1-3-1 decision memo with one problem sentence, exactly three onboarding options, pros and cons for each, one recommendation, aligned definition of done, and an action plan.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "What are my choices for reducing meeting overload across our team? I need something I can forward with your recommendation.",
+      "expected_output": "A forwardable decision memo that uses the 1-3-1 structure even though the user did not name it explicitly, with three distinct meeting-reduction strategies and one clear recommendation.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "We have three ways to handle customer training: live workshops, recorded videos, or office hours. Can you help me decide?",
+      "expected_output": "A 1-3-1 response that frames the training decision, compares exactly the three provided approaches, recommends one, and aligns definition of done and action plan to the recommended path.",
+      "files": []
+    }
+  ]
+}
