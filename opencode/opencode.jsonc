@@ -43,8 +43,8 @@
     "bash": {
       "*": "ask",
       "bash -n *": "allow",
-      "cp *": "allow",
       "container *": "allow",
+      "cp *": "allow",
       "file *": "allow",
       "find *": "allow",
       "git *": "allow", // plugin hook prevents dangerous commands
@@ -69,6 +69,8 @@
       "make vet *": "allow",
       "mkdir *": "allow",
       "mv *": "allow",
+      "npm astro *": "allow",
+      "npx astro *": "allow",
       "pwd *": "allow",
       "rg *": "allow",
       "ripgrep *": "allow",
