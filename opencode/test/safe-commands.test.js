@@ -22,13 +22,13 @@ const allowedCommands = [
   "go vet ./...",
   "go list ./...",
   "go env",
+  "go run .",
   "rg \"go run\"",
 ];
 
 const blockedCommands = [
   ["git push", /git push commands are blocked/],
   ["git push origin feature", /git push commands are blocked/],
-  ["go run .", /go run is blocked/],
   ["go install example.com/tool@latest", /go install is blocked/],
   ["go env -w GOPROXY=direct", /go env -w\/-u is blocked/],
   ["go env -u GOPROXY", /go env -w\/-u is blocked/],
@@ -47,7 +47,7 @@ test("isGitPushCommand only matches actual git push invocations", () => {
 });
 
 test("isUnsafeGoCommand only matches unsafe go invocations", () => {
-  assert.equal(isUnsafeGoCommand("go run ."), true);
+  assert.equal(isUnsafeGoCommand("go run ."), false);
   assert.equal(isUnsafeGoCommand("go test -exec ./wrapper ./..."), true);
   assert.equal(isUnsafeGoCommand("go get example.com/module@latest"), false);
   assert.equal(isUnsafeGoCommand("rg \"go run\""), false);
@@ -70,6 +70,6 @@ test("plugin hook uses validateSafeCommand", async () => {
   const beforeExecute = plugin["tool.execute.before"];
 
   await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, { args: { command: "go test ./..." } }));
-  await assert.rejects(() => beforeExecute({ tool: "bash" }, { args: { command: "go run ." } }), /go run is blocked/);
+  await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, { args: { command: "go run ." } }));
   await assert.doesNotReject(() => beforeExecute({ tool: "read" }, { args: { command: "go run ." } }));
 });

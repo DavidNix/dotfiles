@@ -53,10 +53,6 @@ const unsafeGoCommandReason = ({ name, args }) => {
   const subcommand = (args[0] || "").toLowerCase();
   const subcommandArgs = args.slice(1);
 
-  if (subcommand === "run") {
-    return "go run is blocked because it executes arbitrary local or remote Go code.";
-  }
-
   if (subcommand === "install") {
     return "go install is blocked because it writes binaries and can fetch remote code.";
   }
