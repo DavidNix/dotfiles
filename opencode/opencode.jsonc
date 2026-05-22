@@ -71,6 +71,7 @@
       "mv *": "allow",
       "npm astro *": "allow",
       "npx astro *": "allow",
+      "npx test *": "allow",
       "pwd *": "allow",
       "rg *": "allow",
       "ripgrep *": "allow",
