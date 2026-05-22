@@ -119,6 +119,9 @@ install_skills() {
     echo -e "  Installing nixpowers skills..."
     try_or_warn_quiet "Installing nixpowers skills" npx --yes skills add "https://github.com/DavidNix/nixpowers" -g -y -a "claude-code" -a "opencode"
 
+    echo -e "  Installing emilkowalski skills..."
+    try_or_warn_quiet "Installing emilkowalski skills" npx --yes skills add "emilkowalski/skill" -g -y -a "claude-code" -a "opencode"
+
     # Meta
     install_skill "https://github.com/anthropics/skills" "skill-creator"
 
