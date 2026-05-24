@@ -14,6 +14,7 @@ make relink    # Symlink dotfiles to ~/
 make setup     # Full new Mac setup (NOT idempotent)
 make defaults  # Apply macOS preferences (requires reboot)
 make pkgs      # Install Homebrew packages
+make vet       # Run all lint, type, and syntax checks
 make bash-check FILE=bin/script # Validate a bash script
 ```
 
@@ -40,7 +41,11 @@ Read these files directly for details.
 
 **Shell changes:** Edit `.zshrc`, reload with `source ~/.zshrc`.
 
-**Script changes:** After modifying bash/zsh scripts, run `make bash-check FILE=<file>` instead of invoking `shellcheck` and `bash -n` separately.
+**Script changes:** After modifying any script, run `make vet`. For a single bash/zsh script, `make bash-check FILE=<file>` is available, but `make vet` is required before considering script work complete.
+
+**New scripts:** When adding a new script, add it to the appropriate script list in `Makefile` (`SHELL_SCRIPTS` or `PYTHON_SCRIPTS`) so `make vet` checks it.
+
+**Python dependencies:** Always pin Python package versions exactly in `pyproject.toml` and PEP 723 inline script metadata (use `==`, not `>=`) to reduce supply chain risk. Run `uv lock` after changing Python dependencies.
 
 ## Agent Skills/Plugin Maintenance
 

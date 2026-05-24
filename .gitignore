@@ -7,3 +7,4 @@
 !.config/zed/tasks.json
 
 __pycache__
+.venv/

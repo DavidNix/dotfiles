@@ -4,6 +4,9 @@
 
 SHELL := /bin/zsh
 
+SHELL_SCRIPTS := bin/agent-init bin/ai-sandbox bin/worktree bin/zed-toggle-test-file script/macos-defaults.sh test/ai-sandbox.test.sh tmux-init.sh
+PYTHON_SCRIPTS := bin/image-gen bin/image-edit
+
 default: help
 
 .PHONY: help
@@ -129,6 +132,32 @@ bash-check: ## Run shellcheck and bash -n on FILE=<path>
 	@shellcheck "$(FILE)"
 	@bash -n "$(FILE)"
 	@echo "bash-check passed: $(FILE)"
+
+.PHONY: shellcheck
+shellcheck: ## Run shellcheck and shell syntax checks on scripts
+	@for file in $(SHELL_SCRIPTS); do \
+		case "$$(head -n 1 "$$file")" in \
+			*zsh*) ;; \
+			*) shellcheck "$$file" ;; \
+		esac; \
+		case "$$(head -n 1 "$$file")" in \
+			*bash*) bash -n "$$file" ;; \
+			*zsh*) zsh -n "$$file" ;; \
+			*) sh -n "$$file" ;; \
+		esac; \
+	done
+	@echo "shellcheck passed"
+
+.PHONY: python-check
+python-check: ## Run Python lint, type, and syntax checks on scripts
+	@uv sync --locked --group dev
+	@uv run ruff check $(PYTHON_SCRIPTS)
+	@uv run ty check $(PYTHON_SCRIPTS)
+	@uv run python -m py_compile $(PYTHON_SCRIPTS)
+	@echo "python-check passed"
+
+.PHONY: vet
+vet: shellcheck python-check opencode-check ## Run all repo lint, type, and syntax checks
 
 .PHONY: opencode-check
 opencode-check: ## Run opencode plugin checks

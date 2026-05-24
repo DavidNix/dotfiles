@@ -4,7 +4,7 @@
 
 DFILES_DIR=~/src/dotfiles
 
-tmux new-session -c"$DFILES_DIR" -d -s $(basename "$DFILES_DIR")
+tmux new-session -c"$DFILES_DIR" -d -s "$(basename "$DFILES_DIR")"
 
 tmux rename-window "main"
 
@@ -16,7 +16,7 @@ tmux select-pane -t 0
 
 WORK_DIR=~/src/metarouter/roost
 
-tmux new-session -c "$WORK_DIR" -d -s $(basename "$WORK_DIR")
+tmux new-session -c "$WORK_DIR" -d -s "$(basename "$WORK_DIR")"
 
 tmux rename-window "main"
 
@@ -28,7 +28,7 @@ tmux select-pane -t 0
 
 YND_DIR=~/src/your-next-domain
 
-tmux new-session -c "$YND_DIR" -d -s $(basename "$YND_DIR")
+tmux new-session -c "$YND_DIR" -d -s "$(basename "$YND_DIR")"
 
 tmux rename-window "main"
 
@@ -38,4 +38,4 @@ tmux select-pane -t 0
 
 # Attach
 
-tmux attach -t $(basename "$DFILES_DIR")
+tmux attach -t "$(basename "$DFILES_DIR")"
