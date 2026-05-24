@@ -32,7 +32,9 @@ toggle_go_file() {
 # Create Go test file template
 create_go_test_template() {
     local file_path="$1"
-    local package_name=$(basename "$(dirname "$file_path")")
+    local package_name
+
+    package_name=$(basename "$(dirname "$file_path")")
 
     cat <<EOF
 package ${package_name}
@@ -41,6 +43,7 @@ EOF
 
 main() {
     local target_file=""
+    local template=""
 
     # Determine language and toggle file
     if [[ "$ZED_RELATIVE_FILE" == *.go ]]; then
@@ -61,7 +64,8 @@ main() {
 
         # Create file with template based on language
         if [[ "$target_file" == *_test.go ]]; then
-            create_go_test_template "$full_target_path" > "$full_target_path"
+            template=$(create_go_test_template "$full_target_path")
+            printf '%s\n' "$template" > "$full_target_path"
         else
             # For implementation files, create empty file
             touch "$full_target_path"

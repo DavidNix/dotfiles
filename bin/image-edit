@@ -1,0 +1,161 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.14"
+# dependencies = [
+#     "google-genai==2.6.0",
+#     "pillow==12.2.0",
+#     "typer==0.25.1",
+# ]
+# ///
+
+import os
+import secrets
+import subprocess
+import textwrap
+from datetime import datetime
+from io import BytesIO
+from pathlib import Path
+from shutil import which
+from typing import Annotated
+
+import typer
+from google import genai
+from google.genai import types
+from PIL import Image
+
+VALID_ASPECT_RATIOS = [
+    "1:1",
+    "2:3",
+    "3:2",
+    "3:4",
+    "4:3",
+    "4:5",
+    "5:4",
+    "9:16",
+    "16:9",
+    "21:9",
+]
+VALID_RESOLUTIONS = ["1K", "2K", "4K"]
+KEYCHAIN_SERVICE = "gemini-api-key"
+
+
+def get_api_key(command_name: str) -> str:
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if api_key:
+        return api_key
+
+    api_key = get_keychain_api_key()
+    if api_key:
+        return api_key
+
+    typer.echo(missing_api_key_message(command_name), err=True)
+    raise typer.Exit(1)
+
+
+def get_keychain_api_key() -> str | None:
+    if which("security") is None:
+        return None
+
+    user = os.environ.get("USER")
+    if not user:
+        return None
+
+    result = subprocess.run(
+        ["security", "find-generic-password", "-a", user, "-s", KEYCHAIN_SERVICE, "-w"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+
+    return result.stdout.strip() or None
+
+
+def missing_api_key_message(command_name: str) -> str:
+    return textwrap.dedent(
+        f"""
+        GEMINI_API_KEY is not set and no {KEYCHAIN_SERVICE} item was found in macOS Keychain.
+
+        Add it to Keychain with:
+          security add-generic-password -U -a "$USER" -s {KEYCHAIN_SERVICE} -w "YOUR_GEMINI_API_KEY"
+
+        Or run one command with:
+          GEMINI_API_KEY="YOUR_GEMINI_API_KEY" {command_name} /absolute/path/to/image.png "edit instructions"
+        """
+    ).strip()
+
+
+def main(
+    file: Annotated[Path, typer.Argument(help="Path to the image file to edit")],
+    prompt: Annotated[str, typer.Argument(help="Instructions for how to edit the image")],
+    output_dir: Annotated[Path, typer.Option("--output-dir", "-o", help="Output directory")] = Path("."),
+    aspect_ratio: Annotated[str, typer.Option("--aspect-ratio", "-a", help="Aspect ratio")] = "1:1",
+    resolution: Annotated[str, typer.Option("--resolution", "-r", help="Resolution (1K, 2K, 4K)")] = "1K",
+    width: Annotated[int | None, typer.Option(help="Target width for resize")] = None,
+    height: Annotated[int | None, typer.Option(help="Target height for resize")] = None,
+) -> None:
+    """Edit an image using Google Gemini."""
+    if not file.exists():
+        raise typer.BadParameter(f"File not found: {file}")
+
+    if not file.is_file():
+        raise typer.BadParameter(f"Not a file: {file}")
+
+    if aspect_ratio not in VALID_ASPECT_RATIOS:
+        raise typer.BadParameter(f"Invalid aspect ratio '{aspect_ratio}'. Must be one of: {', '.join(VALID_ASPECT_RATIOS)}")
+
+    if resolution not in VALID_RESOLUTIONS:
+        raise typer.BadParameter(f"Invalid resolution '{resolution}'. Must be one of: {', '.join(VALID_RESOLUTIONS)}")
+
+    if (width is None) != (height is None):
+        raise typer.BadParameter("--width and --height must be provided together")
+
+    if width is not None and width <= 0:
+        raise typer.BadParameter("--width must be a positive integer")
+
+    if height is not None and height <= 0:
+        raise typer.BadParameter("--height must be a positive integer")
+
+    api_key = get_api_key("image-edit")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    source_image = Image.open(file)
+    client = genai.Client(api_key=api_key)
+    response = client.models.generate_content(
+        model="gemini-3-pro-image-preview",
+        contents=[prompt, source_image],
+        config=types.GenerateContentConfig(
+            response_modalities=["TEXT", "IMAGE"],
+            image_config=types.ImageConfig(
+                aspect_ratio=aspect_ratio,
+                image_size=resolution,
+            ),
+        ),
+    )
+
+    for part in response.parts or []:
+        if part.text is not None:
+            typer.echo(part.text)
+        elif part.inline_data is not None:
+            genai_image = part.as_image()
+            if genai_image is None or genai_image.image_bytes is None:
+                continue
+            pil_image = Image.open(BytesIO(genai_image.image_bytes))
+
+            if width is not None and height is not None:
+                pil_image = pil_image.resize((width, height), Image.Resampling.LANCZOS)
+
+            timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+            output_path = output_dir / f"{timestamp}-{secrets.token_hex(3)}.png"
+
+            pil_image.save(str(output_path))
+            typer.echo(f"Image saved to: {output_path}")
+            return
+
+    raise RuntimeError("No image was generated")
+
+
+if __name__ == "__main__":
+    typer.run(main)
