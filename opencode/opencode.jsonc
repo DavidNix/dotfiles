@@ -56,6 +56,7 @@
       "glab pipeline ci *": "allow",
       "glab repo view *": "allow",
       "go *": "allow", // plugin hook prevents dangerous commands
+      "gopls *": "allow",
       "gofmt *": "allow",
       "goimports *": "allow",
       "golangci-lint *": "allow",
