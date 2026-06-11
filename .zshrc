@@ -214,3 +214,6 @@ eval "$(atuin init zsh --disable-up-arrow)"
 
 # opencode
 export PATH=/Users/nix/.opencode/bin:$PATH
+
+# opencode
+export PATH=/Users/metarouter/.opencode/bin:$PATH
