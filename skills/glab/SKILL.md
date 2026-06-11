@@ -59,6 +59,49 @@ glab mr approve <mr-number>
 glab mr note <mr-number> -m "Please update tests"
 ```
 
+#### Draft Line Comments
+
+To leave draft comments on specific MR line numbers, use GitLab's draft notes API through `glab api`. Use the `draft_notes` endpoint, send JSON input, use the `note` key, and nest the line position under `position`.
+
+First get the diff refs:
+
+```bash
+glab mr view <mr-number> --output json
+```
+
+Use `diff_refs.base_sha`, `diff_refs.start_sha`, and `diff_refs.head_sha` in the draft note payload:
+
+```bash
+glab api --method POST 'projects/<project-id>/merge_requests/<mr-number>/draft_notes' \
+  --header 'Content-Type: application/json' \
+  --input <(printf '%s' '{
+    "note":"Could this return an error whenever `FilesFailed` or `EventsFailed` is non-zero, so partial replay failures do not get logged as `Replay completed`?",
+    "position":{
+      "base_sha":"<base-sha>",
+      "start_sha":"<start-sha>",
+      "head_sha":"<head-sha>",
+      "position_type":"text",
+      "old_path":"retl/replay/executor.go",
+      "new_path":"retl/replay/executor.go",
+      "new_line":99
+    }
+  }')
+```
+
+Repeat the command with the target file paths and `new_line` changed for each draft line comment.
+
+Verify draft notes:
+
+```bash
+glab api 'projects/<project-id>/merge_requests/<mr-number>/draft_notes'
+```
+
+Important details:
+- Use `draft_notes`, not regular MR notes.
+- Use `note`, not `body`.
+- Use JSON input so `position` is nested correctly.
+- Read `base_sha`, `start_sha`, and `head_sha` from `glab mr view <mr-number> --output json` under `diff_refs`.
+
 ### Managing Issues
 
 ```bash
