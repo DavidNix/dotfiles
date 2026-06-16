@@ -97,6 +97,7 @@ export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 export PATH="/usr/local/bin:/usr/local/sbin:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/bin"
 
 # Get psql without postgres (using Postgres.app instead)
+export PATH="/Applications/Postgres.app/Contents/Versions/18/bin:$PATH"
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 
 # Homebrew for silicon (cached)
