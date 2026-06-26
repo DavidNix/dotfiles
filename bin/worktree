@@ -55,6 +55,14 @@ else
     echo "Warning: .envrc not found, skipped"
 fi
 
+while IFS= read -r -d '' vault_file; do
+    rel_path="${vault_file#./}"
+    dest_dir="$worktree_path/$(dirname "$rel_path")"
+    mkdir -p "$dest_dir"
+    cp "$vault_file" "$dest_dir/"
+    echo "Copied $rel_path"
+done < <(find . -path ./.git -prune -o -name .vault-password -type f -print0 2>/dev/null)
+
 abs_path="$(cd "$worktree_path" && pwd)"
 echo ""
 echo "Worktree created at: ${abs_path}"
