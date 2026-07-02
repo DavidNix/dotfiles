@@ -80,5 +80,6 @@
   "skipDangerousModePermissionPrompt": true,
   "editorMode": "vim",
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": false
+  "voiceEnabled": false,
+  "model": "claude-fable-5[1m]"
 }
