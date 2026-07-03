@@ -29,6 +29,7 @@
       "*.env": "deny",
       "*.env.*": "deny",
       "*.env.example": "allow",
+      "*.envrc": "deny",
       "*.envrc.*": "deny",
       "*.envrc.example": "allow",
       "*.vault-password": "deny",
