@@ -7,6 +7,8 @@ description: Thorough, critical code review of implementation, tests, and docume
 
 Review the specified code thoroughly and critically. Prioritize finding real issues over being agreeable. Review ALL aspects: implementation, tests, and documentation.
 
+Perform the entire review yourself. Never use subagents or the Task tool for discovery, analysis, verification, or any other part of the review.
+
 ### What to Review
 
 If `$ARGUMENTS` specifies files or paths, review those. Or if user specifies a target branch, review that. Otherwise, review uncommitted changes in the current repository. If there are no uncommitted changes, review the changes on the branch compared to upstream (main or master).
