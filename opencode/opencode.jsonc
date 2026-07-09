@@ -5,7 +5,7 @@
   "agent": {
     "plan": {
       "mode": "primary",
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol-fast",
     },
   },
   "share": "disabled",
@@ -22,7 +22,7 @@
       "enabled": false,
     },
   },
-  "model": "openai/gpt-5.5",
+  "model": "openai/gpt-5.6-sol-fast",
   "permission": {
     "read": {
       "*": "allow",
