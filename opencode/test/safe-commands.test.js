@@ -73,3 +73,23 @@ test("plugin hook uses validateSafeCommand", async () => {
   await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, { args: { command: "go run ." } }));
   await assert.doesNotReject(() => beforeExecute({ tool: "read" }, { args: { command: "go run ." } }));
 });
+
+test("plugin hook tolerates missing or non-string command args", async () => {
+  const plugin = await SafeCommandsPlugin();
+  const beforeExecute = plugin["tool.execute.before"];
+
+  await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, { args: {} }));
+  await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, {}));
+  await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, { args: { command: { command: "go test ./..." } } }));
+});
+
+test("plugin hook inspects string-array command args", async () => {
+  const plugin = await SafeCommandsPlugin();
+  const beforeExecute = plugin["tool.execute.before"];
+
+  await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, { args: { command: ["go", "test", "./..."] } }));
+  await assert.rejects(
+    () => beforeExecute({ tool: "bash" }, { args: { command: ["git", "push"] } }),
+    /git push commands are blocked/,
+  );
+});
