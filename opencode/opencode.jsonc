@@ -4,7 +4,22 @@
   "default_agent": "plan",
   "disabled_providers": ["opencode", "baseten"],
   "model": "openai/gpt-5.6-sol-fast",
-  "small_model": "opencode-go/deepseek-v4-flash",
+  "small_model": "homelab/qwen3.6-35b-a3b-nvfp4",
+  "provider": {
+    "homelab": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Homelab",
+      "options": {
+        "baseURL": "http://ai1-inference:8000/v1",
+        "apiKey": "local",
+      },
+      "models": {
+        "qwen3.6-35b-a3b-nvfp4": {
+          "name": "Qwen3.6-35B-A3B",
+        },
+      },
+    },
+  },
   "agent": {
     "plan": {
       "mode": "primary",
