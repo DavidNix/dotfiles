@@ -27,6 +27,10 @@
     },
     "explore": {
       "model": "opencode-go/deepseek-v4-flash",
+      "permission": { "task": "deny" }, // deny subagents from spawning more subagents
+    },
+    "general": {
+      "permission": { "task": "deny" }, // deny subagents from spawning more subagents
     },
     "summary": {
       "model": "opencode-go/deepseek-v4-flash",
