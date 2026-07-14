@@ -7,7 +7,7 @@ description: Thorough, critical code review of implementation, tests, and docume
 
 Review the specified code thoroughly and critically. Prioritize finding real issues over being agreeable. Review ALL aspects: implementation, tests, and documentation.
 
-Perform the entire review yourself. Never use subagents or the Task tool for discovery, analysis, verification, or any other part of the review.
+Perform the entire review yourself. Do NOT delegate to subagents or use the Task tool for discovery, analysis, verification, or any other part of the review.
 
 ### What to Review
 
