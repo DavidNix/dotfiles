@@ -17,7 +17,7 @@ Usage: `/phased-build <plan-path> <phase-selector>`
 # Rules
 
 - Use `builder` for general work and `frontend-builder` for frontend work.
-- Split mixed phases into general and frontend units. Build and review each unit separately.
+- Split mixed phases by assigned subagent. Build and review each unit separately.
 - Use `code-review` after every implementation or fix commit. Review only that unit's commits and phase requirements.
 - Run phases and work units sequentially. They share a worktree, plan state, and history.
 - Resume the same builder task for fixes and final verification.
@@ -43,9 +43,18 @@ If selected work needs a path that was already dirty, stop before editing and as
 
 Before invoking a subagent, use the todo tool to list:
 
-- Each selected phase, including implementation, scoped review, verification, and state update.
-- Separate general and frontend units for mixed phases.
-- Final branch code review, security review, and plan cleanup when the selection completes the actual last phase.
+- Each implementation or fix item MUST begin with the exact builder name: `[builder]` or `[frontend-builder]`.
+- Each mixed-phase item MUST name its assigned builder.
+- Each review item MUST begin with the exact reviewer name: `[code-review]` or `[security-review]`.
+- Final verification and plan cleanup MUST name the builder that will perform them.
+
+Use concrete labels such as:
+
+- `[builder] Phase 2: implement API persistence`
+- `[frontend-builder] Phase 2: implement settings UI`
+- `[code-review] Review Phase 2 builder commits`
+- `[security-review] Review the completed branch`
+- `[builder] Verify final acceptance and delete the plan`
 
 Ask the user to confirm the list. Update it if needed. During execution, keep one todo in progress and mark a phase complete only when the plan records completion.
 
