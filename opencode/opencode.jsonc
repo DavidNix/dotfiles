@@ -166,6 +166,9 @@
       "tokei *": "allow",
       "whatis *": "allow",
 
+      // Diagram rendering
+      "merman-cli *": "allow",
+
       // Version control and hosting
       "git *": "allow", // plugin hook prevents dangerous commands
       "glab *": "allow",
