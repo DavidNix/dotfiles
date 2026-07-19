@@ -259,6 +259,6 @@
     "question": "allow",
     "doom_loop": "ask",
     "context7*": "allow",
-    "webfetch": "ask",
+    "webfetch": "allow",
   },
 }
