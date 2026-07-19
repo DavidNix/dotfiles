@@ -158,7 +158,8 @@
       // OpenCode diagnostics
       "opencode debug *": "allow",
 
-      // Diagram rendering
+      // Image and diagram rendering
+      "image-gen *": "allow",
       "merman-cli *": "allow",
 
       // Version control and hosting
