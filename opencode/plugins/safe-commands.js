@@ -155,7 +155,8 @@ export const SafeCommandsPlugin = async () => {
         return;
       }
 
-      validateSafeCommand(output.args.command || "");
+      const command = output.args?.command;
+      validateSafeCommand(Array.isArray(command) ? command.join(" ") : typeof command === "string" ? command : "");
     },
   };
 };

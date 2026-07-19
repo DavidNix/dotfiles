@@ -2,10 +2,39 @@
   "$schema": "https://opencode.ai/config.json",
   "lsp": true,
   "default_agent": "plan",
+  "disabled_providers": ["opencode", "baseten"],
+  "model": "openai/gpt-5.6-sol-fast",
+  "small_model": "homelab/qwen3.6-35b-a3b-nvfp4",
+  "provider": {
+    "homelab": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Homelab",
+      "options": {
+        "baseURL": "http://ai1-inference:8000/v1",
+        "apiKey": "local",
+      },
+      "models": {
+        "qwen3.6-35b-a3b-nvfp4": {
+          "name": "Qwen3.6-35B-A3B",
+        },
+      },
+    },
+  },
   "agent": {
     "plan": {
       "mode": "primary",
-      "model": "openai/gpt-5.5",
+      "model": "openai/gpt-5.6-sol-fast",
+    },
+    "explore": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "permission": { "task": "deny" }, // deny subagents from spawning more subagents
+    },
+    "general": {
+      "model": "openai/gpt-5.6-terra-fast",
+      "permission": { "task": "deny" }, // deny subagents from spawning more subagents
+    },
+    "summary": {
+      "model": "opencode-go/deepseek-v4-flash",
     },
   },
   "share": "disabled",
@@ -22,7 +51,6 @@
       "enabled": false,
     },
   },
-  "model": "openai/gpt-5.5",
   "permission": {
     "read": {
       "*": "allow",
@@ -43,49 +71,157 @@
     "todoread": "allow",
     "codesearch": "allow",
     "bash": {
+      // Default policy
       "*": "ask",
+
+      // Shell validation
       "bash -n *": "allow",
-      "container *": "allow",
+      "shellcheck *": "allow",
+
+      // Filesystem operations
       "cp *": "allow",
+      "mkdir *": "allow",
+      "mv *": "allow",
+
+      // File inspection and navigation
+      "basename *": "allow",
+      "bat *": "allow",
+      "cat *": "allow",
+      "df *": "allow",
+      "dirname *": "allow",
+      "du *": "allow",
+      "dust *": "allow",
       "file *": "allow",
       "find *": "allow",
+      // find -delete remains blocked by the safe-commands plugin.
+      "find *-exec*": "ask",
+      "find *-ok*": "ask",
+      "ls *": "allow",
+      "lsd *": "allow",
+      "pwd *": "allow",
+      "readlink *": "allow",
+      "realpath *": "allow",
+      "stat *": "allow",
+      "tree *": "allow",
+
+      // Search and text processing
+      "cmp *": "allow",
+      "column *": "allow",
+      "comm *": "allow",
+      "cut *": "allow",
+      "diff *": "allow",
+      "fold *": "allow",
+      "grep *": "allow",
+      "head *": "allow",
+      "join *": "allow",
+      "jq *": "allow",
+      "nl *": "allow",
+      "paste *": "allow",
+      "rg *": "allow",
+      "ripgrep *": "allow",
+      "sort *": "allow",
+      "strings *": "allow",
+      "tac *": "allow",
+      "tail *": "allow",
+      "tr *": "allow",
+      "uniq *": "allow",
+      "wc *": "allow",
+
+      // Checksums and archive inspection
+      "md5 *": "allow",
+      "shasum *": "allow",
+      "unzip -l *": "allow",
+      "zipinfo *": "allow",
+
+      // System and process inspection
+      "command -v *": "allow",
+      "id *": "allow",
+      "iostat *": "allow",
+      "lsof *": "allow",
+      "pgrep *": "allow",
+      "procs *": "allow",
+      "ps *": "allow",
+      "sw_vers *": "allow",
+      "uname *": "allow",
+      "uptime *": "allow",
+      "vm_stat *": "allow",
+      "whereis *": "allow",
+      "which *": "allow",
+      "whoami *": "allow",
+
+      // Documentation and code statistics
+      "apropos *": "allow",
+      "man *": "allow",
+      "tokei *": "allow",
+      "whatis *": "allow",
+
+      // OpenCode diagnostics
+      "opencode debug *": "allow",
+
+      // Diagram rendering
+      "merman-cli *": "allow",
+
+      // Version control and hosting
       "git *": "allow", // plugin hook prevents dangerous commands
       "glab *": "allow",
+
+      // Go tooling
       "go *": "allow", // plugin hook prevents dangerous commands
       "gofmt *": "allow",
       "goimports *": "allow",
       "golangci-lint *": "allow",
       "gopls *": "allow",
-      "grep *": "allow",
-      "head *": "allow",
-      "jq *": "allow",
-      "ls *": "allow",
+
+      // Node.js tooling
+      "npm astro *": "allow",
+      "npm audit *": "allow",
+      "npm ci *": "allow",
+      "npm explain *": "allow",
+      "npm list *": "allow",
+      "npm view *": "allow",
+      "npx astro *": "allow",
+      "npx test *": "allow",
+
+      // Homebrew inspection
+      "brew deps *": "allow",
+      "brew info *": "allow",
+      "brew leaves *": "allow",
+      "brew list *": "allow",
+      "brew search *": "allow",
+      "brew uses *": "allow",
+
+      // uv and mise inspection
+      "mise current *": "allow",
+      "mise doctor *": "allow",
+      "mise ls *": "allow",
+      "mise where *": "allow",
+      "mise which *": "allow",
+      "uv pip check *": "allow",
+      "uv pip freeze *": "allow",
+      "uv pip list *": "allow",
+      "uv pip show *": "allow",
+      "uv python find *": "allow",
+      "uv python list *": "allow",
+      "uv tool list *": "allow",
+      "uv tree *": "allow",
+
+      // Trusted Make targets
       "make dev *": "allow",
       "make fmt *": "allow",
       "make lint *": "allow",
       "make test *": "allow",
       "make vet *": "allow",
-      "mkdir *": "allow",
-      "mv *": "allow",
-      "npm astro *": "allow",
-      "npm audit *": "allow",
-      "npm ci *": "allow",
-      "npm view *": "allow",
-      "npx astro *": "allow",
-      "npx test *": "allow",
-      "pwd *": "allow",
-      "rg *": "allow",
-      "ripgrep *": "allow",
-      "shellcheck *": "allow",
-      "stat *": "allow",
-      "tail *": "allow",
+
+      // Infrastructure validation
       "terraform fmt *": "allow",
       "terraform init *": "allow",
       "terraform plan *": "allow",
       "terraform state list *": "allow",
       "terraform validate *": "allow",
       "uv run ansible-lint *": "allow",
-      "wc *": "allow",
+
+      // Container tooling
+      "container *": "allow",
     },
     "skill": {
       "*": "allow",
@@ -115,6 +251,6 @@
     "question": "allow",
     "doom_loop": "ask",
     "context7*": "allow",
-    "webfetch": "ask",
+    "webfetch": "allow",
   },
 }

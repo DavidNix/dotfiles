@@ -129,14 +129,15 @@ install_skills() {
     install_skill "https://github.com/obra/the-elements-of-style" "writing-clearly-and-concisely"
 
     # Document
-    install_skill "https://github.com/anthropics/skills" "pdf"
-    install_skill "https://github.com/anthropics/skills" "xlsx"
-    install_skill "https://github.com/anthropics/skills" "docx"
+    # Hardly used so commenting out for now
+    # install_skill "https://github.com/anthropics/skills" "pdf"
+    # install_skill "https://github.com/anthropics/skills" "xlsx"
+    # install_skill "https://github.com/anthropics/skills" "docx"
 
     # Design
     install_skill "https://github.com/zarazhangrui/frontend-slides" "frontend-slides"
     install_skill "https://github.com/vercel-labs/agent-skills" "web-design-guidelines"
-    install_skill "https://github.com/anthropics/skills" "frontend-design"
+    # install_skill "https://github.com/anthropics/skills" "frontend-design" (I use design taste skills now)
     # install_skill "https://github.com/rknall/claude-skills" "SVG Logo Designer"
     install_skill "https://github.com/Leonxlnx/taste-skill" "design-taste-frontend"
     install_skill "https://github.com/Leonxlnx/taste-skill" "gpt-taste"
