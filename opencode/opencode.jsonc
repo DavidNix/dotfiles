@@ -41,7 +41,7 @@
       "permission": { "task": "deny" }, // deny subagents from spawning more subagents
     },
     "general": {
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "openai/gpt-5.6-terra-fast",
       "permission": { "task": "deny" }, // deny subagents from spawning more subagents
     },
     "summary": {
