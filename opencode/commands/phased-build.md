@@ -45,7 +45,7 @@ Before invoking a subagent, use the todo tool to list:
 
 - Each implementation or fix item MUST begin with the exact builder name: `[builder]` or `[frontend-builder]`.
 - Each mixed-phase item MUST name its assigned builder.
-- Each orchestrator verification item MUST begin with `[orchestrator]`.
+- Create one `[orchestrator] Verify Phase N` todo per phase by default. Add a work-unit verification todo only when a multi-unit phase has a distinct focused command that provides earlier feedback. Never create separate work-unit and phase todos for the same commands or coverage.
 - Each phase or final review item MUST begin with the exact reviewer name: `[code-review]` or `[security-review]`.
 - Final verification MUST name `[orchestrator]`; plan cleanup MUST name the builder that will perform it.
 
@@ -79,9 +79,9 @@ Supply this context directly. Do not make the builder read the full plan or redi
 After each builder return:
 
 1. Verify the commit exists and contains only declared work.
-2. Run the narrowest focused tests, linters, format checks, type checks, diagnostics, or other commands that cover the work unit.
-3. If verification fails, resume the same builder with the exact command, relevant output, and a concrete correction request. The builder applies the fix and commits without running verification.
-4. Rerun focused verification yourself. Repeat until it passes or a blocking decision requires the user.
+2. If more work units remain and a distinct focused check would provide useful early feedback, run the narrowest command that covers this work unit. Otherwise, proceed to the phase verification without creating or running a separate work-unit check.
+3. If a focused check fails, resume the same builder with the exact command, relevant output, and a concrete correction request. The builder applies the fix and commits without running verification.
+4. Rerun that focused check yourself. Repeat until it passes or a blocking decision requires the user.
 
 Before a later phase, rerun the preceding completed phase's verification yourself. If it fails, make no changes and ask the user whether to select that phase for repair.
 
@@ -89,9 +89,9 @@ Stop if a builder needs a pre-existing dirty path.
 
 # 4. Review the completed phase
 
-After every work unit in a phase is implemented and its focused verification passes:
+After every work unit in a phase is implemented and any distinct focused verification passes:
 
-1. Run the phase's exact verification criteria yourself. Resolve failures through the responsible builder and rerun them until they pass.
+1. Run the phase's exact verification criteria once. This single run also satisfies work-unit verification when the commands or coverage are the same. Resolve failures through the responsible builder and rerun only after a fix.
 2. Collect the complete ordered commit list from the phase's starting commit through its latest implementation or fix commit.
 3. Invoke `code-review` once for the whole phase. Limit review to that commit range and the complete phase requirements. Exclude unrelated history and dirty changes.
 
@@ -103,7 +103,7 @@ Apply this code-review gate:
 
 After the user answers a blocking review item, send the decision and all remaining findings to the responsible builder. Have the phase's designated builder record any accepted risk in the plan and commit it separately.
 
-After review fixes, run focused and exact phase verification yourself, then rerun one phase-level review over the full ordered commit list. Do not invoke code review for individual implementation or fix commits. Continue until no findings remain. Never dismiss a finding without a fix, explicit user acceptance, or reviewer confirmation that it is invalid.
+After review fixes, run the exact phase verification yourself. Add a focused check only when it is distinct and needed to diagnose the fixes; never run the same command twice in one verification cycle. Then rerun one phase-level review over the full ordered commit list. Do not invoke code review for individual implementation or fix commits. Continue until no findings remain. Never dismiss a finding without a fix, explicit user acceptance, or reviewer confirmation that it is invalid.
 
 # 5. Complete non-final phases
 
