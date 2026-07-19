@@ -1,10 +1,10 @@
 ---
-description: Create an executable spec and phased implementation plan
+description: Create or revise an executable spec and phased implementation plan
 ---
 
 First, load the `writing-clearly-and-concisely` skill (if present) and apply it to every part of the plan.
 
-Use the research and decisions already present in this conversation to produce a spec and phased implementation plan that another agent can execute without drifting. Treat `$ARGUMENTS` as optional additional direction. Do not discard or repeat research already completed in the current context.
+Use the research and decisions already present in this conversation to create or revise a spec and phased implementation plan that another agent can execute without drifting. Treat `$ARGUMENTS` as optional additional direction. Do not discard or repeat research already completed in the current context.
 
 Do not implement the project. Your deliverable is one plan artifact at `plans/<short-kebab-case-name>.md` in the repository root.
 
@@ -37,6 +37,20 @@ Use `[NEEDS CLARIFICATION: ...]` only when the answer could materially change:
 - The ability to define credible acceptance criteria.
 
 Ask before drafting only when no safe default exists and the answer would reshape the entire plan. Otherwise, finish the draft and ask at most three blocking questions afterward. Give a recommended default for every question so the user can reply, "defaults are fine."
+
+## Editing an existing plan
+
+If the request or `$ARGUMENTS` identifies an existing plan, edit that file instead of creating another. If the user asks to revise a plan but no path is clear, infer it only when one plan is unambiguous; otherwise ask for the path. Read the entire plan before proposing changes.
+
+Treat phase status as an edit boundary:
+
+- `[x] COMPLETE`: immutable history. Do not remove, rewrite, reorder, renumber, reopen, or alter its verification evidence.
+- `[~] IN PROGRESS`: preserve its scope and order while implementation is active. Put new or changed scope in a later phase.
+- `[ ] NOT STARTED`: may be removed, rewritten, split, combined, added, or reordered.
+
+If a requested change would alter completed or active work, preserve the locked phase and create one or more pending follow-up phases instead. Explain the substitution in chat; do not ask the user to redesign it when a safe follow-up is clear.
+
+Keep locked phase identifiers stable. Renumber pending phases only when doing so does not change a locked phase's identity or recorded references. Update pending dependencies, project acceptance criteria, architecture, and interface sketches to match the revised future work, but never rewrite the historical claim or evidence of a completed phase.
 
 ## Required document structure
 
@@ -178,8 +192,10 @@ After writing the draft:
 - Types, layers, configuration, or phases that do not trace to a goal or acceptance criterion.
 - Interface sketches with implementation bodies.
 - A completed phase whose acceptance check was not run in the current session.
+- Removing, rewriting, reordering, renumbering, or reopening a completed phase. Add a pending follow-up phase instead.
+- Changing the scope or order of an active phase. Defer the change to a pending phase.
 - Ancillary-first ordering without a documented constraint or material tradeoff.
 
 ## Output
 
-Write the spec to `plans/<short-kebab-case-name>.md` in the repository root, creating `plans/` if needed. Then run the clarification loop only when blocking questions remain. Report the artifact path and recommended phase order; implementation belongs to a later command or agent.
+For a new plan, write `plans/<short-kebab-case-name>.md` in the repository root, creating `plans/` if needed. For an existing plan, update it in place. Then run the clarification loop only when blocking questions remain. Report the artifact path, the recommended phase order, and any locked-phase request converted to follow-up work. Implementation belongs to a later command or agent.
