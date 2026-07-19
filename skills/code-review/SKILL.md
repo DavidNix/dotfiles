@@ -84,7 +84,7 @@ Structure your review with clearly visible priority sections. Each issue gets a 
 ### M1: [Title]
 **File**: `path/to/file.go:789`
 **Issue**: What's suboptimal or unclear.
-**Possible solutions**: 1-3 concrete fixes, ordered by preference.
+**Recommended solution**: The single most appropriate concrete fix.
 **Example**: Optional. Include only for complex issues that span multiple files or several locations in one file.
 
 ---
@@ -95,7 +95,7 @@ Structure your review with clearly visible priority sections. Each issue gets a 
 ### L1: [Title]
 **File**: `path/to/file.go:101`
 **Issue**: Minor concern.
-**Possible solutions**: 1-3 concrete fixes, ordered by preference.
+**Recommended solution**: The single most appropriate concrete fix.
 **Example**: Optional. Include only for complex issues that span multiple files or several locations in one file.
 
 ---
@@ -114,7 +114,7 @@ Context and what needs clarification.
 - Low: L1, L2, L3...
 - Questions: Q1, Q2, Q3...
 
-Include **Possible solutions** for every issue. Give 1-3 concrete fixes, ordered by preference. Include **Example** only for complex issues, especially issues that span multiple files or several locations in one file. Omit empty sections.
+For Critical and High issues, include **Possible solutions** with 1-3 concrete fixes ordered by preference. For Medium and Low issues, include only the single most appropriate fix under **Recommended solution**; do not list alternatives. Include **Example** only for complex issues, especially issues that span multiple files or several locations in one file. Omit empty sections.
 
 **Visibility Guidelines:**
 - Start with Critical issues - make them impossible to miss
