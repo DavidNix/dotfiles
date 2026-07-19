@@ -172,6 +172,16 @@
       "golangci-lint *": "allow",
       "gopls *": "allow",
 
+      // Rust tooling
+      "cargo *": "allow", // plugin hook prevents dangerous commands
+      "cargo-clippy *": "allow",
+      "cargo-fmt *": "allow",
+      "clippy-driver *": "allow",
+      "rust-analyzer *": "allow",
+      "rustc *": "allow",
+      "rustdoc *": "allow",
+      "rustfmt *": "allow",
+
       // Node.js tooling
       "npm astro *": "allow",
       "npm audit *": "allow",

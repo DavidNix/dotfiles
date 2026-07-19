@@ -45,6 +45,28 @@ const commandSegments = (command) => command
 
 const hasOption = (args, option) => args.some((arg) => arg === option || arg.startsWith(`${option}=`));
 
+const cargoSubcommand = (args) => {
+  const optionsWithValues = new Set(["--color", "--config", "--explain", "-c", "-z"]);
+  let index = args[0]?.startsWith("+") ? 1 : 0;
+
+  while (index < args.length) {
+    const arg = args[index].toLowerCase();
+    if (optionsWithValues.has(arg)) {
+      index += 2;
+      continue;
+    }
+
+    if (arg.startsWith("-")) {
+      index += 1;
+      continue;
+    }
+
+    return arg;
+  }
+
+  return "";
+};
+
 const unsafeGoCommandReason = ({ name, args }) => {
   if (name !== "go") {
     return;
@@ -74,6 +96,33 @@ const unsafeGoCommandReason = ({ name, args }) => {
   }
 };
 
+const unsafeCargoCommandReason = ({ name, args }) => {
+  if (name !== "cargo") {
+    return;
+  }
+
+  const subcommand = cargoSubcommand(args);
+  if (["install", "uninstall"].includes(subcommand)) {
+    return "cargo install/uninstall is blocked because it changes globally installed binaries and can fetch remote code.";
+  }
+
+  if (["login", "logout"].includes(subcommand)) {
+    return "cargo login/logout is blocked because it changes stored registry credentials.";
+  }
+
+  if (subcommand === "owner") {
+    return "cargo owner is blocked because it changes crate ownership on a remote registry.";
+  }
+
+  if (subcommand === "publish") {
+    return "cargo publish is blocked because it uploads crates to a remote registry.";
+  }
+
+  if (subcommand === "yank") {
+    return "cargo yank is blocked because it changes crate availability on a remote registry.";
+  }
+};
+
 export const isGitPushCommand = (command) => commandSegments(command)
   .some(({ name, args }) => name === "git" && (args[0] || "").toLowerCase() === "push");
 
@@ -98,7 +147,7 @@ export const getUnsafeCommandReason = (command) => {
   }
 
   for (const segment of commandSegments(command)) {
-    const reason = unsafeGoCommandReason(segment);
+    const reason = unsafeGoCommandReason(segment) || unsafeCargoCommandReason(segment);
     if (reason) {
       return reason;
     }

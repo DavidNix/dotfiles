@@ -24,6 +24,20 @@ const allowedCommands = [
   "go env",
   "go run .",
   "rg \"go run\"",
+  "cargo build --workspace",
+  "cargo check --all-targets",
+  "cargo clippy --all-targets --all-features -- -D warnings",
+  "cargo fmt --all -- --check",
+  "cargo test --all-features",
+  "cargo run --bin app",
+  "cargo clean",
+  "cargo add serde",
+  "cargo update",
+  "cargo doc --no-deps",
+  "rustc --version",
+  "rustfmt --check src/lib.rs",
+  "rustdoc --test src/lib.rs",
+  "clippy-driver --version",
 ];
 
 const blockedCommands = [
@@ -38,6 +52,14 @@ const blockedCommands = [
   ["go vet -toolexec ./wrapper ./...", /go -toolexec is blocked/],
   ["go list -toolexec ./wrapper ./...", /go -toolexec is blocked/],
   ["go vet -vettool ./vettool ./...", /go vet -vettool is blocked/],
+  ["cargo install cargo-edit", /cargo install\/uninstall is blocked/],
+  ["cargo uninstall cargo-edit", /cargo install\/uninstall is blocked/],
+  ["cargo login token", /cargo login\/logout is blocked/],
+  ["cargo logout", /cargo login\/logout is blocked/],
+  ["cargo owner --add user crate", /cargo owner is blocked/],
+  ["cargo publish", /cargo publish is blocked/],
+  ["cargo +nightly publish", /cargo publish is blocked/],
+  ["cargo yank --version 1.0.0 crate", /cargo yank is blocked/],
 ];
 
 test("isGitPushCommand only matches actual git push invocations", () => {
