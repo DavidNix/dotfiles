@@ -4,7 +4,7 @@ description: Create or revise an executable spec and phased implementation plan
 
 First, load the `writing-clearly-and-concisely` skill (if present) and apply it to every part of the plan.
 
-Use the research and decisions already present in this conversation to create or revise a spec and phased implementation plan that another agent can execute without drifting. Treat `$ARGUMENTS` as optional additional direction. Do not discard or repeat research already completed in the current context.
+Use the research and decisions already present in this conversation to create or revise a spec and phased implementation plan that an orchestrator can delegate without drifting. Treat `$ARGUMENTS` as optional additional direction. Do not discard or repeat research already completed in the current context.
 
 Do not implement the project. Your deliverable is one plan artifact at `plans/<short-kebab-case-name>.md` in the repository root.
 
@@ -116,7 +116,7 @@ AC-2: `curl -s -o /dev/null -w "%{http_code}" localhost:3000/dashboard` without 
 AC-3: `npm run build` -> exit 0 with no new type errors
 ```
 
-Every criterion must be independently checkable by an agent from the terminal. Inspect the repository to identify the appropriate commands instead of asking the user to write the criteria. If no test exists, require the relevant phase to create one. Use a manual check only when automation is impractical; then state exact steps and the expected observation.
+Every criterion must be independently checkable by the orchestrator from the terminal. Inspect the repository to identify the appropriate commands instead of asking the user to write the criteria. If no test exists, require the relevant phase to create one. Use a manual check only when automation is impractical; then state exact steps and the expected observation.
 
 Reject subjective criteria such as "the code is clean," "performance is good," or "the UI feels smooth."
 
@@ -127,7 +127,7 @@ Recommend one to six phases. Each phase must be:
 - Atomic: it leaves the repository working and committable.
 - Core-first: it proves the project's essential claim before ancillary work.
 - Risk-aware: move a blocking library or external API spike into the earliest sensible phase.
-- Self-verifying: it ends with commands and expected results.
+- Orchestrator-verifiable: it ends with commands and expected results.
 
 Use core-first order unless the user explicitly requires another order. Ask about ordering only when two viable sequences have materially different risks. Otherwise, state the recommended order without requesting confirmation.
 
@@ -136,11 +136,11 @@ Use this template for every phase:
 ```markdown
 ### Phase N: <name>
 **Status:** [ ] NOT STARTED
-<!-- [ ] NOT STARTED | [~] IN PROGRESS | [x] COMPLETE (date, verified by: <command and result>) -->
+<!-- [ ] NOT STARTED | [~] IN PROGRESS | [x] COMPLETE (date, verified by: <command and result>; code review: <result>) -->
 **Outcome:** One sentence describing what this phase proves or delivers.
 **Changes:**
 - Deliverable
-**Verification:** Exact command(s), expected output, and expected exit code. Use a precise manual check only when no command is practical.
+**Verification (orchestrator-owned):** Exact command(s), expected output, and expected exit code. Use a precise manual check only when no command is practical.
 ```
 
 Add `Depends on`, `Out of scope`, or `Est. size` only when the information changes how an implementation agent should execute the phase.
@@ -150,11 +150,15 @@ Add `Depends on`, `Out of scope`, or `Est. size` only when the information chang
 The spec file is the source of truth for progress.
 
 - Every phase starts as `[ ] NOT STARTED`.
-- Before work, the implementation agent changes the phase to `[~] IN PROGRESS`. Commit that status separately only when parallel agents might duplicate work.
-- The agent may mark a phase `[x] COMPLETE` only after running its acceptance check in the current session.
-- A completion record must include the date, command, and result, for example: `[x] COMPLETE (2026-07-19, verified by: npm test -- store.test.ts -> 14 passed)`.
-- An agent resuming the project must read the full spec, find the earliest incomplete phase, and rerun the immediately preceding completed phase's acceptance check.
-- If that regression check fails, the agent must return the failed phase to `[~] IN PROGRESS` and repair it before continuing.
+- Before delegation, the orchestrator gives each assigned builder the entire current phase verbatim plus the relevant goals, constraints, interfaces, acceptance criteria, assigned scope, exclusions, and repository state. For a mixed phase, every builder receives the same complete phase followed by its specific work unit.
+- Before coding, the designated builder changes the phase to `[~] IN PROGRESS`. Commit that status separately only when parallel agents might duplicate work.
+- Builders must not run tests, builds, linters, format checks, type checks, acceptance commands, or other verification. They may use LSP and must fix every diagnostic in changed code files.
+- The orchestrator runs focused checks after builder work and sends exact failures back to the responsible builder for correction.
+- After all phase work passes its exact verification, the orchestrator runs one code review over the complete phase commit range. Do not review individual implementation or fix commits.
+- A designated builder may mark a phase `[x] COMPLETE` only after the orchestrator supplies current-session verification evidence and confirms that the phase-level code review has no unresolved findings. The builder records the evidence without rerunning verification.
+- A completion record must include the date, command, result, and phase-review result, for example: `[x] COMPLETE (2026-07-19, verified by: npm test -- store.test.ts -> 14 passed; code review: no findings)`.
+- An orchestrator resuming the project must read the full spec, find the earliest incomplete phase, and rerun the immediately preceding completed phase's acceptance check.
+- If that regression check fails, the orchestrator must stop before new work and arrange repair of the failed phase before continuing.
 
 ## 9. Open questions
 
@@ -183,7 +187,7 @@ After writing the draft:
 
 - A missing or empty Non-Goals section.
 - Subjective or unverifiable acceptance criteria.
-- "Phase 1: build everything; Phase 2: test everything." Each phase owns its tests and verification.
+- "Phase 1: build everything; Phase 2: test everything." Each phase defines its own tests and orchestrator-run verification.
 - Invented details hidden as facts rather than tagged assumptions or questions.
 - Asking the user to supply goals, non-goals, acceptance criteria, or phase boundaries that the agent can reasonably recommend.
 - Asking questions about reversible assumptions or low-impact preferences.
@@ -191,7 +195,7 @@ After writing the draft:
 - Scope changes made in code before the spec is amended.
 - Types, layers, configuration, or phases that do not trace to a goal or acceptance criterion.
 - Interface sketches with implementation bodies.
-- A completed phase whose acceptance check was not run in the current session.
+- A completed phase whose acceptance check was not run by the orchestrator in the current session or whose phase-level code review has unresolved findings.
 - Removing, rewriting, reordering, renumbering, or reopening a completed phase. Add a pending follow-up phase instead.
 - Changing the scope or order of an active phase. Defer the change to a pending phase.
 - Ancillary-first ordering without a documented constraint or material tradeoff.

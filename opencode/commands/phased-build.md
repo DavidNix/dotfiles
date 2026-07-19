@@ -4,7 +4,7 @@ agent: plan
 subtask: false
 ---
 
-Orchestrate selected phases from the Plan primary agent. Subagents own all edits, tests, plan updates, and commits. Never implement or commit work yourself.
+Orchestrate selected phases from the Plan primary agent. Builders own all edits, plan updates, and commits. You own builder context, all verification, and review gates. Never implement or commit work yourself.
 
 Usage: `/phased-build <plan-path> <phase-selector>`
 
@@ -17,10 +17,10 @@ Usage: `/phased-build <plan-path> <phase-selector>`
 # Rules
 
 - Use `builder` for general work and `frontend-builder` for frontend work.
-- Split mixed phases by assigned subagent. Build and review each unit separately.
-- Use `code-review` after every implementation or fix commit. Review only that unit's commits and phase requirements.
+- Split mixed phases by assigned builder. Give each builder the entire phase, but assign a narrow work unit.
+- Do not run code review between builder work units or after individual commits. Review the complete phase only after its implementation and verification pass.
 - Run phases and work units sequentially. They share a worktree, plan state, and history.
-- Resume the same builder task for fixes and final verification.
+- Resume the same builder task for fixes and plan updates.
 - Preserve pre-existing work. Never revert, overwrite, stage, or commit unrelated changes.
 - Never push, amend, skip hooks, force Git operations, or create empty commits.
 - Keep the plan until all phases pass every final gate. Then delete it and commit the deletion.
@@ -45,85 +45,98 @@ Before invoking a subagent, use the todo tool to list:
 
 - Each implementation or fix item MUST begin with the exact builder name: `[builder]` or `[frontend-builder]`.
 - Each mixed-phase item MUST name its assigned builder.
-- Each review item MUST begin with the exact reviewer name: `[code-review]` or `[security-review]`.
-- Final verification and plan cleanup MUST name the builder that will perform them.
+- Each orchestrator verification item MUST begin with `[orchestrator]`.
+- Each phase or final review item MUST begin with the exact reviewer name: `[code-review]` or `[security-review]`.
+- Final verification MUST name `[orchestrator]`; plan cleanup MUST name the builder that will perform it.
 
 Use concrete labels such as:
 
 - `[builder] Phase 2: implement API persistence`
 - `[frontend-builder] Phase 2: implement settings UI`
-- `[code-review] Review Phase 2 builder commits`
+- `[orchestrator] Verify Phase 2`
+- `[code-review] Review completed Phase 2`
 - `[security-review] Review the completed branch`
-- `[builder] Verify final acceptance and delete the plan`
+- `[orchestrator] Run final acceptance criteria`
+- `[builder] Record final evidence and delete the plan`
 
 Ask the user to confirm the list. Update it if needed. During execution, keep one todo in progress and mark a phase complete only when the plan records completion.
 
-# 3. Build and commit
+# 3. Hand off, build, and verify
 
 Choose the appropriate builder for each work unit. Give it:
 
-- The plan path, full phase text, relevant goals, constraints, interfaces, and acceptance criteria.
-- Repository instructions, assigned scope, exclusions, starting commit, and dirty-path baseline.
-- Instructions to read the full plan and load `ai-tdd` when present.
+- The plan path and the entire current phase verbatim, including its status, outcome, changes, dependencies, exclusions, and verification criteria. Never summarize or omit part of the phase.
+- The relevant project goals, non-goals, constraints, interface sketches, and acceptance criteria needed to understand the phase.
+- The exact assigned work unit and excluded scope. For a mixed phase, give every builder the same complete phase followed by its specific slice.
+- Repository instructions, known files or symbols, prior-phase decisions and verification evidence, starting commit, and dirty-path baseline.
 - Instructions to set the phase to `[~] IN PROGRESS` before coding and include that update in the first implementation commit.
-- Instructions to run focused tests, linters, formatters, type checks, and relevant phase verification.
-- Instructions to inspect status, diff, and recent commit style; stage only its work; and make one atomic commit.
-- Instructions to return the commit SHA, changed paths, commands, results, and blockers.
+- The exact commit message or commit-message intent.
+- An explicit reminder that verification criteria are context only: the builder must not run tests, builds, linters, format checks, type checks, acceptance commands, or other verification. It may use LSP and must fix every diagnostic in changed code files.
+- Instructions to stage only assigned paths, create one atomic commit, and return the commit SHA, changed paths, LSP issues fixed, and blockers.
 
-Before a later phase, have its builder rerun the preceding completed phase's verification. If it fails, make no changes and ask the user whether to select that phase for repair.
+Supply this context directly. Do not make the builder read the full plan or rediscover decisions that the plan or orchestrator already contains.
+
+After each builder return:
+
+1. Verify the commit exists and contains only declared work.
+2. Run the narrowest focused tests, linters, format checks, type checks, diagnostics, or other commands that cover the work unit.
+3. If verification fails, resume the same builder with the exact command, relevant output, and a concrete correction request. The builder applies the fix and commits without running verification.
+4. Rerun focused verification yourself. Repeat until it passes or a blocking decision requires the user.
+
+Before a later phase, rerun the preceding completed phase's verification yourself. If it fails, make no changes and ask the user whether to select that phase for repair.
 
 Stop if a builder needs a pre-existing dirty path.
 
-# 4. Review each work unit
+# 4. Review the completed phase
 
-After each implementation or fix commit:
+After every work unit in a phase is implemented and its focused verification passes:
 
-1. Verify the commit and confirm it contains only declared work.
-2. Invoke `code-review` with the unit's ordered commit list.
-3. Limit review to those commits against their immediate parent and the selected phase's requirements. Exclude unrelated history and dirty changes.
+1. Run the phase's exact verification criteria yourself. Resolve failures through the responsible builder and rerun them until they pass.
+2. Collect the complete ordered commit list from the phase's starting commit through its latest implementation or fix commit.
+3. Invoke `code-review` once for the whole phase. Limit review to that commit range and the complete phase requirements. Exclude unrelated history and dirty changes.
 
 Apply this code-review gate:
 
 - Critical (`C`), High (`H`), or Question (`Q`): stop all work. Show the findings, possible solutions, and your recommendation. Ask the user how to proceed. Do not fix Medium or Low findings while blocked.
-- Medium (`M`) or Low (`L`) only: resume the same builder, fix every finding, verify the fixes, and create a separate atomic commit.
+- Medium (`M`) or Low (`L`) only: group all findings by responsible builder, resume each builder once, and have it create a separate atomic fix commit without running verification.
 - No findings: continue.
 
-After the user answers a blocking review item, resume the same builder with the decision and all remaining findings. Record any accepted risk in the plan and commit it separately.
+After the user answers a blocking review item, send the decision and all remaining findings to the responsible builder. Have the phase's designated builder record any accepted risk in the plan and commit it separately.
 
-Review the full ordered commit list after each fix. Continue until no findings remain. Never dismiss a finding without a fix, explicit user acceptance, or reviewer confirmation that it is invalid.
+After review fixes, run focused and exact phase verification yourself, then rerun one phase-level review over the full ordered commit list. Do not invoke code review for individual implementation or fix commits. Continue until no findings remain. Never dismiss a finding without a fix, explicit user acceptance, or reviewer confirmation that it is invalid.
 
 # 5. Complete non-final phases
 
-After all units in a non-final phase pass review, resume its builder and run the exact phase verification. On failure, fix, commit, and return to review. On success:
+After a non-final phase passes exact verification and phase-level review:
 
-1. Mark the phase `[x] COMPLETE` with the date, command, and result.
-2. Commit only the state update.
+1. Give its designated builder the orchestrator's verification evidence and instruct it to mark the phase `[x] COMPLETE` with the date, command, and result. The builder must not rerun verification.
+2. Have the builder commit only the state update.
 3. Verify the plan and complete the phase todo.
 
-Keep the actual final phase `[~] IN PROGRESS` until every final gate passes.
+Keep the actual final phase `[~] IN PROGRESS` after its phase-level review until every final gate passes.
 
 # 6. Final gates
 
 Run these gates only when the selected work includes the actual last phase and all earlier phases are complete.
 
-1. Run every project acceptance criterion. Builders fix failures, verify them, commit atomically, and pass scoped code review.
+1. Run every project acceptance criterion yourself. Builders fix failures and commit atomically without running verification; rerun the failed criteria yourself.
 2. Find the merge base with the resolved main or master branch.
-3. Invoke `code-review` on all committed branch changes against the full plan. Apply the code-review gate above: fix Medium and Low findings; ask the user about Critical, High, and Questions.
+3. Invoke `code-review` on all committed branch changes against the full plan. Apply the code-review gate above: batch Medium and Low findings by responsible builder; ask the user about Critical, High, and Questions.
 4. Invoke `security-review` on the same branch range. Review security only.
 
-Fix every actionable security finding, including `SEC-C`, `SEC-H`, `SEC-M`, and `SEC-L`. Route each finding to `builder` or `frontend-builder`, verify the fix, and commit it atomically. Do not ask the user merely because a security finding is Critical or High.
+Fix every actionable security finding, including `SEC-C`, `SEC-H`, `SEC-M`, and `SEC-L`. Batch findings by responsible builder, have the builder commit them atomically without running verification, and verify the fixes yourself. Do not ask the user merely because a security finding is Critical or High.
 
 Send `SEC-Q` items to the appropriate builder to investigate from repository evidence. Ask the security reviewer to report external unknowns as residual testing gaps rather than questions. Never invent security assumptions.
 
-Every security-fix commit must pass scoped `code-review`. Its Critical, High, and Question findings still require user input; its Medium and Low findings are fixed automatically.
+Do not invoke scoped code review for individual final-gate, code-review-fix, or security-fix commits.
 
-After any final-gate fix, rerun the full branch code review, full security review, and all project acceptance criteria. Continue until both reviews have no actionable findings and every criterion passes.
+After builders finish a batch of final-gate fixes, rerun all project acceptance criteria, the full branch code review, and the full security review. Continue until both reviews have no actionable findings and every criterion passes.
 
 # 7. Delete the completed plan
 
 After all final gates pass:
 
-1. Resume the final builder and mark the final phase complete in its working tree with verification evidence.
+1. Resume the final phase's designated builder, give it the orchestrator's verification and review evidence, and have it mark the final phase complete without rerunning verification.
 2. Confirm that all phases are complete and no blocking question remains.
 3. Delete the plan instead of committing a standalone final-state update.
 4. Inspect status and diff, stage only the deletion, and create one atomic cleanup commit.
@@ -131,6 +144,6 @@ After all final gates pass:
 
 # 8. Stop, resume, and report
 
-When blocked, leave the phase and todo in progress. Report the phase, commit SHAs, review IDs, and verification results. Ask concise numbered questions with recommended answers. Resume the saved builder and review loop after the user responds.
+When blocked, leave the phase and todo in progress. Report the phase, commit SHAs, review IDs, and verification results. Ask concise numbered questions with recommended answers. Resume the saved builder, orchestrator verification, and phase-review loop after the user responds.
 
-When selected work finishes, report completed phases, verification, all commit SHAs, scoped reviews, final code and security reviews, project acceptance results, accepted risks, and remaining phases. Leave the todo list accurate. Do not push.
+When selected work finishes, report completed phases, verification, all commit SHAs, phase-level reviews, final code and security reviews, project acceptance results, accepted risks, and remaining phases. Leave the todo list accurate. Do not push.
