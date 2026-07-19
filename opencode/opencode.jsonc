@@ -155,6 +155,9 @@
       "tokei *": "allow",
       "whatis *": "allow",
 
+      // OpenCode diagnostics
+      "opencode debug *": "allow",
+
       // Diagram rendering
       "merman-cli *": "allow",
 

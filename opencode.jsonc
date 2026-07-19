@@ -3,6 +3,7 @@
   "permission": {
     "bash": {
       "make bash-check *": "allow",
+      "make relink": "allow",
     },
   },
 }
