@@ -1,11 +1,11 @@
 ---
 name: code-review
-description: Thorough, critical code review of implementation, tests, and documentation. Use when reviewing code changes, pull requests, or implementations. Only invoke when user explicitly asks for code review.
+description: Thorough, critical code review focused on correctness, business logic, implementation, tests, and documentation. Use when reviewing code changes, pull requests, or implementations. Only invoke when user explicitly asks for code review.
 ---
 
 ## Code Review Instructions
 
-Review the specified code thoroughly and critically. Prioritize finding real issues over being agreeable. Review ALL aspects: implementation, tests, and documentation.
+Review the specified code thoroughly and critically. Prioritize finding real issues over being agreeable. Focus on functional correctness, business behavior, implementation, tests, and documentation.
 
 Perform the entire review yourself. Do NOT delegate to subagents or use the Task tool for discovery, analysis, verification, or any other part of the review.
 
@@ -16,8 +16,9 @@ If `$ARGUMENTS` specifies files or paths, review those. Or if user specifies a t
 ### Review Criteria (The 5 C's)
 
 **Correctness**
+- Business rules, domain invariants, calculations, and state transitions
 - Logic errors, edge cases, off-by-one errors, race conditions, nil/null handling
-- Security: injection, auth/authz gaps, data exposure, input validation
+- Ordering, retries, idempotency, transaction boundaries, and partial failures
 - Concurrency: data races, deadlocks, improper synchronization
 - Compatibility: backward compatibility, API stability, migration path (only when applicable)
 - Tests actually verify the behavior they claim to test
@@ -54,7 +55,7 @@ Structure your review with clearly visible priority sections. Each issue gets a 
 # Code Review Findings
 
 ## Critical - MUST FIX
-<!-- Bugs, security vulnerabilities, data loss risk, broken builds -->
+<!-- Broken business invariants, data loss or corruption risk, unusable core flows, broken builds -->
 
 ### C1: [Short descriptive title]
 **File**: `path/to/file.go:123`
