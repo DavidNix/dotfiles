@@ -25,17 +25,6 @@
       "mode": "primary",
       "model": "openai/gpt-5.6-sol-fast",
     },
-    "implementer": {
-      "description": "Implements requested changes after the parent agent has planned the work.",
-      "mode": "subagent",
-      "hidden": true,
-      "model": "xai/grok-4.5",
-      "prompt": "You are an implementation-only subagent. Make the requested code or configuration changes directly. Do not delegate work. Use ai-tdd skill if present. Run ONLY FOCUSED tests, linters, formatters, type checks, diagnostics, or other verification. Return a concise summary of the changes and leave in-depth verification to the calling agent.",
-      "permission": {
-        "bash": "deny",
-        "task": "deny",
-      },
-    },
     "explore": {
       "model": "opencode-go/deepseek-v4-flash",
       "permission": { "task": "deny" }, // deny subagents from spawning more subagents
