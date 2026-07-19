@@ -245,6 +245,7 @@
     },
     "external_directory": {
       "*": "ask",
+      "/Users/*/.agents/skills/writing-clearly-and-concisely/**": "allow",
       "/Users/*/go/pkg/mod/**": "allow",
     },
     "websearch": "ask",
