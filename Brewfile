@@ -53,6 +53,7 @@ brew "lazygit"
 brew "lsd"
 brew "luarocks"
 brew "make"
+brew "merman-cli"
 brew "mise" # asdf replacement
 brew "mole"
 brew "neovim"
