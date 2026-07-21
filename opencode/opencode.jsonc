@@ -149,6 +149,10 @@
       "which *": "allow",
       "whoami *": "allow",
 
+      // Network and DNS inspection
+      "dig *": "allow",
+      "dog *": "allow",
+
       // Documentation and code statistics
       "apropos *": "allow",
       "man *": "allow",
