@@ -2,7 +2,8 @@
 description: Builds requested changes after the parent agent has planned the work.
 mode: subagent
 hidden: true
-model: openai/gpt-5.6-terra-fast
+model: openai/gpt-5.6-sol-fast
+variant: medium
 steps: 20
 permission:
   bash:
