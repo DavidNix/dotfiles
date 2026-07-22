@@ -47,6 +47,7 @@ Before invoking a subagent, use the todo tool to list:
 - Each mixed-phase item MUST name its assigned builder.
 - Create exactly one `[orchestrator] Verify Phase N` todo per phase. Do not create work-unit, regression, or re-verification todos.
 - Create exactly one phase-review todo beginning with `[code-review]`. Final review items MUST begin with `[code-review]` or `[security-review]`.
+- Run the final `[code-review]` and `[security-review]` todos in parallel against the same branch range. Wait for both before dispatching fixes.
 - Final verification MUST name `[orchestrator]`; plan cleanup MUST name the builder that will perform it.
 - Keep the existing verification or review todo in progress while handling its findings. Do not add repeat-review or re-verification todos.
 
@@ -117,15 +118,15 @@ Run these gates only when the selected work includes the actual last phase and a
 
 1. Run every project acceptance criterion once under the single final-verification todo. If a criterion fails, have the responsible builder fix it, then rerun only that failed criterion under the same todo until it passes.
 2. Find the merge base with the resolved main or master branch.
-3. Invoke `security-review` once on all committed branch changes against the full plan. Review security only.
+3. Invoke `code-review` and `security-review` concurrently on all committed branch changes from the same merge base. Give both agents the full plan and branch range. Tell `code-review` to review the implementation and `security-review` to review security only. Wait for both results before handling any findings.
 
-Fix every actionable security finding, including `SEC-C`, `SEC-H`, `SEC-M`, and `SEC-L`. Batch findings by responsible builder and have each builder make one atomic fix commit without running verification. Do not ask the user merely because a security finding is Critical or High.
+Apply the code-review gate above to the code-review findings. If a Critical, High, or Question finding blocks, resolve it with the user before dispatching any final-review fixes.
 
-Send `SEC-Q` items to the appropriate builder to investigate from repository evidence. Ask the security reviewer to report external unknowns as residual testing gaps rather than questions. Never invent security assumptions.
+Fix every actionable security finding, including `SEC-C`, `SEC-H`, `SEC-M`, and `SEC-L`. Do not ask the user merely because a security finding is Critical or High. Include `SEC-Q` investigation in the responsible builder's assignment when repository evidence can resolve it. Treat external unknowns as residual testing gaps. Never invent security assumptions.
 
-After security findings are fixed or accepted, invoke `code-review` exactly once on the full branch range, including all phase-review and security-review fixes. Apply the code-review gate above: batch Medium and Low findings by responsible builder; ask the user about Critical, High, and Questions.
+After resolving blocking questions, combine all code-review and security-review findings by responsible builder. Send each builder one final fix assignment and have it create one atomic fix commit without running verification.
 
-Send each builder all final code-review findings in one pass. After the builders commit their fixes, do not rerun project acceptance, security review, or code review. Treat each finding as resolved by a fix, explicit user acceptance, or reviewer confirmation that it is invalid, then continue to cleanup.
+After the builders commit their fixes, do not rerun project acceptance, security review, or code review. Treat each finding as resolved by a fix, explicit user acceptance, or reviewer confirmation that it is invalid, then continue to cleanup.
 
 # 7. Delete the completed plan
 
