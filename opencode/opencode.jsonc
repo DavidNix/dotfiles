@@ -26,11 +26,11 @@
       "model": "openai/gpt-5.6-sol-fast",
     },
     "explore": {
-      "model": "homelab/qwen3.6-35b-a3b-nvfp4",
+      "model": "opencode-go/deepseek-v4-flash",
       "permission": { "task": "deny" }, // deny subagents from spawning more subagents
     },
     "general": {
-      "model": "homelab/qwen3.6-35b-a3b-nvfp4",
+      "model": "opencode-go/deepseek-v4-flash",
       "permission": { "task": "deny" }, // deny subagents from spawning more subagents
     },
     "summary": {
