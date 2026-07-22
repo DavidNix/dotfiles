@@ -2,6 +2,7 @@
 description: Reviews security by invoking the security-review skill exactly as written.
 mode: subagent
 hidden: true
+model: opencode-go/glm-5.2 # Fewer guardrails for thorough defensive analysis.
 permission:
   "*": deny
   read: allow
