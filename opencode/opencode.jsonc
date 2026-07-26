@@ -261,7 +261,8 @@
     "external_directory": {
       "*": "ask",
       "/Users/*/.agents/skills/writing-clearly-and-concisely/**": "allow",
-      "/Users/*/go/pkg/mod/**": "allow",
+      "~/go/pkg/mod/**": "allow",
+      "~/.cargo/registry/src/*": "allow",
     },
     "websearch": "ask",
     "question": "allow",
