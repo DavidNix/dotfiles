@@ -45,6 +45,7 @@ Before invoking a subagent, use the todo tool to list:
 
 - Each implementation or fix item MUST begin with the exact builder name: `[builder]` or `[frontend-builder]`.
 - Each mixed-phase item MUST name its assigned builder.
+- Review findings must never become orchestrator or per-finding todos. Aggregate all automatically handled findings into one `[builder]` or `[frontend-builder]` fix todo per responsible builder without severity details in the label.
 - Create exactly one `[orchestrator] Verify Phase N` todo per phase. Do not create work-unit, regression, or re-verification todos.
 - Create exactly one phase-review todo beginning with `[code-review]`. Final review items MUST begin with `[code-review]` or `[security-review]`.
 - Run the final `[code-review]` and `[security-review]` todos in parallel against the same branch range. Wait for both before dispatching fixes.
@@ -94,13 +95,15 @@ After every work unit in a phase is implemented:
 
 Apply this code-review gate:
 
-- Critical (`C`), High (`H`), or Question (`Q`): stop all work. Show the findings, possible solutions, and your recommendation. Ask the user how to proceed. Do not fix Medium or Low findings while blocked.
-- Medium (`M`) or Low (`L`) only: group all findings by responsible builder for one fix pass without verification.
+- Critical (`C`): stop all work. Show only the Critical findings, possible solutions, and your recommendation. Ask the user how to proceed.
+- High (`H`): choose and apply the best repository-consistent solution automatically. Prefer the reviewer's recommendation when it preserves the approved architecture, public interfaces, and phase scope. If every credible fix requires a major architectural change or large refactor of the approved design, promote the finding to Critical and ask the user.
+- Question (`Q`): investigate from repository evidence and choose the safest reversible answer without asking the user. Promote it to Critical only when the decision would require a major architectural change, large design refactor, irreversible public-interface change, or cannot be made safely from available evidence.
+- Medium (`M`) or Low (`L`): group all findings silently by responsible builder for one fix pass without verification.
 - No findings: continue.
 
-After the user answers a blocking review item, group the decision and all remaining findings by responsible builder. Have the phase's designated builder record any accepted risk in the plan and commit it separately.
+Only Critical findings may produce user questions. When a Critical finding blocks, do not surface High, Medium, Low, or Question details in chat; retain them for the later builder fix pass. After the user answers, group the decision and all remaining findings by responsible builder. Have the phase's designated builder record any accepted risk in the plan and commit it separately.
 
-Send each builder all of its review findings in one pass. After the builders commit their fixes, do not rerun phase verification or code review. Treat each finding as resolved by a fix, explicit user acceptance, or reviewer confirmation that it is invalid, then move on. The final branch review is the backstop for phase-review fixes.
+Send each builder all of its review findings in one pass. Do not enumerate automatically handled High, Medium, Low, or Question findings in orchestrator chat; report only the aggregate fix commit. After the builders commit their fixes, do not rerun phase verification or code review. Treat each finding as resolved by a fix, explicit user acceptance, or reviewer confirmation that it is invalid, then move on. The final branch review is the backstop for phase-review fixes.
 
 # 5. Complete non-final phases
 
@@ -120,7 +123,7 @@ Run these gates only when the selected work includes the actual last phase and a
 2. Find the merge base with the resolved main or master branch.
 3. Invoke `code-review` and `security-review` concurrently on all committed branch changes from the same merge base. Give both agents the full plan and branch range. Tell `code-review` to review the implementation and `security-review` to review security only. Wait for both results before handling any findings.
 
-Apply the code-review gate above to the code-review findings. If a Critical, High, or Question finding blocks, resolve it with the user before dispatching any final-review fixes.
+Apply the code-review gate above to the code-review findings. Resolve any Critical finding with the user before dispatching final-review fixes; handle every other severity automatically.
 
 Fix every actionable security finding, including `SEC-C`, `SEC-H`, `SEC-M`, and `SEC-L`. Do not ask the user merely because a security finding is Critical or High. Include `SEC-Q` investigation in the responsible builder's assignment when repository evidence can resolve it. Treat external unknowns as residual testing gaps. Never invent security assumptions.
 
