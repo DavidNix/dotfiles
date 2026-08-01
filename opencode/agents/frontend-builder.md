@@ -3,7 +3,6 @@ description: Preferred for all frontend work. Implements UI, styling, interactio
 mode: subagent
 hidden: true
 model: opencode-go/glm-5.2
-steps: 20
 permission:
   bash:
     "*": allow

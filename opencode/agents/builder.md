@@ -4,7 +4,6 @@ mode: subagent
 hidden: true
 model: openai/gpt-5.6-sol-fast
 variant: medium
-steps: 20
 permission:
   bash:
     "*": allow
