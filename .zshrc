@@ -94,7 +94,7 @@ export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 # ==============================================================================
 # PATH Modifications
 # ==============================================================================
-export PATH="/usr/local/bin:/usr/local/sbin:$HOME/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/bin"
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/bin"
 
 # Get psql without postgres (using Postgres.app instead)
 export PATH="/Applications/Postgres.app/Contents/Versions/18/bin:$PATH"

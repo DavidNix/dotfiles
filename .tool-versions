@@ -1,3 +1,4 @@
 python prefix:3.14
-golang prefix:1.25
+golang prefix:1.26
 nodejs prefix:25.1
+rust prefix:1.97
