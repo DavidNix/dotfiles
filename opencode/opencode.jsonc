@@ -168,6 +168,7 @@
 
       // Version control and hosting
       "git *": "allow", // plugin hook prevents dangerous commands
+      "gh *": "allow",
       "glab *": "allow",
 
       // Go tooling
@@ -259,7 +260,7 @@
     },
     "external_directory": {
       "*": "ask",
-      "/Users/*/.agents/skills/writing-clearly-and-concisely/**": "allow",
+      "~/.agents/**": "allow",
       "~/go/pkg/mod/**": "allow",
       "~/.cargo/registry/src/*": "allow",
     },
