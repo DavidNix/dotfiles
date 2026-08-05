@@ -21,6 +21,7 @@ Prevent these common failures:
 - Silent assumptions: tag guesses instead of inventing details.
 - Monolithic delivery: create atomic, independently verifiable phases.
 - Over-engineering: sketch only the simplest interfaces required by the acceptance criteria.
+- Data-model drift: define persisted or shared data and its evolution before dependent behavior.
 - Context loss: track each phase's status in the spec so a fresh agent can resume from the file alone.
 
 ## 0. Draft first
@@ -126,6 +127,7 @@ Recommend one to six phases. Each phase must be:
 
 - Atomic: it leaves the repository working and committable.
 - Core-first: it proves the project's essential claim before ancillary work.
+- Data-model-first when applicable: put entities, fields, identifiers, relationships, constraints, ownership, lifecycle, indexes or query patterns, and migration/backfill/rollback needs in Phase 1 or the earliest prerequisite phase. Resolve compatibility with existing data before dependent feature phases. If the work does not create or change persisted data or shared state, do not invent data-model work.
 - Risk-aware: move a blocking library or external API spike into the earliest sensible phase.
 - Orchestrator-verifiable: it ends with commands and expected results.
 
@@ -194,6 +196,7 @@ After writing the draft:
 - Scope changes made in code before the spec is amended.
 - Types, layers, configuration, or phases that do not trace to a goal or acceptance criterion.
 - Interface sketches with implementation bodies.
+- Persisted-data or shared-state changes deferred until after features that depend on their schema or lifecycle.
 - A phase marked complete before its exact verification passed or before every finding from its single phase review was fixed, accepted, or invalidated.
 - Removing, rewriting, reordering, renumbering, or reopening a completed phase. Add a pending follow-up phase instead.
 - Changing the scope or order of an active phase. Defer the change to a pending phase.
