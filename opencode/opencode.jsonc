@@ -135,6 +135,7 @@
 
       // System and process inspection
       "command -v *": "allow",
+      "date *": "allow",
       "id *": "allow",
       "iostat *": "allow",
       "lsof *": "allow",
@@ -161,6 +162,9 @@
 
       // OpenCode diagnostics
       "opencode debug *": "allow",
+
+      // New Relic queries
+      "newrelic nrql *": "allow",
 
       // Image and diagram rendering
       "image-gen *": "allow",
