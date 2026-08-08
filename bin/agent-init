@@ -129,10 +129,9 @@ install_skills() {
     install_skill "https://github.com/obra/the-elements-of-style" "writing-clearly-and-concisely"
 
     # Document
-    # Hardly used so commenting out for now
-    # install_skill "https://github.com/anthropics/skills" "pdf"
-    # install_skill "https://github.com/anthropics/skills" "xlsx"
-    # install_skill "https://github.com/anthropics/skills" "docx"
+    install_skill "https://github.com/anthropics/skills" "pdf"
+    install_skill "https://github.com/anthropics/skills" "xlsx"
+    install_skill "https://github.com/anthropics/skills" "docx"
 
     # Design
     install_skill "https://github.com/zarazhangrui/frontend-slides" "frontend-slides"
