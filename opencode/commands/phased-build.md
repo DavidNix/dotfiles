@@ -1,6 +1,6 @@
 ---
 description: Implement selected phases with delegated builds and review gates
-agent: plan
+agent: build
 subtask: false
 ---
 
