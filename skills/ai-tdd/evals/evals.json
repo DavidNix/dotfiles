@@ -1,0 +1,49 @@
+{
+  "skill_name": "ai-tdd",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a minimal Go module and implement CalculateShippingCents(subtotalCents int) int. It should return 799 for subtotals below 5000 cents and 0 for subtotals of 5000 cents or more. Add table-driven tests and run them.",
+      "expected_output": "The agent should write the tests and a compiling, behavior-free stub in the same initial pass. Because zero is a valid expected result, the stub should use a deliberately incorrect sentinel that makes every case fail at an assertion. Only after observing red should the agent add the shipping logic, run the targeted tests green, and finish without replacing completed behavior to manufacture another red state.",
+      "assertions": [
+        "Writes behavioral tests and a compiling, behavior-free stub in the same initial pass",
+        "Runs the tests before writing the real shipping calculation",
+        "The initial run reaches behavioral assertions rather than failing to compile or import",
+        "Chooses a stub result that fails both the 799-cent and zero-cent expectations",
+        "Adds the real implementation only after observing the expected red state",
+        "Ends with the targeted tests passing",
+        "Does not replace completed behavior with a stub after reaching green"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Create a minimal Go module and implement IsPalindrome(value string) bool. Add tests covering at least one palindrome that should return true and one non-palindrome that should return false, then run the tests.",
+      "expected_output": "The agent should preserve the rule that every new test is proven red. Since one constant bool stub cannot fail both a true and false expectation, the agent should use smaller test-stub red-green cycles rather than accepting a test that passes on its first run. Each red run should be an assertion failure, real behavior should follow red, and the final suite should pass.",
+      "assertions": [
+        "Pairs each new behavior with a compiling stub or existing implementation state before adding the behavior",
+        "Splits the work into smaller cycles when one bool stub cannot make both expectations fail",
+        "Observes each new test fail at a behavioral assertion before implementing what makes it pass",
+        "Does not treat a compile, import, panic, or setup failure as a valid red state",
+        "Does not add the complete palindrome implementation before the first valid red run",
+        "Ends with both true and false cases passing",
+        "Does not replace completed behavior with a stub after reaching green"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Create a minimal Python module where parse_limit(value) currently returns int(value), then fix the bug that negative limits are accepted. Negative input must raise ValueError. Add a unittest regression test and run the tests.",
+      "expected_output": "The agent should use the existing faulty implementation as the natural red state. It should write the regression test before changing parse_limit, run it and observe an assertion-level failure against the bug, then make the minimal fix and run the tests green. It should not replace the existing function with an artificial stub.",
+      "assertions": [
+        "Writes the regression test before modifying the faulty parse_limit implementation",
+        "Runs the regression test against the existing bug and observes it fail",
+        "The red run fails for the missing negative-limit validation rather than a compile, import, or setup problem",
+        "Does not replace the existing implementation with an artificial stub",
+        "Makes the minimal validation fix only after observing red",
+        "Ends with the regression test and relevant suite passing"
+      ],
+      "files": []
+    }
+  ]
+}

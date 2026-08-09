@@ -9,7 +9,7 @@ description: Use when implementing any feature or bugfix, before writing impleme
 
 **Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
 
-Unlike classic TDD, AI agents can write tests and implementation code simultaneously. However, you must verify every test actually fails when the implementation is removed. This prevents evergreen tests that pass regardless of implementation.
+AI agents can write tests and a compiling stub in the same pass. This avoids compile-only failures while preserving the essential TDD proof: the test fails before the requested behavior exists.
 
 **A "bad failing test" is one that:**
 - Doesn't compile (compile errors don't prove behavior)
@@ -20,7 +20,7 @@ Unlike classic TDD, AI agents can write tests and implementation code simultaneo
 
 Two modes depending on the task:
 
-- **Feature Mode** — New features, refactoring, behavior changes. Write tests and implementation together, then verify tests fail when implementation is removed.
+- **Feature Mode** — New features, refactoring, behavior changes. Write tests and a behavior-free stub together, prove red, then add the real implementation.
 - **Bug Fix Mode** — Bug fixes. The bug provides the natural failing state. Classic red-green-refactor.
 
 ## When to Use
@@ -47,7 +47,7 @@ EVERY TEST MUST BE PROVEN TO FAIL
 ```
 
 - **Bug fixes:** The bug makes the test fail naturally. Write the test, run it, watch it fail.
-- **Features:** No natural failing state. Write tests and implementation together, then do a **Red-Green-Refactor verification pass**: comment out implementation, see it fail, restore it, see it pass.
+- **Features:** Write tests and a compiling, behavior-free stub in one pass. Run the tests and prove they fail at behavioral assertions before adding real behavior.
 
 Either way, every test must demonstrate it catches the problem it's designed to catch.
 
@@ -57,27 +57,30 @@ Either way, every test must demonstrate it catches the problem it's designed to 
 
 For new features, refactoring, and behavior changes.
 
-Unlike classic TDD, you can write tests and implementation code simultaneously. After both are written, perform a **Red-Green-Refactor verification pass** to ensure tests actually validate the implementation.
+Write tests and the smallest compiling stub in one pass. Prove the tests fail for the expected behavioral reason, then fill in the real implementation.
 
 ### Flow
 
 ```dot
 digraph feature_mode {
     rankdir=TB;
-    write [label="1. WRITE\nTests + implementation\n(simultaneously)", shape=box, style=filled, fillcolor="#ccccff"];
-    pass [label="2. PASS\nRun tests, fix until green", shape=box, style=filled, fillcolor="#ccffcc"];
-    verify [label="3. VERIFY (RED)\nComment out implementation\nRun tests → must fail", shape=box, style=filled, fillcolor="#ffcccc"];
-    check [label="Fails at runtime?", shape=diamond];
-    restore [label="4. RESTORE (GREEN)\nUncomment, run tests → pass", shape=box, style=filled, fillcolor="#ccffcc"];
+    write [label="1. TEST + STUB\nWrite both in one pass", shape=box, style=filled, fillcolor="#ccccff"];
+    red [label="2. RED\nRun tests → must fail", shape=box, style=filled, fillcolor="#ffcccc"];
+    check_red [label="Assertion failure\nfor expected reason?", shape=diamond];
+    implement [label="3. IMPLEMENT\nFill in real behavior", shape=box, style=filled, fillcolor="#ccccff"];
+    green [label="4. GREEN\nRun tests → must pass", shape=box, style=filled, fillcolor="#ccffcc"];
+    check_green [label="Passes?", shape=diamond];
     refactor [label="5. REFACTOR\nClean up, keep green", shape=box, style=filled, fillcolor="#ccccff"];
     next [label="Next test case", shape=ellipse];
 
-    write -> pass;
-    pass -> verify;
-    verify -> check;
-    check -> restore [label="yes"];
-    check -> verify [label="no — fix\ntest or stub"];
-    restore -> refactor;
+    write -> red;
+    red -> check_red;
+    check_red -> implement [label="yes"];
+    check_red -> write [label="no — fix\ntest or stub"];
+    implement -> green;
+    green -> check_green;
+    check_green -> refactor [label="yes"];
+    check_green -> implement [label="no — fix code"];
     refactor -> next;
     next -> write;
 }
@@ -85,40 +88,42 @@ digraph feature_mode {
 
 ### Steps
 
-#### 1. WRITE — Tests and Implementation (Simultaneously)
+#### 1. TEST + STUB — Write Both in One Pass
 
-Write both the test and the implementation code together. Unlike classic TDD, you don't need to write the test first and watch it fail with compile errors. Write them both, then verify correctness in the next steps.
+Write the tests and the smallest production stub needed for them to compile and run. Do this in one edit pass, but put no requested behavior in the stub.
 
-**Why:** AI agents can efficiently write coherent test-implementation pairs. The critical part is the verification pass that follows.
+Choose stub outputs that are deliberately inconsistent with the test expectations. Do not blindly return a zero value when zero is a valid expected result.
 
-#### 2. PASS — Run Tests, Fix Until Green
+If one stub cannot make every new test fail at the assertion level, split the work into smaller test-stub cycles. Each test still needs a proven red state.
 
-```bash
-go test ./...
-```
+**Why:** The stub avoids wasting the first run on missing symbols or compiler errors. Writing it with the tests is efficient, while withholding real behavior preserves the red-green proof.
 
-Fix until all tests pass. This is your baseline.
+If changing existing behavior and the current implementation already makes the new test fail correctly, use that as the red state. Do not replace working code with a synthetic stub.
 
-#### 3. VERIFY (RED) — Comment Out Implementation
-
-For each test case, comment out the related implementation code and run the tests.
-
-**The test must fail at runtime.** Not a compile error, not an import error — a runtime assertion failure.
-
-For compiled languages: leave stubs or zero values so code compiles but the test fails at runtime (see [Stub Patterns for Verification](#stub-patterns-for-verification)).
+#### 2. RED — Run Tests and Prove Failure
 
 ```bash
 go test ./...
 # FAIL: expected "success", got ""
 ```
 
-**Test still passes?** The test doesn't actually test the implementation. Fix the test. This catches **evergreen tests** — tests that pass regardless of implementation.
+**The test must fail at runtime.** Not a compile error, not an import error — a runtime assertion failure.
 
-**Compile error?** Add a stub return value so it compiles. The test must fail at the assertion (`expected X, got Y`), not the compiler. Compile errors don't prove behavior.
+**Test passes?** The test or stub does not establish the missing behavior. Strengthen the test or choose a deliberately incorrect stub. This catches **evergreen tests** — tests that pass regardless of implementation.
 
-#### 4. RESTORE (GREEN) — Uncomment and Verify
+**Compile error?** Complete the stub so the test reaches its assertion. Compile errors don't prove behavior.
 
-Uncomment the implementation. Run tests. All green.
+**Wrong failure?** Fix the test setup or stub until the failure clearly describes the missing behavior.
+
+#### 3. IMPLEMENT — Fill In Real Behavior
+
+Only after observing the correct red state, replace the stub with the minimal implementation needed to satisfy the test.
+
+Do not add speculative behavior. Let the tests drive what the implementation needs.
+
+#### 4. GREEN — Run Tests and Verify
+
+Run the targeted tests, then the broader relevant suite. All green.
 
 ```bash
 go test ./...
@@ -136,7 +141,7 @@ Keep tests green. Don't add behavior.
 
 ### Example
 
-**WRITE** — Test and implementation:
+**TEST + STUB** — Write the test and compiling stub in one pass:
 
 ```go
 // retry_test.go
@@ -159,6 +164,19 @@ func TestRetryOperation(t *testing.T) {
 ```go
 // retry.go
 func RetryOperation[T any](fn func() (T, error)) (T, error) {
+    var zero T
+    return zero, nil
+}
+```
+
+**RED** — Run the test before adding real behavior:
+
+`go test ./...` → fails at an assertion because the result is not `"success"`. Good — it compiles and proves the behavior is missing.
+
+**IMPLEMENT** — Fill in the real behavior:
+
+```go
+func RetryOperation[T any](fn func() (T, error)) (T, error) {
     var lastErr error
     for i := 0; i < 3; i++ {
         result, err := fn()
@@ -172,26 +190,15 @@ func RetryOperation[T any](fn func() (T, error)) (T, error) {
 }
 ```
 
-**PASS** — `go test ./...` → all green.
+**GREEN** — `go test ./...` → pass.
 
-**VERIFY (RED)** — Replace body with zero-value stub (must compile):
-
-```go
-func RetryOperation[T any](fn func() (T, error)) (T, error) {
-    var zero T
-    return zero, nil
-}
-```
-
-`go test ./...` → fails: `expected "success", got ""`. Good — compiles, fails at runtime.
-
-**RESTORE (GREEN)** — Restore implementation, run tests → pass.
+**REFACTOR** — Clean up only if needed, keeping the tests green.
 
 ---
 
 ## Bug Fix Mode
 
-For bug fixes. The bug provides the natural failing state — no comment-out needed. This is traditional red-green-refactor.
+For bug fixes, the existing faulty behavior provides the natural failing state. This is traditional red-green-refactor.
 
 **Important:** Always write the test FIRST, before any fix. The test must fail at runtime with an assertion error (`expected X, got Y`), not a compile error.
 
@@ -231,7 +238,7 @@ go test ./...
 
 **Test passes?** You haven't reproduced the bug. Fix the test.
 
-**Compile error?** Add a stub return value so it compiles. The test must fail at the assertion, not the compiler.
+**Compile error?** If reproducing the bug requires new API surface, add only enough stub code to compile. The test must fail at the assertion, not the compiler.
 
 **Wrong error type?** The test must fail with an assertion failure (`expected X, got Y`), not a setup error or exception.
 
@@ -254,24 +261,26 @@ Clean up the fix. Keep tests green.
 
 **Bug:** Empty email accepted by form validation.
 
-**RED:** Write test first (add stub so it compiles):
+**Existing faulty implementation:**
+
 ```go
-func TestValidateEmail_RejectsEmpty(t *testing.T) {
-    err := ValidateEmail("")
-    assert.Equal(t, "email required", err.Error())
+func ValidateEmail(email string) error {
+    return nil
 }
 ```
 
+**RED:** Write the regression test before changing the implementation:
+
 ```go
-// Stub so test compiles (returns empty error, not nil)
-func ValidateEmail(email string) error {
-    return errors.New("")
+func TestValidateEmail_RejectsEmpty(t *testing.T) {
+    err := ValidateEmail("")
+    assert.EqualError(t, err, "email required")
 }
 ```
 
 ```bash
 $ go test ./...
-FAIL: expected "email required", got ""
+FAIL: expected error "email required", got nil
 ```
 
 **GREEN:** Fix the bug:
@@ -293,20 +302,21 @@ PASS
 
 ---
 
-## Stub Patterns for Verification
+## Stub Patterns for Initial Red
 
-When commenting out implementation for Feature Mode verification, use zero-value stubs so code compiles but tests fail at runtime:
+Use a minimal, type-correct stub so tests compile and reach behavioral assertions before real implementation begins. Pick a value that is guaranteed to contradict the current test expectation:
 
 | Type | Stub Pattern |
 |------|-------------|
-| `T` (generic) | `var zero T; return zero, nil` |
-| `error` | `return errors.New("")` or `nil` (whichever makes test fail) |
-| `bool` | `return false` |
-| `int` | `return 0` |
-| `string` | `return ""` |
-| `slice` | `return nil` |
+| `T` (generic) | Return a test-specific sentinel, or a zero value only when zero is not expected |
+| `error` | Return `nil` when an error is expected; return a sentinel error when success is expected |
+| `bool` | Return the opposite of the current expected value |
+| `int` | Return an out-of-domain sentinel such as `-1`, when valid for the type |
+| `string` | Return an unmistakable sentinel such as `"not implemented"` |
+| `slice` | Return `nil` or a sentinel element, whichever contradicts the expectation |
+| Side effect | Do nothing when the test expects an observable effect |
 
-The test must fail at the assertion (`expected X, got Y`), not at the compiler.
+If the same stub would satisfy another test, use a different sentinel or split the tests into smaller cycles. The test must fail at the assertion (`expected X, got Y`), not at the compiler.
 
 ## Good Tests
 
@@ -342,14 +352,14 @@ expect(() => service.createUser('bad', 'name')).toThrow('Invalid email');
 | Excuse | Reality |
 |--------|---------|
 | "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
-| "I'll verify it works by inspection" | Inspection doesn't prove the test catches failures. Comment-out does. |
-| "Commenting out code is silly" | It takes 30 seconds and proves your test works. Skipping it proves nothing. |
+| "I'll verify it works by inspection" | Inspection doesn't prove the test catches missing behavior. The initial red run does. |
+| "The stub is wasted work" | A tiny stub avoids compiler-only failures and proves the test before behavior is added. |
 | "Already manually tested" | Ad-hoc ≠ systematic. No record, can't re-run. |
 | "Need to explore first" | Fine. Throw away exploration, start with TDD. |
 | "Test hard = design unclear" | Listen to test. Hard to test = hard to use. |
 | "TDD will slow me down" | TDD faster than debugging. Pragmatic = test-first. |
 | "The compile error proves it" | Compile errors prove syntax, not behavior. Tests must fail at runtime with assertion errors. |
-| "I wrote test and code together, no need to verify" | Skipping verification creates evergreen tests. Always do the Red-Green-Refactor pass. |
+| "I'll write the test and real behavior together" | That skips red. The first pass contains tests and a behavior-free stub only. |
 | "Existing code has no tests" | You're improving it. Add tests for the code you're changing. |
 
 ## Red Flags — STOP and Reassess
@@ -361,9 +371,10 @@ expect(() => service.createUser('bad', 'name')).toThrow('Invalid email');
 - No tests for new behavior
 
 **Feature Mode:**
-- Skipped the comment-out verification step
-- Test still passes with implementation commented out
-- Compiler error instead of runtime failure during verification
+- Added real behavior before observing the initial red state
+- A new test passes against the behavior-free stub
+- Compiler or setup error instead of a behavioral assertion failure
+- Replaced completed behavior with a stub after reaching green
 
 **Bug Fix Mode:**
 - Wrote the fix before writing the test (write test FIRST)
@@ -381,11 +392,10 @@ expect(() => service.createUser('bad', 'name')).toThrow('Invalid email');
 Before marking work complete:
 
 - [ ] Every new function/method has a test
-- [ ] All tests pass (GREEN baseline)
-- [ ] Red-Green-Refactor verification pass completed for each test:
-  - [ ] Commented out implementation (VERIFY RED)
-  - [ ] Watched test fail at runtime with assertion error (not compile error)
-  - [ ] Restored implementation and confirmed test passes (RESTORE GREEN)
+- [ ] Tests and a behavior-free compiling stub were written in one pass
+- [ ] Every new test was observed failing at a behavioral assertion
+- [ ] Real implementation began only after the correct red state
+- [ ] Targeted tests and the broader relevant suite pass
 - [ ] Tests use real code (mocks only if unavoidable)
 - [ ] Edge cases and errors covered
 
