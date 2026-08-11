@@ -58,6 +58,7 @@ brew "mise" # asdf replacement
 brew "mole"
 brew "neovim"
 brew "oven-sh/bun/bun"
+brew "pandoc"
 brew "procs"
 brew "rdap"
 brew "rename"
