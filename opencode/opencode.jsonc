@@ -101,6 +101,7 @@
       "pwd *": "allow",
       "readlink *": "allow",
       "realpath *": "allow",
+      "printf *": "allow",
       "stat *": "allow",
       "tree *": "allow",
 
