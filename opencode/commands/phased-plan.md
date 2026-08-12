@@ -1,16 +1,36 @@
 ---
-description: Create or revise an executable spec and phased implementation plan
+description: Create or revise an executable phased plan in a file or GitHub issue hierarchy
 ---
 
 First, load the `writing-clearly-and-concisely` skill (if present) and apply it to every part of the plan.
 
-Use the research and decisions already present in this conversation to create or revise a spec and phased implementation plan that an orchestrator can delegate without drifting. Treat `$ARGUMENTS` as optional additional direction. Do not discard or repeat research already completed in the current context.
+Use the research and decisions already present in this conversation to create or revise a spec and phased implementation plan that an orchestrator can delegate without drifting. Treat direction after the target as optional. Do not discard or repeat research already completed in the current context.
 
-Do not implement the project. Your deliverable is one plan artifact at `plans/<short-kebab-case-name>.md` in the repository root.
+Do not implement the project. Persist the plan only to the explicit file or existing GitHub issue supplied by the user.
 
-# Spec and phased plan
+# 0. Resolve the target
 
-## Purpose
+Usage: `/phased-plan <plan-target> [additional direction]`
+
+- Target: `$1`
+- Full input: `$ARGUMENTS`
+- A Markdown path that resolves inside the current repository selects file mode. Create that file if it does not exist or revise it in place if it does.
+- A positive issue number, `#<number>`, or GitHub issue URL selects GitHub mode. It must identify an existing parent issue; never create the parent issue. Strip a leading `#` before passing the number to `gh`.
+- Infer the mode when the user clearly names a file or GitHub issue anywhere in the request. Do not ask them to choose a mode they already indicated.
+- If no target is supplied, two targets conflict, or the target is genuinely ambiguous, ask one concise clarification question. Never invent a default path or issue.
+
+For file mode, resolve the supplied path and require it to stay inside the current repository. Read the entire existing file before revising it.
+
+For GitHub mode:
+
+1. Load the `gh-issues` skill and follow its compatible command and stdin guidance.
+2. Run `gh auth status` and `gh repo view --json nameWithOwner,hasIssuesEnabled,viewerPermission,url` before the first mutation.
+3. Treat a bare number as an issue in the current repository. If an issue URL points to another repository, ask whether that repository is intentional before mutating it.
+4. Read the parent with `gh issue view "$parent" --json number,title,body,state,stateReason,parent,subIssues,subIssuesSummary,comments,url`, then read every managed phase issue in full.
+5. If the supplied issue is itself a sub-issue, is closed, or contains sub-issues whose role makes the requested plan ambiguous, ask before proceeding. Do not ask merely because unrelated sub-issues exist; leave them untouched.
+6. Preserve the existing parent title unless the user explicitly asks to change it. Treat its current body as planning input and fold relevant content into the structured spec.
+
+# 1. Purpose
 
 Write a right-sized spec: detailed enough to make scope, sequence, and completion unambiguous, but not so detailed that it pre-writes the implementation.
 
@@ -22,13 +42,13 @@ Prevent these common failures:
 - Monolithic delivery: create atomic, independently verifiable phases.
 - Over-engineering: sketch only the simplest interfaces required by the acceptance criteria.
 - Data-model drift: define persisted or shared data and its evolution before dependent behavior.
-- Context loss: track each phase's status in the spec so a fresh agent can resume from the file alone.
+- Context loss: make the selected plan target sufficient for a fresh agent to resume.
 
-## 0. Draft first
+# 2. Draft and clarify before persistence
 
-Use the conversation, repository, and your judgment to draft the plan without interviewing the user. You own the initial recommendations for goals, non-goals, acceptance criteria, and phase order; do not ask the user to author them.
+Use the conversation, repository, existing target, and your judgment to draft the complete parent spec and every phase without interviewing the user. You own the initial recommendations for goals, non-goals, acceptance criteria, and phase order; do not ask the user to author them.
 
-Check the problem and user, success signal, hard constraints, and rough scope boundaries while drafting. Record reasonable, reversible assumptions under Constraints and Assumptions. State them directly or tag them `[ASSUMED: ...]`; do not ask the user to confirm each one.
+Record reasonable, reversible assumptions under Constraints and Assumptions. State them directly or tag them `[ASSUMED: ...]`.
 
 Use `[NEEDS CLARIFICATION: ...]` only when the answer could materially change:
 
@@ -37,25 +57,29 @@ Use `[NEEDS CLARIFICATION: ...]` only when the answer could materially change:
 - A public interface or irreversible decision.
 - The ability to define credible acceptance criteria.
 
-Ask before drafting only when no safe default exists and the answer would reshape the entire plan. Otherwise, finish the draft and ask at most three blocking questions afterward. Give a recommended default for every question so the user can reply, "defaults are fine."
+Ask before drafting only when no safe default exists and the answer would reshape the entire plan. Otherwise, finish the draft in memory and ask at most three blocking questions afterward, with a recommended default for each. Do not write the file or mutate any issue until blocking questions have been answered. Questions affecting only a later phase may remain, but that phase cannot start until they are resolved.
 
-## Editing an existing plan
+Draft all GitHub issue bodies before the first mutation. This minimizes partial hierarchies and makes retries deterministic.
 
-If the request or `$ARGUMENTS` identifies an existing plan, edit that file instead of creating another. If the user asks to revise a plan but no path is clear, infer it only when one plan is unambiguous; otherwise ask for the path. Read the entire plan before proposing changes.
+# 3. Editing an existing plan
 
-Treat phase status as an edit boundary:
+Treat phase status as an edit boundary in either backend:
 
 - `[x] COMPLETE`: immutable history. Do not remove, rewrite, reorder, renumber, reopen, or alter its verification evidence.
 - `[~] IN PROGRESS`: preserve its scope and order while implementation is active. Put new or changed scope in a later phase.
 - `[ ] NOT STARTED`: may be removed, rewritten, split, combined, added, or reordered.
 
+In GitHub mode, a completed phase must also be closed with reason `completed`; pending and active phases remain open. If issue state and the body status conflict, ask before changing either one.
+
 If a requested change would alter completed or active work, preserve the locked phase and create one or more pending follow-up phases instead. Explain the substitution in chat; do not ask the user to redesign it when a safe follow-up is clear.
 
-Keep locked phase identifiers stable. Renumber pending phases only when doing so does not change a locked phase's identity or recorded references. Update pending dependencies, project acceptance criteria, architecture, and interface sketches to match the revised future work, but never rewrite the historical claim or evidence of a completed phase.
+Keep locked phase identifiers stable. Renumber pending phases only when doing so does not change a locked phase's identity or recorded references. Update pending dependencies, project acceptance criteria, architecture, and interface sketches to match revised future work, but never rewrite historical completion evidence.
 
-## Required document structure
+In GitHub mode, manage only sub-issues containing `<!-- phased-plan-phase:v1 -->`. Leave unrelated sub-issues unchanged. When removing a pending managed phase, detach it with `--remove-parent`, explain the removal in a comment, and close it with reason `not planned`; never delete it. Use the sub-issue priority REST endpoint only when a revision actually changes phase order.
 
-Create one Markdown document with exactly these sections, in this order.
+# 4. Required plan content
+
+The shared spec must contain these sections in this order. In file mode they form one Markdown document. In GitHub mode they form the parent issue body, followed by a phase index whose entries link to the managed sub-issues.
 
 ## 1. Problem statement
 
@@ -63,16 +87,14 @@ In two to four sentences, state what hurts, for whom, and why it matters now. Do
 
 ## 2. Goals
 
-Recommend one to six outcomes from the available context. Each goal must be checkable at the end of the project. Do not ask the user to supply goals unless a missing decision would materially change the project.
+Recommend one to six checkable outcomes from the available context.
 
 - Bad: "Improve the API."
 - Good: "Keep `/search` p95 latency below 200 ms under the documented benchmark."
 
 ## 3. Non-Goals
 
-Recommend one to six plausible expectations that this project deliberately excludes. Give each a brief reason. This section is required and may not be empty. If the user supplied no exclusions, fill in reasonable non-goals from the context; do not ask the user to invent them.
-
-Example: "No admin UI because the two internal operators can use the CLI."
+Recommend one to six plausible expectations that the project deliberately excludes, with a brief reason for each. This section is required and may not be empty.
 
 ## 4. Constraints and assumptions
 
@@ -82,27 +104,15 @@ Record the stack, environment, preserved interfaces, timeline, and other hard li
 
 Include this section, but add a Mermaid diagram only when the work has at least three interacting components, such as services, queues, external APIs, or distinct layers.
 
-Keep diagrams high-level, with about five to twelve nodes. A single-module change or CRUD endpoint needs no diagram. If an honest diagram needs more than twelve nodes, split the project into a parent spec and smaller child specs.
-
-Example:
-
-```mermaid
-flowchart LR
-  CLI[CLI entry] --> Parser
-  Parser --> Store[(SQLite)]
-  Parser --> Render[Renderer]
-  Render --> Out[stdout / --json]
-```
+Keep diagrams high-level, with about five to twelve nodes. A single-module change or CRUD endpoint needs no diagram. If an honest diagram needs more than twelve nodes, split the work into smaller phases or a second-level issue hierarchy only when that added hierarchy is necessary.
 
 ## 6. Interface sketches
 
-Show the solution's shape through load-bearing types, signatures, handlers, endpoints, and contracts. These sketches are normative but amendable: the implementation agent should follow them unless implementation reveals a problem, in which case it must update the spec first.
-
-Rules:
+Show the solution's shape through load-bearing types, signatures, handlers, endpoints, and contracts. These sketches are normative but amendable: implementation should follow them unless it reveals a problem, in which case the plan must be revised first.
 
 - Write signatures and types, never implementation bodies. Use `// ...`, `TODO`, or an equivalent placeholder.
 - Sketch only public boundaries, core data models, contracts shared across phases, and details that are easy to misunderstand.
-- Use about 30 to 80 lines in total. Skip this section's code for small tasks when no interface sketch adds value.
+- Use about 30 to 80 lines in total. Skip code for small tasks when no interface sketch adds value.
 - Use the repository's language. If the language is genuinely ambiguous, default to Go.
 - Choose the simplest shape that satisfies the acceptance criteria.
 - Do not add speculative abstractions, plugin systems, generic extension points, or interfaces with one implementation.
@@ -117,7 +127,7 @@ AC-2: `curl -s -o /dev/null -w "%{http_code}" localhost:3000/dashboard` without 
 AC-3: `npm run build` -> exit 0 with no new type errors
 ```
 
-Every criterion must be independently checkable by the orchestrator from the terminal. Inspect the repository to identify the appropriate commands instead of asking the user to write the criteria. If no test exists, require the relevant phase to create one. Use a manual check only when automation is impractical; then state exact steps and the expected observation.
+Every criterion must be independently checkable by the orchestrator from the terminal. Inspect the repository to identify appropriate commands. If no test exists, require the relevant phase to create one. Use a manual check only when automation is impractical; state exact steps and the expected observation.
 
 Reject subjective criteria such as "the code is clean," "performance is good," or "the UI feels smooth."
 
@@ -127,13 +137,13 @@ Recommend one to six phases. Each phase must be:
 
 - Atomic: it leaves the repository working and committable.
 - Core-first: it proves the project's essential claim before ancillary work.
-- Data-model-first when applicable: put entities, fields, identifiers, relationships, constraints, ownership, lifecycle, indexes or query patterns, and migration/backfill/rollback needs in Phase 1 or the earliest prerequisite phase. Resolve compatibility with existing data before dependent feature phases. If the work does not create or change persisted data or shared state, do not invent data-model work.
+- Data-model-first when applicable: define entities, fields, identifiers, relationships, constraints, ownership, lifecycle, indexes or query patterns, and migration/backfill/rollback needs before dependent behavior. Do not invent data-model work when no persisted or shared state changes.
 - Risk-aware: move a blocking library or external API spike into the earliest sensible phase.
 - Orchestrator-verifiable: it ends with commands and expected results.
 
-Use core-first order unless the user explicitly requires another order. Ask about ordering only when two viable sequences have materially different risks. Otherwise, state the recommended order without requesting confirmation.
+Use core-first order unless the user explicitly requires another order. Ask about ordering only when viable sequences carry materially different risks.
 
-Use this template for every phase:
+In file mode, use this template inline for every phase:
 
 ```markdown
 ### Phase N: <name>
@@ -145,63 +155,107 @@ Use this template for every phase:
 **Verification (orchestrator-owned):** Exact command(s), expected output, and expected exit code. Use a precise manual check only when no command is practical.
 ```
 
-Add `Depends on`, `Out of scope`, or `Est. size` only when the information changes how an implementation agent should execute the phase.
+In GitHub mode, the parent issue's `## 8. Phased plan` section is an ordered list of phase issue links. Each managed sub-issue uses this body:
 
-### Status protocol
+```markdown
+<!-- phased-plan-phase:v1 -->
+**Status:** [ ] NOT STARTED
+<!-- [ ] NOT STARTED | [~] IN PROGRESS | [x] COMPLETE (date, verified by: <command and result>; code review: <result>) -->
 
-The spec file is the source of truth for progress.
+## Outcome
+One sentence describing what this phase proves or delivers.
 
-- Every phase starts as `[ ] NOT STARTED`.
-- Before delegation, the orchestrator gives each assigned builder the entire current phase verbatim plus the relevant goals, constraints, interfaces, acceptance criteria, assigned scope, exclusions, and repository state. For a mixed phase, every builder receives the same complete phase followed by its specific work unit.
-- Before coding, the designated builder changes the phase to `[~] IN PROGRESS`. Commit that status separately only when parallel agents might duplicate work.
-- Builders must not run tests, builds, linters, format checks, type checks, acceptance commands, or other verification. They may use LSP and must fix every diagnostic in changed code files.
-- After all builder work, the orchestrator runs the phase's exact verification once. If a command fails, the responsible builder fixes it and the orchestrator reruns only that failed command under the same verification todo. Do not run work-unit checks or re-run passing commands.
-- After exact verification passes, the orchestrator runs one code review over the complete phase commit range. Builders fix all findings in one pass. Do not review or verify the phase again after those fixes; the final branch review is the backstop.
-- The orchestrator marks a phase `[x] COMPLETE` after current-session verification passes and every finding from the single phase review was fixed, accepted by the user, or invalidated by the reviewer. The orchestrator records the evidence and commits the non-final phase status without rerunning verification.
-- A completion record must include the date, command, result, and phase-review outcome, for example: `[x] COMPLETE (2026-07-19, verified by: npm test -- store.test.ts -> 14 passed; code review: 2 findings fixed)`.
-- An orchestrator resuming the project must read the full spec and continue from the earliest incomplete phase without re-verifying completed phases.
+## Changes
+- Deliverable
+
+## Verification (orchestrator-owned)
+Exact command(s), expected output, and expected exit code.
+```
+
+Put `Depends on`, `Out of scope`, or `Est. size` in the phase only when it changes execution.
 
 ## 9. Open questions
 
 Collect only blocking `[NEEDS CLARIFICATION]` items so the user can answer in one pass. Include no more than three. If none remain, write `None.`
 
-## Clarification and handoff
+# 5. Status protocol
 
-After writing the draft:
+- Every phase starts as `[ ] NOT STARTED`.
+- Before delegation, the orchestrator gives each builder the entire current phase verbatim plus relevant goals, constraints, interfaces, acceptance criteria, assigned scope, exclusions, and repository state.
+- Before coding, record `[~] IN PROGRESS` using the backend's protocol: the designated builder includes the file update in its first implementation commit, while the orchestrator edits a GitHub phase issue before delegation.
+- Builders must not run tests, builds, linters, format checks, type checks, acceptance commands, or other verification. They may use LSP and must fix every diagnostic in changed code files.
+- After builder work, the orchestrator runs the phase's exact verification once. If a command fails, the responsible builder fixes it and the orchestrator reruns only that failed command.
+- After verification passes, the orchestrator runs one code review over the complete phase commit range. Builders fix all findings in one pass. Do not review or verify the phase again after those fixes; the final branch review is the backstop.
+- The orchestrator marks a phase `[x] COMPLETE` only after verification passes and every review finding is fixed, accepted, or invalidated.
+- A completion record includes the date, command and result, and phase-review outcome, for example: `[x] COMPLETE (2026-07-19, verified by: npm test -- store.test.ts -> 14 passed; code review: 2 findings fixed)`.
+- A resuming orchestrator reads the entire selected plan target and continues from the earliest incomplete phase without re-verifying completed phases.
 
-1. If Open Questions is non-empty, ask each blocking question directly in chat. Number the questions and suggest a default for each so the user can reply "defaults are fine" or answer selectively.
-2. Fold the answers into the relevant sections, remove resolved tags, and restate anything still open.
-3. Ask the user to choose a phase order only when viable sequences carry materially different risks. Otherwise, use the recommended core-first order.
-4. If no blocking questions remain, report the artifact path and recommended phase order without requesting approval.
-5. Do not implement the project or hand it to an implementation agent as part of this command.
-6. Do not mark the plan ready for immediate work while a blocking `[NEEDS CLARIFICATION]` tag remains. Questions affecting only later phases may remain, but must be resolved before that phase becomes `[~] IN PROGRESS`.
+In file mode, the file is the source of truth and status updates follow the existing commit protocol used by `/phased-build`.
 
-## Right-sizing
+In GitHub mode, the issue hierarchy is the source of truth. The orchestrator edits the phase body for pending and active states, adds completion evidence as a comment, then records `[x] COMPLETE` and closes the phase issue. The parent remains open until all final gates pass.
 
-- Small task, one file or less than about one day: use one or two phases. Keep the required section headings, but write `Not needed for this task.` under Architecture Sketch or Interface Sketches when they add no value.
+# 6. GitHub persistence contract
+
+Use compatible native `gh issue` commands and quoted stdin; do not create temporary files.
+
+```bash
+gh issue edit "$parent" --body-file - <<'EOF'
+<!-- phased-plan:v1 -->
+...
+EOF
+
+gh issue create --title "Phase N: Name" --body-file - --parent "$parent" <<'EOF'
+<!-- phased-plan-phase:v1 -->
+...
+EOF
+
+gh issue edit "$phase" --body-file - <<'EOF'
+<!-- phased-plan-phase:v1 -->
+...
+EOF
+```
+
+For a removed pending phase:
+
+```bash
+gh issue edit "$phase" --remove-parent
+gh issue comment "$phase" --body-file - <<'EOF'
+Removed from the phased plan because ...
+EOF
+gh issue close "$phase" --reason "not planned"
+```
+
+For reordered pending phases, obtain integer issue IDs with `gh api "repos/{owner}/{repo}/issues/$phase" --jq .id`, then call:
+
+```bash
+gh api --method PATCH \
+  "repos/{owner}/{repo}/issues/$parent/sub_issues/priority" \
+  -F sub_issue_id="$sub_issue_id" \
+  -F after_id="$after_id"
+```
+
+Use `before_id` instead when moving before another phase. Do not call the ordering endpoint when titles changed but order did not.
+
+Create or update managed phase issues sequentially, then edit the parent body with the final ordered links. If an operation fails partway through, do not delete or duplicate successful issues. Report the parent and completed child URLs and instruct a retry against the same parent issue.
+
+# 7. Right-sizing and anti-patterns
+
+- Small task, one file or less than about one day: use one or two phases. Write `Not needed for this task.` under Architecture Sketch or Interface Sketches when appropriate.
 - Medium feature, about one week: use the full template.
-- Large, multi-week or multi-system project: create one parent spec whose phases point to focused child specs.
-- Keep the spec within roughly one to three screens. Split oversized work instead of adding prose.
-- Do not dictate variable names, internal file layout, or other choices the implementation agent can safely make.
+- Large, multi-week or multi-system project: keep the parent concise and split phases rather than adding prose.
+- Keep the shared spec within roughly one to three screens. Keep each phase self-contained but compact.
+- Do not dictate variable names, internal file layout, or choices an implementation agent can safely make.
+- Do not omit Non-Goals, use subjective acceptance criteria, hide assumptions, defer dependent data-model work, or create a "build everything, then test everything" sequence.
+- Do not change code before amending the selected plan target.
+- Do not mark a phase complete before exact verification and its single phase review finish.
+- Do not alter completed phases or the scope/order of active phases; add pending follow-up work instead.
 
-## Refuse these anti-patterns
+# 8. Persist and report
 
-- A missing or empty Non-Goals section.
-- Subjective or unverifiable acceptance criteria.
-- "Phase 1: build everything; Phase 2: test everything." Each phase defines its own tests and orchestrator-run verification.
-- Invented details hidden as facts rather than tagged assumptions or questions.
-- Asking the user to supply goals, non-goals, acceptance criteria, or phase boundaries that the agent can reasonably recommend.
-- Asking questions about reversible assumptions or low-impact preferences.
-- Unasked clarification tags. Every tag must produce a chat question.
-- Scope changes made in code before the spec is amended.
-- Types, layers, configuration, or phases that do not trace to a goal or acceptance criterion.
-- Interface sketches with implementation bodies.
-- Persisted-data or shared-state changes deferred until after features that depend on their schema or lifecycle.
-- A phase marked complete before its exact verification passed or before every finding from its single phase review was fixed, accepted, or invalidated.
-- Removing, rewriting, reordering, renumbering, or reopening a completed phase. Add a pending follow-up phase instead.
-- Changing the scope or order of an active phase. Defer the change to a pending phase.
-- Ancillary-first ordering without a documented constraint or material tradeoff.
+After blocking questions are resolved:
 
-## Output
-
-For a new plan, write `plans/<short-kebab-case-name>.md` in the repository root, creating `plans/` if needed. For an existing plan, update it in place. Then run the clarification loop only when blocking questions remain. Report the artifact path, the recommended phase order, and any locked-phase request converted to follow-up work. Implementation belongs to a later command or agent.
+- File mode: write or revise exactly the supplied path. Do not create a second plan file.
+- GitHub mode: add `<!-- phased-plan:v1 -->` to the parent body, reconcile only managed phase sub-issues, and preserve unrelated sub-issues and the parent title.
+- If no blocking questions remain, persist immediately without asking for approval.
+- Do not implement the project or hand it to an implementation agent as part of this command.
+- Report the file path or parent issue URL, the ordered phases, every managed phase issue URL in GitHub mode, and any locked-phase request converted to follow-up work.
