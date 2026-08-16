@@ -4,31 +4,39 @@ description: Create or revise an executable phased plan in a file or GitHub issu
 
 First, load the `writing-clearly-and-concisely` skill (if present) and apply it to every part of the plan.
 
-Use the research and decisions already present in this conversation to create or revise a spec and phased implementation plan that an orchestrator can delegate without drifting. Treat direction after the target as optional. Do not discard or repeat research already completed in the current context.
+Use the research and decisions already present in this conversation to create or revise a spec and phased implementation plan that an orchestrator can delegate without drifting. Treat direction after the mode or target as optional. Do not discard or repeat research already completed in the current context.
 
-Do not implement the project. Persist the plan only to the explicit file or existing GitHub issue supplied by the user.
+Do not implement the project. Persist the plan as a file or GitHub issue hierarchy according to the selected creation mode or existing artifact target.
 
 # 0. Resolve the target
 
-Usage: `/phased-plan <plan-target> [additional direction]`
+New plan: `/phased-plan <file|gh|github> [additional direction]`
 
-- Target: `$1`
+Revise a plan: `/phased-plan <plan-target> [additional direction]`
+
+- Mode or target: `$1`
 - Full input: `$ARGUMENTS`
-- A Markdown path that resolves inside the current repository selects file mode. Create that file if it does not exist or revise it in place if it does.
-- A positive issue number, `#<number>`, or GitHub issue URL selects GitHub mode. It must identify an existing parent issue; never create the parent issue. Strip a leading `#` before passing the number to `gh`.
-- Infer the mode when the user clearly names a file or GitHub issue anywhere in the request. Do not ask them to choose a mode they already indicated.
-- If no target is supplied, two targets conflict, or the target is genuinely ambiguous, ask one concise clarification question. Never invent a default path or issue.
+- `file` selects creation mode for a new Markdown plan. `gh` and `github` select creation mode for a new parent issue and managed phase sub-issues.
+- A Markdown path that resolves inside the current repository selects file mode for that exact artifact. Create it if it does not exist or revise it in place if it does.
+- A positive issue number, `#<number>`, or GitHub issue URL selects GitHub revision mode and must identify an existing parent issue. Strip a leading `#` before passing the number to `gh`.
+- A creation mode always creates a new artifact. Never silently reuse or revise a similarly named file or issue.
+- Infer creation mode when the user clearly asks for a new file or GitHub issue anywhere in the request. Infer revision mode when they clearly name an artifact target. Do not ask them to choose a mode they already indicated.
+- If neither a mode nor target is supplied, two choices conflict, or the choice is genuinely ambiguous, ask one concise clarification question. Never invent whether the user wants a file or issue.
 
-For file mode, resolve the supplied path and require it to stay inside the current repository. Read the entire existing file before revising it.
+For new file mode, derive a concise short kebab-case name from the project goal and create `plans/<short-kebab-case-name>.md` inside the repository. Create `plans/` when needed. If that path already exists, use the first unused numeric suffix such as `-2`; do not overwrite or revise it.
+
+For an explicit file target, resolve the supplied path and require it to stay inside the current repository. Read the entire existing file before revising it.
 
 For GitHub mode:
 
 1. Load the `gh-issues` skill and follow its compatible command and stdin guidance.
 2. Run `gh auth status` and `gh repo view --json nameWithOwner,hasIssuesEnabled,viewerPermission,url` before the first mutation.
-3. Treat a bare number as an issue in the current repository. If an issue URL points to another repository, ask whether that repository is intentional before mutating it.
-4. Read the parent with `gh issue view "$parent" --json number,title,body,state,stateReason,parent,subIssues,subIssuesSummary,comments,url`, then read every managed phase issue in full.
-5. If the supplied issue is itself a sub-issue, is closed, or contains sub-issues whose role makes the requested plan ambiguous, ask before proceeding. Do not ask merely because unrelated sub-issues exist; leave them untouched.
-6. Preserve the existing parent title unless the user explicitly asks to change it. Treat its current body as planning input and fold relevant content into the structured spec.
+3. Require issues to be enabled and the viewer to have `WRITE`, `MAINTAIN`, or `ADMIN` permission. Before creating sub-issues, verify that `gh issue create --help` exposes `--parent`; stop and request a `gh` upgrade if it does not.
+4. In creation mode, derive a concise, action-oriented parent title from the problem and goals. Create a fresh parent even when a similar issue exists; do not search for or reuse a possible match.
+5. In revision mode, treat a bare number as an issue in the current repository. If an issue URL points to another repository, ask whether that repository is intentional before mutating it.
+6. In revision mode, read the parent with `gh issue view "$parent" --json number,title,body,state,stateReason,parent,subIssues,subIssuesSummary,comments,url`, then read every managed phase issue in full.
+7. If a supplied issue is itself a sub-issue, is closed, or contains sub-issues whose role makes the requested plan ambiguous, ask before proceeding. Do not ask merely because unrelated sub-issues exist; leave them untouched.
+8. Preserve an existing parent's title unless the user explicitly asks to change it. Treat its current body as planning input and fold relevant content into the structured spec.
 
 # 1. Purpose
 
@@ -42,11 +50,11 @@ Prevent these common failures:
 - Monolithic delivery: create atomic, independently verifiable phases.
 - Over-engineering: sketch only the simplest interfaces required by the acceptance criteria.
 - Data-model drift: define persisted or shared data and its evolution before dependent behavior.
-- Context loss: make the selected plan target sufficient for a fresh agent to resume.
+- Context loss: make the selected plan artifact sufficient for a fresh agent to resume.
 
 # 2. Draft and clarify before persistence
 
-Use the conversation, repository, existing target, and your judgment to draft the complete parent spec and every phase without interviewing the user. You own the initial recommendations for goals, non-goals, acceptance criteria, and phase order; do not ask the user to author them.
+Use the conversation, repository, an existing artifact when revising, and your judgment to draft the complete parent spec and every phase without interviewing the user. You own the initial recommendations for goals, non-goals, acceptance criteria, and phase order; do not ask the user to author them.
 
 Record reasonable, reversible assumptions under Constraints and Assumptions. State them directly or tag them `[ASSUMED: ...]`.
 
@@ -61,7 +69,7 @@ Ask before drafting only when no safe default exists and the answer would reshap
 
 Draft all GitHub issue bodies before the first mutation. This minimizes partial hierarchies and makes retries deterministic.
 
-# 3. Editing an existing plan
+# 3. Revising an existing plan
 
 Treat phase status as an edit boundary in either backend:
 
@@ -188,7 +196,7 @@ Collect only blocking `[NEEDS CLARIFICATION]` items so the user can answer in on
 - After verification passes, the orchestrator runs one code review over the complete phase commit range. Builders fix all findings in one pass. Do not review or verify the phase again after those fixes; the final branch review is the backstop.
 - The orchestrator marks a phase `[x] COMPLETE` only after verification passes and every review finding is fixed, accepted, or invalidated.
 - A completion record includes the date, command and result, and phase-review outcome, for example: `[x] COMPLETE (2026-07-19, verified by: npm test -- store.test.ts -> 14 passed; code review: 2 findings fixed)`.
-- A resuming orchestrator reads the entire selected plan target and continues from the earliest incomplete phase without re-verifying completed phases.
+- A resuming orchestrator reads the entire selected plan artifact and continues from the earliest incomplete phase without re-verifying completed phases.
 
 In file mode, the file is the source of truth and status updates follow the existing commit protocol used by `/phased-build`.
 
@@ -198,14 +206,25 @@ In GitHub mode, the issue hierarchy is the source of truth. The orchestrator edi
 
 Use compatible native `gh issue` commands and quoted stdin; do not create temporary files.
 
+For a new hierarchy, create the parent before its managed phase sub-issues. The initial parent body must contain the complete spec with an ordered phase-title index; replace that index with issue links after creating the children.
+
 ```bash
-gh issue edit "$parent" --body-file - <<'EOF'
+title="<concise project title>"
+parent_url="$(
+  gh issue create --title "$title" --body-file - <<'EOF'
 <!-- phased-plan:v1 -->
 ...
 EOF
+)"
+parent="${parent_url##*/}"
 
 gh issue create --title "Phase N: Name" --body-file - --parent "$parent" <<'EOF'
 <!-- phased-plan-phase:v1 -->
+...
+EOF
+
+gh issue edit "$parent" --body-file - <<'EOF'
+<!-- phased-plan:v1 -->
 ...
 EOF
 
@@ -236,7 +255,7 @@ gh api --method PATCH \
 
 Use `before_id` instead when moving before another phase. Do not call the ordering endpoint when titles changed but order did not.
 
-Create or update managed phase issues sequentially, then edit the parent body with the final ordered links. If an operation fails partway through, do not delete or duplicate successful issues. Report the parent and completed child URLs and instruct a retry against the same parent issue.
+In creation mode, create the parent, create each managed phase issue sequentially, then edit the parent body with the final ordered links. In revision mode, create or update managed phase issues sequentially before editing the parent. If an operation fails partway through, do not delete or duplicate successful issues. Report the parent and completed child URLs, then instruct a retry against the same parent issue.
 
 # 7. Right-sizing and anti-patterns
 
@@ -246,7 +265,7 @@ Create or update managed phase issues sequentially, then edit the parent body wi
 - Keep the shared spec within roughly one to three screens. Keep each phase self-contained but compact.
 - Do not dictate variable names, internal file layout, or choices an implementation agent can safely make.
 - Do not omit Non-Goals, use subjective acceptance criteria, hide assumptions, defer dependent data-model work, or create a "build everything, then test everything" sequence.
-- Do not change code before amending the selected plan target.
+- Do not change code before creating or amending the selected plan artifact.
 - Do not mark a phase complete before exact verification and its single phase review finish.
 - Do not alter completed phases or the scope/order of active phases; add pending follow-up work instead.
 
@@ -254,8 +273,10 @@ Create or update managed phase issues sequentially, then edit the parent body wi
 
 After blocking questions are resolved:
 
-- File mode: write or revise exactly the supplied path. Do not create a second plan file.
-- GitHub mode: add `<!-- phased-plan:v1 -->` to the parent body, reconcile only managed phase sub-issues, and preserve unrelated sub-issues and the parent title.
+- New file mode: create the fresh collision-safe path selected under target resolution.
+- Explicit file target: create or revise exactly that path. Do not create a second plan file.
+- New GitHub mode: create a fresh parent with `<!-- phased-plan:v1 -->`, then create and link every managed phase sub-issue.
+- Existing GitHub target: add or preserve `<!-- phased-plan:v1 -->`, reconcile only managed phase sub-issues, and preserve unrelated sub-issues and the parent title.
 - If no blocking questions remain, persist immediately without asking for approval.
 - Do not implement the project or hand it to an implementation agent as part of this command.
 - Report the file path or parent issue URL, the ordered phases, every managed phase issue URL in GitHub mode, and any locked-phase request converted to follow-up work.

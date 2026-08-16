@@ -162,7 +162,7 @@ vet: shellcheck python-check opencode-check ## Run all repo lint, type, and synt
 .PHONY: opencode-check
 opencode-check: ## Run opencode plugin checks
 	node --check opencode/plugins/safe-commands.js
-	node --test opencode/test/safe-commands.test.js
+	node --test opencode/test/*.test.js
 
 OPT_OWNER ?= nix
 OPT_GROUP ?= staff
