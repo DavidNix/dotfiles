@@ -10,7 +10,7 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "Homelab",
       "options": {
-        "baseURL": "http://ai1-inference:8000/v1",
+        "baseURL": "http://ai2-inference:8000/v1",
         "apiKey": "local",
       },
       "models": {
