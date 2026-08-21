@@ -4,11 +4,11 @@
   "default_agent": "plan",
   "disabled_providers": ["opencode", "baseten"],
   "model": "openai/gpt-5.6-sol-fast",
-  "small_model": "homelab/qwen3.6-35b-a3b-nvfp4",
+  "small_model": "nixlab-small/qwen3.6-35b-a3b-nvfp4",
   "provider": {
-    "homelab": {
+    "nixlab-small": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Homelab",
+      "name": "Nixlab Small",
       "options": {
         "baseURL": "http://ai2-inference:8000/v1",
         "apiKey": "local",
@@ -16,6 +16,51 @@
       "models": {
         "qwen3.6-35b-a3b-nvfp4": {
           "name": "Qwen3.6-35B-A3B",
+          "reasoning": true,
+          "limit": {
+            "context": 131072,
+            "output": 32000,
+          },
+          "variants": {
+            "none": {
+              "chat_template_kwargs": {
+                "enable_thinking": false,
+              },
+            },
+            "thinking": {
+              "chat_template_kwargs": {
+                "enable_thinking": true,
+              },
+            },
+            "low": { "disabled": true },
+            "medium": { "disabled": true },
+            "high": { "disabled": true },
+          },
+        },
+      },
+    },
+    "nixlab-large": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Nixlab Large",
+      "options": {
+        "baseURL": "http://ai1-inference:8000/v1",
+        "apiKey": "local",
+      },
+      "models": {
+        "deepseek-ai/DeepSeek-V4-Flash-0731": {
+          "name": "DeepSeek V4 Flash 0731",
+          "reasoning": true,
+          "limit": {
+            "context": 262144,
+            "output": 32000,
+          },
+          "variants": {
+            "none": { "reasoningEffort": "none" },
+            "low": { "reasoningEffort": "low" },
+            "medium": { "disabled": true },
+            "high": { "reasoningEffort": "high" },
+            "max": { "reasoningEffort": "max" },
+          },
         },
       },
     },
