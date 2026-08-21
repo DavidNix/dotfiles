@@ -2,8 +2,8 @@
 description: Builds requested changes after the parent agent has planned the work.
 mode: subagent
 hidden: true
-model: openai/gpt-5.6-sol-fast
-variant: medium
+model: nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731
+variant: high
 permission:
   bash:
     "*": allow

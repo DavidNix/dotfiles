@@ -2,7 +2,7 @@
 description: Preferred for all frontend work. Implements UI, styling, interactions, responsive behavior, and other frontend changes after the parent agent has planned the work.
 mode: subagent
 hidden: true
-model: opencode-go/glm-5.3
+model: nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731
 permission:
   bash:
     "*": allow
