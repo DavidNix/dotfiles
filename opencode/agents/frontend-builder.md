@@ -3,6 +3,7 @@ description: Preferred for all frontend work. Implements UI, styling, interactio
 mode: subagent
 hidden: true
 model: nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731
+variant: high
 permission:
   bash:
     "*": allow

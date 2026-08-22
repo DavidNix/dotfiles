@@ -72,10 +72,12 @@
     },
     "explore": {
       "model": "nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731",
+      "variant": "low",
       "permission": { "task": "deny" }, // deny subagents from spawning more subagents
     },
     "general": {
       "model": "nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731",
+      "variant": "low",
       "permission": { "task": "deny" }, // deny subagents from spawning more subagents
     },
     "summary": {
