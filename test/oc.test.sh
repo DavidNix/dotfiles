@@ -34,6 +34,16 @@ printf '[user]\n\tname = Sandbox Test\n\temail = sandbox@example.com\n' >"$home_
 printf 'config-target-readable\n' >"$outside_dir/config-target.txt"
 printf 'config-sibling-private\n' >"$outside_dir/config-sibling.txt"
 ln -s "$outside_dir/config-target.txt" "$home_dir/.config/opencode/config-link"
+cat >"$work_dir/heredoc-probe.zsh" <<'ZSH'
+#!/bin/zsh
+
+value=$(cat <<'EOF'
+heredoc-ok
+EOF
+)
+[[ "$value" == "heredoc-ok" ]]
+ZSH
+chmod +x "$work_dir/heredoc-probe.zsh"
 for private_dir in \
     "$home_dir/.krew" \
     "$home_dir/.lmstudio" \
@@ -102,6 +112,9 @@ esac
 printf 'tmpdir=%s\n' "$TMPDIR"
 printf 'workspace-write\n' >"$PWD/workspace-write.txt"
 printf 'temp-write\n' >"$TMPDIR/temp-write.txt"
+printf 'cache-write\n' >"$XDG_CACHE_HOME/write-probe.txt"
+mkdir -p "$XDG_CACHE_HOME/uv"
+printf 'uv-cache-write\n' >"$XDG_CACHE_HOME/uv/write-probe.txt"
 if (printf 'opencode-install-write\n' >"$HOME/.opencode/bin/write-probe.txt") 2>/dev/null; then
     printf 'opencode-install-write=allowed\n'
 else
@@ -124,6 +137,12 @@ probe_private_read lmstudio-private "$HOME/.lmstudio/private.txt"
 probe_private_read mise-private "$HOME/.local/share/mise/private.txt"
 probe_private_read opencode-private "$HOME/.opencode/private.txt"
 
+if /usr/bin/ssh -F /dev/null -G localhost >/dev/null 2>&1; then
+    printf 'ssh-user-lookup=allowed\n'
+else
+    printf 'ssh-user-lookup=blocked\n'
+fi
+
 for root in "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"; do
     mkdir -p "$root/opencode"
     printf 'opencode-write\n' >"$root/opencode/write-probe.txt"
@@ -137,6 +156,12 @@ else
     printf 'config-link-write=blocked\n'
 fi
 probe_outside_write
+
+if /bin/zsh "$PWD/heredoc-probe.zsh"; then
+    printf 'zsh-heredoc=allowed\n'
+else
+    printf 'zsh-heredoc=blocked\n'
+fi
 
 IFS= read -r go_value <"$GOMODCACHE/probe.txt"
 IFS= read -r path_value <"$(dirname "$0")/path-probe.txt"
@@ -186,13 +211,17 @@ assert_contains "$output_file" "krew-private-read=allowed"
 assert_contains "$output_file" "lmstudio-private-read=allowed"
 assert_contains "$output_file" "mise-private-read=allowed"
 assert_contains "$output_file" "opencode-private-read=allowed"
+assert_contains "$output_file" "ssh-user-lookup=allowed"
 assert_contains "$output_file" "outside-write=blocked"
+assert_contains "$output_file" "zsh-heredoc=allowed"
 assert_contains "$output_file" "go-read=go-module-readable"
 assert_contains "$output_file" "path-read=path-readable"
 
 [[ -f "$work_dir/workspace-write.txt" ]]
 [[ -f "$home_dir/.config/opencode/write-probe.txt" ]]
+[[ -f "$home_dir/.cache/write-probe.txt" ]]
 [[ -f "$home_dir/.cache/opencode/write-probe.txt" ]]
+[[ -f "$home_dir/.cache/uv/write-probe.txt" ]]
 [[ -f "$home_dir/.local/share/opencode/write-probe.txt" ]]
 [[ -f "$home_dir/.local/state/opencode/write-probe.txt" ]]
 [[ -f "$home_dir/.opencode/bin/write-probe.txt" ]]

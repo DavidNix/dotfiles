@@ -101,18 +101,16 @@ main() {
         [[ "$root" == /* ]] || die "XDG directories must be absolute: $root"
     done
 
-    local opencode_config_dir opencode_cache_dir opencode_data_dir opencode_state_dir
+    local opencode_config_dir opencode_data_dir opencode_state_dir
     opencode_config_dir="$xdg_config_home/opencode"
-    opencode_cache_dir="$xdg_cache_home/opencode"
     opencode_data_dir="$xdg_data_home/opencode"
     opencode_state_dir="$xdg_state_home/opencode"
-    mkdir -p "$opencode_config_dir" "$opencode_cache_dir" "$opencode_data_dir" "$opencode_state_dir"
+    mkdir -p "$opencode_config_dir" "$xdg_cache_home/opencode" "$opencode_data_dir" "$opencode_state_dir"
     xdg_config_home=$(cd -P "$xdg_config_home" && pwd)
     xdg_cache_home=$(cd -P "$xdg_cache_home" && pwd)
     xdg_data_home=$(cd -P "$xdg_data_home" && pwd)
     xdg_state_home=$(cd -P "$xdg_state_home" && pwd)
     opencode_config_dir="$xdg_config_home/opencode"
-    opencode_cache_dir="$xdg_cache_home/opencode"
     opencode_data_dir="$xdg_data_home/opencode"
     opencode_state_dir="$xdg_state_home/opencode"
 
@@ -131,6 +129,7 @@ main() {
     export TMPDIR="$sandbox_tmp"
     export TMP="$sandbox_tmp"
     export TEMP="$sandbox_tmp"
+    export TMPPREFIX="$sandbox_tmp/zsh"
     export GOCACHE="$sandbox_tmp/go-build"
     export GOTMPDIR="$sandbox_tmp/go-tmp"
     export XDG_CONFIG_HOME="$xdg_config_home"
@@ -144,7 +143,7 @@ main() {
     add_write_root "$work_dir"
     add_write_root "$sandbox_tmp"
     add_write_root "$opencode_config_dir"
-    add_write_root "$opencode_cache_dir"
+    add_write_root "$xdg_cache_home"
     add_write_root "$opencode_data_dir"
     add_write_root "$opencode_state_dir"
     add_write_root "$HOME/.opencode/bin"
@@ -201,8 +200,8 @@ main() {
 (allow network-outbound)
 (allow network-inbound)
 
-; Security.framework delegates TLS certificate validation to this service.
-(allow mach-lookup (global-name "com.apple.trustd.agent"))'
+; Native tools rely on macOS services; file writes remain constrained separately.
+(allow mach-lookup)'
 
     local -a definitions=()
     local index key root
