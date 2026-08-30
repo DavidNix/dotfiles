@@ -4,7 +4,7 @@
 
 SHELL := /bin/zsh
 
-SHELL_SCRIPTS := bin/agent-init bin/ai-sandbox bin/worktree bin/zed-toggle-test-file script/macos-defaults.sh test/ai-sandbox.test.sh tmux-init.sh
+SHELL_SCRIPTS := bin/agent-init bin/oc bin/worktree bin/zed-toggle-test-file script/macos-defaults.sh test/oc.test.sh tmux-init.sh
 PYTHON_SCRIPTS := bin/image-gen bin/image-edit
 
 default: help
@@ -17,6 +17,7 @@ help: ## Print this help message
 install-scripts: ## Symlink custom scripts to ~/.local/bin
 	@echo "Symlinking scripts to ~/.local/bin..."
 	@mkdir -p ~/.local/bin
+	@rm -f ~/.local/bin/oc-sandbox
 	@chmod +x $$PWD/bin/*
 	@ln -sf $$PWD/bin/* ~/.local/bin/
 	@echo "Scripts installed successfully"

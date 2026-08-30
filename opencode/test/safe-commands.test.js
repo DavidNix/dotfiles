@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import os from "node:os";
+import path from "node:path";
 import test from "node:test";
 
 import {
@@ -114,4 +116,12 @@ test("plugin hook inspects string-array command args", async () => {
     () => beforeExecute({ tool: "bash" }, { args: { command: ["git", "push"] } }),
     /git push commands are blocked/,
   );
+});
+
+test("validateSafeCommand blocks OpenCode private data", () => {
+  const dataDir = path.join(process.env.XDG_DATA_HOME || path.join(os.homedir(), ".local", "share"), "opencode");
+  assert.throws(() => validateSafeCommand(`cat ${path.join(dataDir, "auth.json")}`), /OpenCode private data/);
+  assert.throws(() => validateSafeCommand(`sqlite3 ${path.join(dataDir, "opencode.db")}`), /OpenCode private data/);
+  assert.throws(() => validateSafeCommand(`rg token ${path.join(dataDir, "storage")}`), /OpenCode private data/);
+  assert.doesNotThrow(() => validateSafeCommand(`cat ${path.join(dataDir, "tool-output", "result.txt")}`));
 });

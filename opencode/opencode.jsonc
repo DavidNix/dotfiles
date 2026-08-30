@@ -85,7 +85,7 @@
     },
   },
   "share": "disabled",
-  "autoupdate": "notify",
+  "autoupdate": true,
   "mcp": {
     "context7": {
       "type": "remote",

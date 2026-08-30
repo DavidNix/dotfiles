@@ -1,17 +1,52 @@
 // Safe Commands Plugin - Blocks dangerous bash commands
 // Blocks dangerous shell commands, secret access, and destructive macOS operations.
 
+import os from "node:os";
+import path from "node:path";
+
 const secretPatterns = [
   /\.(?:pem|key|p12)\b/i,
   /\.aws\/credentials\b/i,
+  /\.azure\//i,
+  /\.cargo\/credentials(?:\.toml)?\b/i,
+  /\.config\/gcloud\//i,
   /\.npmrc\b/i,
   /\.netrc\b/i,
+  /\.pypirc\b/i,
+  /\.ssh\//i,
   /\.kube\/config\b/i,
   /\.docker\/config\.json\b/i,
   /\.config\/gh\/hosts\.yml\b/i,
+  /\.gem\/credentials\b/i,
   /\.gnupg\//i,
+  /\.terraform\.d\/credentials\.tfrc\.json\b/i,
   /\.vault-token\b/i,
 ];
+
+const openCodePrivateDataReason = "Access denied: OpenCode private data contains credentials, session history, logs, or snapshots that must not be exposed to AI agents.";
+const sensitiveCredentialReason = "Access denied: sensitive credentials and authentication data must not be exposed to AI agents.";
+
+const opencodeDataDir = () => path.resolve(
+  process.env.OC_SANDBOX_OPENCODE_DATA_DIR
+    || path.join(process.env.XDG_DATA_HOME || path.join(os.homedir(), ".local", "share"), "opencode"),
+);
+
+const commandReferencesOpenCodePrivateData = (command) => {
+  const home = os.homedir();
+  const expanded = command
+    .replaceAll("${HOME}", home)
+    .replaceAll("$HOME", home)
+    .replaceAll("~/", `${home}/`);
+  const dataDir = opencodeDataDir();
+
+  if (expanded.includes(path.join(dataDir, "auth.json")) || expanded.includes(path.join(dataDir, "mcp-auth.json"))) {
+    return true;
+  }
+  if (["log", "project", "snapshot", "storage"].some((name) => expanded.includes(path.join(dataDir, name)))) {
+    return true;
+  }
+  return new RegExp(`${dataDir.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/opencode(?:-[^/\\s]+)?\\.db(?:-(?:shm|wal))?`, "i").test(expanded);
+};
 
 const simpleShellWords = (segment) => (segment.match(/"[^"]*"|'[^']*'|\S+/g) || [])
   .map((word) => word.replace(/^(["'])(.*)\1$/, "$2"));
@@ -138,12 +173,16 @@ export const getUnsafeCommandReason = (command) => {
     return "terraform apply commands are blocked because they can make destructive infrastructure changes that are difficult to reverse. The AI agent is not permitted to modify live infrastructure automatically.";
   }
 
+  if (commandReferencesOpenCodePrivateData(command)) {
+    return openCodePrivateDataReason;
+  }
+
   if (command.includes(".env") || command.includes(".envrc") || command.includes(".vault-password")) {
     return "Access denied: Commands containing '.env', '.envrc', or '.vault-password' are blocked because these files typically contain sensitive credentials, API keys, passwords, or other secrets that should never be exposed or manipulated by AI agents.";
   }
 
   if (secretPatterns.some((pattern) => pattern.test(command))) {
-    return "Access denied: Commands referencing cloud credentials, package tokens, kube configs, Docker auth, GitHub auth, GPG data, or Vault tokens are blocked because they can expose sensitive secrets.";
+    return sensitiveCredentialReason;
   }
 
   for (const segment of commandSegments(command)) {
@@ -200,10 +239,7 @@ export const validateSafeCommand = (command) => {
 export const SafeCommandsPlugin = async () => {
   return {
     "tool.execute.before": async (input, output) => {
-      if (input.tool !== "bash") {
-        return;
-      }
-
+      if (input.tool !== "bash") return;
       const command = output.args?.command;
       validateSafeCommand(Array.isArray(command) ? command.join(" ") : typeof command === "string" ? command : "");
     },

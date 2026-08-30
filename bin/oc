@@ -1,0 +1,217 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: oc [--without-sandbox] [--] [OPENCODE_ARGS...]
+
+Run OpenCode with filesystem writes sandboxed by default.
+
+OPTIONS:
+    -h, --help       Show this help message
+    --without-sandbox  Run OpenCode directly without the macOS sandbox
+    --               Pass all remaining arguments to OpenCode
+
+EXAMPLES:
+    oc
+    oc --model openai/gpt-5.6-sol
+    oc --without-sandbox --version
+    oc -- --help
+EOF
+}
+
+die() {
+    printf 'oc: %s\n' "$*" >&2
+    exit 1
+}
+
+resolve_script_dir() {
+    local source dir target
+    source=${BASH_SOURCE[0]}
+
+    while [[ -L "$source" ]]; do
+        dir=$(cd -P "$(dirname "$source")" && pwd)
+        target=$(readlink "$source")
+        if [[ "$target" == /* ]]; then
+            source=$target
+        else
+            source=$dir/$target
+        fi
+    done
+
+    cd -P "$(dirname "$source")" && pwd
+}
+
+declare -a write_roots=()
+sandbox_tmp=""
+
+add_write_root() {
+    local candidate resolved existing
+    candidate=$1
+    [[ -d "$candidate" ]] || return 0
+    resolved=$(cd -P "$candidate" && pwd)
+
+    for existing in "${write_roots[@]:-}"; do
+        [[ "$existing" == "$resolved" ]] && return 0
+    done
+    write_roots+=("$resolved")
+}
+
+main() {
+    if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+        usage
+        exit 0
+    fi
+
+    local without_sandbox=false
+    if [[ "${1:-}" == "--without-sandbox" ]]; then
+        without_sandbox=true
+        shift
+    elif [[ "${1:-}" == "--" ]]; then
+        shift
+    fi
+
+    local opencode_bin
+    opencode_bin=$(command -v opencode 2>/dev/null || true)
+    [[ -n "$opencode_bin" ]] || die "opencode is not on PATH"
+    opencode_bin=$(realpath "$opencode_bin")
+
+    if [[ "$without_sandbox" == true ]]; then
+        [[ "${1:-}" == "--" ]] && shift
+        exec "$opencode_bin" "$@"
+    fi
+
+    [[ "$(uname -s)" == "Darwin" ]] || die "sandbox-exec is only available on macOS"
+    [[ -x /usr/bin/sandbox-exec ]] || die "/usr/bin/sandbox-exec is unavailable"
+
+    local work_dir script_dir repo_dir config_file
+    work_dir=$(pwd -P)
+    script_dir=$(resolve_script_dir)
+    repo_dir=$(cd "$script_dir/.." && pwd -P)
+    config_file="$repo_dir/opencode/oc-sandbox.jsonc"
+    [[ -r "$config_file" ]] || die "sandbox config is unavailable: $config_file"
+
+    local xdg_config_home xdg_cache_home xdg_data_home xdg_state_home
+    xdg_config_home=${XDG_CONFIG_HOME:-$HOME/.config}
+    xdg_cache_home=${XDG_CACHE_HOME:-$HOME/.cache}
+    xdg_data_home=${XDG_DATA_HOME:-$HOME/.local/share}
+    xdg_state_home=${XDG_STATE_HOME:-$HOME/.local/state}
+    for root in "$xdg_config_home" "$xdg_cache_home" "$xdg_data_home" "$xdg_state_home"; do
+        [[ "$root" == /* ]] || die "XDG directories must be absolute: $root"
+    done
+
+    local opencode_config_dir opencode_cache_dir opencode_data_dir opencode_state_dir
+    opencode_config_dir="$xdg_config_home/opencode"
+    opencode_cache_dir="$xdg_cache_home/opencode"
+    opencode_data_dir="$xdg_data_home/opencode"
+    opencode_state_dir="$xdg_state_home/opencode"
+    mkdir -p "$opencode_config_dir" "$opencode_cache_dir" "$opencode_data_dir" "$opencode_state_dir"
+    xdg_config_home=$(cd -P "$xdg_config_home" && pwd)
+    xdg_cache_home=$(cd -P "$xdg_cache_home" && pwd)
+    xdg_data_home=$(cd -P "$xdg_data_home" && pwd)
+    xdg_state_home=$(cd -P "$xdg_state_home" && pwd)
+    opencode_config_dir="$xdg_config_home/opencode"
+    opencode_cache_dir="$xdg_cache_home/opencode"
+    opencode_data_dir="$xdg_data_home/opencode"
+    opencode_state_dir="$xdg_state_home/opencode"
+
+    local host_tmp work_hash
+    host_tmp=${TMPDIR:-/tmp}
+    [[ "$host_tmp" == /* && -d "$host_tmp" ]] || die "TMPDIR must be an existing absolute directory"
+    work_hash=$(printf '%s' "$work_dir" | /sbin/md5 -q | cut -c1-12)
+    sandbox_tmp=$(mktemp -d "${host_tmp%/}/oc-sandbox-${work_hash}.XXXXXX")
+    sandbox_tmp=$(cd -P "$sandbox_tmp" && pwd)
+    cleanup() {
+        rm -rf -- "$sandbox_tmp"
+    }
+    trap cleanup EXIT
+
+    mkdir -p "$sandbox_tmp/go-build" "$sandbox_tmp/go-tmp"
+    export TMPDIR="$sandbox_tmp"
+    export TMP="$sandbox_tmp"
+    export TEMP="$sandbox_tmp"
+    export GOCACHE="$sandbox_tmp/go-build"
+    export GOTMPDIR="$sandbox_tmp/go-tmp"
+    export XDG_CONFIG_HOME="$xdg_config_home"
+    export XDG_CACHE_HOME="$xdg_cache_home"
+    export XDG_DATA_HOME="$xdg_data_home"
+    export XDG_STATE_HOME="$xdg_state_home"
+    export OC_SANDBOX_OPENCODE_DATA_DIR="$opencode_data_dir"
+    export OPENCODE_CONFIG_CONTENT
+    OPENCODE_CONFIG_CONTENT=$(<"$config_file")
+
+    add_write_root "$work_dir"
+    add_write_root "$sandbox_tmp"
+    add_write_root "$opencode_config_dir"
+    add_write_root "$opencode_cache_dir"
+    add_write_root "$opencode_data_dir"
+    add_write_root "$opencode_state_dir"
+    add_write_root "$HOME/.opencode/bin"
+
+    local git_common_dir
+    git_common_dir=$(git -C "$work_dir" rev-parse --git-common-dir 2>/dev/null || true)
+    if [[ -n "$git_common_dir" ]]; then
+        if [[ "$git_common_dir" != /* ]]; then
+            git_common_dir="$work_dir/$git_common_dir"
+        fi
+        add_write_root "$git_common_dir"
+    fi
+
+    local go_mod_cache go_path
+    go_path=${GOPATH:-$HOME/go}
+    go_mod_cache=${GOMODCACHE:-${go_path%%:*}/pkg/mod}
+    if [[ -d "$go_mod_cache" ]]; then
+        go_mod_cache=$(cd -P "$go_mod_cache" && pwd)
+        export GOMODCACHE="$go_mod_cache"
+    fi
+
+    local developer_dir
+    developer_dir=$(/usr/bin/xcode-select -p 2>/dev/null || true)
+    if [[ -n "$developer_dir" && -d "$developer_dir" ]]; then
+        developer_dir=$(cd -P "$developer_dir" && pwd)
+        export DEVELOPER_DIR="$developer_dir"
+    fi
+
+    local profile
+    profile='(version 1)
+(deny default)
+
+(allow process-exec)
+(allow process-fork)
+(allow signal (target same-sandbox))
+(allow process-info* (target same-sandbox))
+(allow sysctl-read)
+
+; Reads are unrestricted. Seatbelt enforces write isolation only.
+(allow file-read* file-test-existence)
+(allow file-map-executable)
+
+; Terminal and inherited file descriptors.
+(allow pseudo-tty)
+(allow file-read-data file-test-existence file-write-data (subpath "/dev/fd"))
+(allow file-read* file-write* file-ioctl (literal "/dev/ptmx"))
+(allow file-read* file-write* (literal "/dev/null"))
+(allow file-read* file-write* (literal "/dev/tty"))
+(allow file-read-metadata (literal "/dev"))
+(allow file-read* file-write* (regex #"^/dev/ttys[0-9]+$"))
+(allow file-ioctl (regex #"^/dev/ttys[0-9]+$"))
+
+; Network access is always enabled so OpenCode can reach model providers.
+(allow network-outbound)
+(allow network-inbound)'
+
+    local -a definitions=()
+    local index key root
+    index=0
+    for root in "${write_roots[@]}"; do
+        key="WRITABLE_ROOT_$index"
+        profile+=$'\n'"(allow file-write* (subpath (param \"$key\")))"
+        definitions+=("-D$key=$root")
+        index=$((index + 1))
+    done
+
+    /usr/bin/sandbox-exec -p "$profile" "${definitions[@]}" -- "$opencode_bin" "$@"
+}
+
+main "$@"
