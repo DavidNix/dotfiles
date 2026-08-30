@@ -3,6 +3,8 @@
 set -euo pipefail
 
 repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+gh_bin=$(command -v gh 2>/dev/null || true)
+[[ -n "$gh_bin" ]] || { printf 'gh is required for oc tests\n' >&2; exit 1; }
 tmp_dir=$(mktemp -d)
 
 fake_bin="$tmp_dir/bin"
@@ -70,6 +72,18 @@ if [[ "${1:-}" == "commit-probe" ]]; then
     git commit --allow-empty -m oc-test >/dev/null
     printf 'git-commit=ok\n'
     probe_outside_write
+    exit 0
+fi
+
+if [[ "${1:-}" == "tls-probe" ]]; then
+    tls_output=""
+    if ! tls_output=$(GH_TOKEN=invalid "$OC_SANDBOX_TEST_GH" api graphql -f 'query={__typename}' 2>&1); then
+        :
+    fi
+    case "$tls_output" in
+        *"HTTP 401"*|*"Bad credentials"*) printf 'tls-validation=ok\n' ;;
+        *) printf 'tls-validation=failed: %s\n' "$tls_output" ;;
+    esac
     exit 0
 fi
 
@@ -189,6 +203,22 @@ IFS= read -r config_target_value <"$outside_dir/config-target.txt"
 sandbox_tmp=$(grep '^tmpdir=' "$output_file" | cut -d= -f2-)
 [[ "$sandbox_tmp" == *"oc-sandbox-"* ]]
 [[ ! -e "$sandbox_tmp" ]]
+
+tls_output="$tmp_dir/tls-output.log"
+failure_log="$tls_output"
+(
+    cd "$work_dir"
+    PATH="$fake_bin:/usr/bin:/bin" \
+        HOME="$home_dir" \
+        XDG_CONFIG_HOME="$home_dir/.config" \
+        XDG_CACHE_HOME="$home_dir/.cache" \
+        XDG_DATA_HOME="$home_dir/.local/share" \
+        XDG_STATE_HOME="$home_dir/.local/state" \
+        GOMODCACHE="$go_mod_dir" \
+        OC_SANDBOX_TEST_GH="$gh_bin" \
+        "$repo_dir/bin/oc" tls-probe >"$tls_output" 2>&1
+)
+assert_contains "$tls_output" "tls-validation=ok"
 
 bypass_output="$tmp_dir/bypass-output.log"
 failure_log="$bypass_output"

@@ -199,7 +199,10 @@ main() {
 
 ; Network access is always enabled so OpenCode can reach model providers.
 (allow network-outbound)
-(allow network-inbound)'
+(allow network-inbound)
+
+; Security.framework delegates TLS certificate validation to this service.
+(allow mach-lookup (global-name "com.apple.trustd.agent"))'
 
     local -a definitions=()
     local index key root
