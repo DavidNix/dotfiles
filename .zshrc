@@ -176,6 +176,7 @@ alias top="ytop"
 alias vi="nvim"
 alias vim="nvim"
 alias ls="lsd"
+alias opencode="oc"
 
 # M1 Terminal Helpers
 alias arm="env /usr/bin/arch -arm64 /bin/zsh --login"
