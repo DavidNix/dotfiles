@@ -97,6 +97,15 @@ if [[ "${1:-}" == "tls-probe" ]]; then
     exit 0
 fi
 
+if [[ "${1:-}" == "signal-probe" ]]; then
+    if kill -0 "$PPID" 2>/dev/null; then
+        printf 'parent-signal=allowed\n'
+    else
+        printf 'parent-signal=blocked\n'
+    fi
+    exit 0
+fi
+
 printf 'arg-count=%s\n' "$#"
 index=0
 for arg in "$@"; do
@@ -248,6 +257,21 @@ failure_log="$tls_output"
         "$repo_dir/bin/oc" tls-probe >"$tls_output" 2>&1
 )
 assert_contains "$tls_output" "tls-validation=ok"
+
+signal_output="$tmp_dir/signal-output.log"
+failure_log="$signal_output"
+(
+    cd "$work_dir"
+    PATH="$fake_bin:/usr/bin:/bin" \
+        HOME="$home_dir" \
+        XDG_CONFIG_HOME="$home_dir/.config" \
+        XDG_CACHE_HOME="$home_dir/.cache" \
+        XDG_DATA_HOME="$home_dir/.local/share" \
+        XDG_STATE_HOME="$home_dir/.local/state" \
+        GOMODCACHE="$go_mod_dir" \
+        "$repo_dir/bin/oc" signal-probe >"$signal_output" 2>&1
+)
+assert_contains "$signal_output" "parent-signal=allowed"
 
 bypass_output="$tmp_dir/bypass-output.log"
 failure_log="$bypass_output"

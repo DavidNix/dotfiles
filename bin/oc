@@ -178,7 +178,8 @@ main() {
 
 (allow process-exec)
 (allow process-fork)
-(allow signal (target same-sandbox))
+; OpenCode implements Ctrl+Z by signaling its process group, including this wrapper.
+(allow signal)
 (allow process-info* (target same-sandbox))
 (allow sysctl-read)
 
