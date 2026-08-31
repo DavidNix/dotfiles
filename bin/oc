@@ -101,11 +101,13 @@ main() {
         [[ "$root" == /* ]] || die "XDG directories must be absolute: $root"
     done
 
-    local opencode_config_dir opencode_data_dir opencode_state_dir
+    local macos_cache_dir opencode_config_dir opencode_data_dir opencode_state_dir
+    macos_cache_dir="$HOME/Library/Caches"
     opencode_config_dir="$xdg_config_home/opencode"
     opencode_data_dir="$xdg_data_home/opencode"
     opencode_state_dir="$xdg_state_home/opencode"
-    mkdir -p "$opencode_config_dir" "$xdg_cache_home/opencode" "$opencode_data_dir" "$opencode_state_dir"
+    mkdir -p "$macos_cache_dir" "$opencode_config_dir" "$xdg_cache_home/opencode" "$opencode_data_dir" "$opencode_state_dir"
+    macos_cache_dir=$(cd -P "$macos_cache_dir" && pwd)
     xdg_config_home=$(cd -P "$xdg_config_home" && pwd)
     xdg_cache_home=$(cd -P "$xdg_cache_home" && pwd)
     xdg_data_home=$(cd -P "$xdg_data_home" && pwd)
@@ -144,6 +146,7 @@ main() {
     add_write_root "$sandbox_tmp"
     add_write_root "$opencode_config_dir"
     add_write_root "$xdg_cache_home"
+    add_write_root "$macos_cache_dir"
     add_write_root "$opencode_data_dir"
     add_write_root "$opencode_state_dir"
     add_write_root "$HOME/.opencode/bin"

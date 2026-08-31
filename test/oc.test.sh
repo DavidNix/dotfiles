@@ -124,6 +124,12 @@ printf 'temp-write\n' >"$TMPDIR/temp-write.txt"
 printf 'cache-write\n' >"$XDG_CACHE_HOME/write-probe.txt"
 mkdir -p "$XDG_CACHE_HOME/uv"
 printf 'uv-cache-write\n' >"$XDG_CACHE_HOME/uv/write-probe.txt"
+if mkdir -p "$HOME/Library/Caches/golangci-lint" 2>/dev/null &&
+    (printf 'golangci-lint-cache-write\n' >"$HOME/Library/Caches/golangci-lint/write-probe.txt") 2>/dev/null; then
+    printf 'macos-cache-write=allowed\n'
+else
+    printf 'macos-cache-write=blocked\n'
+fi
 if (printf 'opencode-install-write\n' >"$HOME/.opencode/bin/write-probe.txt") 2>/dev/null; then
     printf 'opencode-install-write=allowed\n'
 else
@@ -212,6 +218,7 @@ assert_contains "$output_file" "arg-1=two words"
 assert_contains "$output_file" "config-content=present"
 assert_contains "$output_file" "config-link-read=config-target-readable"
 assert_contains "$output_file" "config-link-write=blocked"
+assert_contains "$output_file" "macos-cache-write=allowed"
 assert_contains "$output_file" "opencode-install-write=allowed"
 assert_contains "$output_file" "private-etc-read=allowed"
 assert_contains "$output_file" "library-preferences-read=allowed"
@@ -231,6 +238,7 @@ assert_contains "$output_file" "path-read=path-readable"
 [[ -f "$home_dir/.cache/write-probe.txt" ]]
 [[ -f "$home_dir/.cache/opencode/write-probe.txt" ]]
 [[ -f "$home_dir/.cache/uv/write-probe.txt" ]]
+[[ -f "$home_dir/Library/Caches/golangci-lint/write-probe.txt" ]]
 [[ -f "$home_dir/.local/share/opencode/write-probe.txt" ]]
 [[ -f "$home_dir/.local/state/opencode/write-probe.txt" ]]
 [[ -f "$home_dir/.opencode/bin/write-probe.txt" ]]
