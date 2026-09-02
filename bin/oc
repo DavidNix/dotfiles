@@ -160,12 +160,21 @@ main() {
         add_write_root "$git_common_dir"
     fi
 
-    local go_mod_cache go_path
+    local go_path go_bin go_mod_cache
     go_path=${GOPATH:-$HOME/go}
-    go_mod_cache=${GOMODCACHE:-${go_path%%:*}/pkg/mod}
-    if [[ -d "$go_mod_cache" ]]; then
+    go_path=${go_path%%:*}
+    go_bin=${GOBIN:-$go_path/bin}
+    go_mod_cache=${GOMODCACHE:-$go_path/pkg/mod}
+
+    if [[ -d "$go_path" || -d "$go_bin" || -d "$go_mod_cache" ]] || command -v go >/dev/null 2>&1; then
+        mkdir -p "$go_path" "$go_bin" "$go_mod_cache"
+        go_path=$(cd -P "$go_path" && pwd)
+        go_bin=$(cd -P "$go_bin" && pwd)
         go_mod_cache=$(cd -P "$go_mod_cache" && pwd)
         export GOMODCACHE="$go_mod_cache"
+        add_write_root "$go_path"
+        add_write_root "$go_bin"
+        add_write_root "$go_mod_cache"
     fi
 
     local developer_dir

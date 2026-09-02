@@ -182,6 +182,11 @@ IFS= read -r go_value <"$GOMODCACHE/probe.txt"
 IFS= read -r path_value <"$(dirname "$0")/path-probe.txt"
 printf 'go-read=%s\n' "$go_value"
 printf 'path-read=%s\n' "$path_value"
+if (printf 'go-module-write\n' >"$GOMODCACHE/write-probe.txt") 2>/dev/null; then
+    printf 'go-module-write=allowed\n'
+else
+    printf 'go-module-write=blocked\n'
+fi
 FAKE
 chmod +x "$fake_bin/opencode"
 
@@ -231,6 +236,7 @@ assert_contains "$output_file" "ssh-user-lookup=allowed"
 assert_contains "$output_file" "outside-write=blocked"
 assert_contains "$output_file" "zsh-heredoc=allowed"
 assert_contains "$output_file" "go-read=go-module-readable"
+assert_contains "$output_file" "go-module-write=allowed"
 assert_contains "$output_file" "path-read=path-readable"
 
 [[ -f "$work_dir/workspace-write.txt" ]]
@@ -242,6 +248,7 @@ assert_contains "$output_file" "path-read=path-readable"
 [[ -f "$home_dir/.local/share/opencode/write-probe.txt" ]]
 [[ -f "$home_dir/.local/state/opencode/write-probe.txt" ]]
 [[ -f "$home_dir/.opencode/bin/write-probe.txt" ]]
+[[ -f "$go_mod_dir/write-probe.txt" ]]
 [[ ! -e "$outside_dir/blocked.txt" ]]
 IFS= read -r config_target_value <"$outside_dir/config-target.txt"
 [[ "$config_target_value" == "config-target-readable" ]]
