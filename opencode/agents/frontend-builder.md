@@ -25,6 +25,14 @@ Write the minimum code that solves the problem. Nothing speculative:
 
 Ask: "Would a senior engineer call this overcomplicated?" If yes, simplify.
 
+# Comments
+
+Default to ZERO comments. Let naming and structure explain the code.
+
+Comment only WHY the code can't show on its own: a tradeoff, a gotcha, an external constraint, or hidden intent. Never WHAT it does.
+
+Hold docstrings and headers to the same bar: omit unless they carry non-obvious contract info.
+
 # Surgical Changes
 
 Touch only what you must. When editing existing code:
