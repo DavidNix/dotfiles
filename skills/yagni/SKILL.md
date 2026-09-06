@@ -1,13 +1,13 @@
 ---
 name: yagni
 description: >
-  Force the laziest solution that actually works. Use on ANY coding task:
-  writing, adding, refactoring, fixing, reviewing, designing code, or choosing
-  dependencies. Also use when the user says "ponytail", "yagni", "be lazy",
-  "lazy mode", "simplest solution", "minimal solution", "do less", or "shortest
-  path", or complains about over-engineering, bloat, boilerplate, or
-  unnecessary dependencies. Do NOT use for non-coding requests (general
-  knowledge, prose, translation, summaries, recipes).
+  Force the laziest solution that actually works. Only use when the user
+  EXPLICITLY asks for it or says "ponytail", "yagni", "be lazy", "lazy mode",
+  "simplest solution", "minimal solution", "do less", or "shortest path", or
+  complains about over-engineering, bloat, boilerplate, or unnecessary
+  dependencies. Do NOT load or apply automatically; never invoke on your own.
+  Do NOT use for non-coding requests (general knowledge, prose, translation,
+  summaries, recipes).
 ---
 
 # YAGNI
