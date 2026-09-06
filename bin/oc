@@ -72,10 +72,18 @@ main() {
         shift
     fi
 
-    local opencode_bin
+    local opencode_bin playwright_cli_bin
     opencode_bin=$(command -v opencode 2>/dev/null || true)
     [[ -n "$opencode_bin" ]] || die "opencode is not on PATH"
     opencode_bin=$(realpath "$opencode_bin")
+    # A nested oc inherits the real executable, not the outer session's PATH shim.
+    playwright_cli_bin=${OC_PLAYWRIGHT_CLI_BIN:-}
+    if [[ ! -x "$playwright_cli_bin" ]]; then
+        playwright_cli_bin=$(command -v playwright-cli 2>/dev/null || true)
+    fi
+    if [[ -n "$playwright_cli_bin" ]]; then
+        playwright_cli_bin=$(realpath "$playwright_cli_bin")
+    fi
 
     if [[ "$without_sandbox" == true ]]; then
         [[ "${1:-}" == "--" ]] && shift
@@ -127,11 +135,14 @@ main() {
     }
     trap cleanup EXIT
 
-    mkdir -p "$sandbox_tmp/go-build" "$sandbox_tmp/go-tmp"
+    mkdir -p "$sandbox_tmp/bin" "$sandbox_tmp/go-build" "$sandbox_tmp/go-tmp"
     export TMPDIR="$sandbox_tmp"
     export TMP="$sandbox_tmp"
     export TEMP="$sandbox_tmp"
     export TMPPREFIX="$sandbox_tmp/zsh"
+    export PWTEST_SOCKETS_DIR="$macos_cache_dir/playwright-cli"
+    export PLAYWRIGHT_MCP_CDP_ENDPOINT=http://127.0.0.1:9222
+    export PLAYWRIGHT_MCP_BROWSER=chromium
     export GOCACHE="$sandbox_tmp/go-build"
     export GOTMPDIR="$sandbox_tmp/go-tmp"
     export XDG_CONFIG_HOME="$xdg_config_home"
@@ -142,6 +153,46 @@ main() {
     export OC_SANDBOX_OPENCODE_DATA_DIR="$opencode_data_dir"
     export OPENCODE_CONFIG_CONTENT
     OPENCODE_CONFIG_CONTENT=$(<"$config_file")
+
+    if [[ -n "$playwright_cli_bin" ]]; then
+        export OC_PLAYWRIGHT_CLI_BIN="$playwright_cli_bin"
+        cat >"$sandbox_tmp/bin/playwright-cli" <<'EOF'
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+case "${1:-}" in
+    ""|-h|--help|-V|--version)
+        exec "$OC_PLAYWRIGHT_CLI_BIN" "$@"
+        ;;
+esac
+
+cli_command=""
+for arg in "$@"; do
+    if [[ "$arg" != -* ]]; then
+        cli_command=$arg
+        break
+    fi
+done
+
+case "$cli_command" in
+    attach|close|close-all|delete-data|detach|install|install-browser|kill-all|list)
+        exec "$OC_PLAYWRIGHT_CLI_BIN" "$@"
+        ;;
+esac
+
+cdp_endpoint=http://127.0.0.1:9222
+if ! curl --connect-timeout 1 --max-time 2 -fsS "$cdp_endpoint/json/version" >/dev/null 2>&1; then
+    printf 'playwright-cli: Chrome CDP is unavailable at %s.\n' "$cdp_endpoint" >&2
+    printf 'Run `chrome-cdp` in a terminal outside oc, then retry.\n' >&2
+    exit 1
+fi
+
+exec "$OC_PLAYWRIGHT_CLI_BIN" "$@"
+EOF
+        chmod +x "$sandbox_tmp/bin/playwright-cli"
+        export PATH="$sandbox_tmp/bin:$PATH"
+    fi
 
     add_write_root "$work_dir"
     add_write_root "$sandbox_tmp"

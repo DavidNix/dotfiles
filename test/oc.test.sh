@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Do not let an enclosing oc session hide missing exports or supply its shim target.
+unset PWTEST_SOCKETS_DIR OC_PLAYWRIGHT_CLI_BIN PLAYWRIGHT_MCP_CDP_ENDPOINT PLAYWRIGHT_MCP_BROWSER
+
 repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 gh_bin=$(command -v gh 2>/dev/null || true)
 [[ -n "$gh_bin" ]] || { printf 'gh is required for oc tests\n' >&2; exit 1; }
@@ -53,6 +56,32 @@ for private_dir in \
     printf 'private\n' >"$private_dir/private.txt"
 done
 mkdir -p "$home_dir/.opencode/bin"
+mkdir -p "$work_dir/.playwright"
+printf '{"testIdAttribute":"project-sentinel"}\n' >"$work_dir/.playwright/cli.config.json"
+printf '{"testIdAttribute":"explicit-sentinel"}\n' >"$work_dir/explicit config.json"
+
+cat >"$fake_bin/curl" <<'FAKE'
+#!/bin/bash
+
+[[ "${OC_SANDBOX_TEST_CDP_AVAILABLE:-false}" == true ]]
+FAKE
+
+cat >"$fake_bin/playwright-cli" <<'FAKE'
+#!/bin/bash
+
+set -euo pipefail
+
+printf 'playwright-real=%s\n' "$0"
+printf 'playwright-arg-count=%s\n' "$#"
+printf 'playwright-arg=<%s>\n' "$@"
+printf 'playwright-cdp=%s\n' "${PLAYWRIGHT_MCP_CDP_ENDPOINT:-unset}"
+printf 'playwright-browser=%s\n' "${PLAYWRIGHT_MCP_BROWSER:-unset}"
+config_file=.playwright/cli.config.json
+for arg in "$@"; do
+    [[ "$arg" != --config=* ]] || config_file=${arg#--config=}
+done
+printf 'playwright-config=%s\n' "$(<"$config_file")"
+FAKE
 
 cat >"$fake_bin/opencode" <<'FAKE'
 #!/bin/bash
@@ -106,6 +135,15 @@ if [[ "${1:-}" == "signal-probe" ]]; then
     exit 0
 fi
 
+if [[ "${1:-}" == "playwright-missing-probe" ]]; then
+    if output=$(playwright-cli open about:blank 2>&1); then
+        printf 'playwright-missing=allowed\n'
+    else
+        printf 'playwright-missing=%s\n' "$output"
+    fi
+    exit 0
+fi
+
 printf 'arg-count=%s\n' "$#"
 index=0
 for arg in "$@"; do
@@ -120,6 +158,13 @@ esac
 
 printf 'tmpdir=%s\n' "$TMPDIR"
 printf 'npm-cache=%s\n' "$NPM_CONFIG_CACHE"
+printf 'playwright-sockets=%s\n' "${PWTEST_SOCKETS_DIR:-unset}"
+if [[ "${OC_SANDBOX_TEST_CDP_AVAILABLE:-false}" == true ]]; then
+    printf 'playwright-command=%s\n' "$(command -v playwright-cli)"
+    playwright-cli open https://example.com
+    playwright-cli open https://example.com "--config=$PWD/explicit config.json"
+    playwright-cli -s=shim-test snapshot
+fi
 printf 'workspace-write\n' >"$PWD/workspace-write.txt"
 printf 'temp-write\n' >"$TMPDIR/temp-write.txt"
 printf 'cache-write\n' >"$XDG_CACHE_HOME/write-probe.txt"
@@ -189,13 +234,13 @@ else
     printf 'go-module-write=blocked\n'
 fi
 FAKE
-chmod +x "$fake_bin/opencode"
+chmod +x "$fake_bin/curl" "$fake_bin/opencode" "$fake_bin/playwright-cli"
 
 assert_contains() {
     local file="$1"
     local expected="$2"
 
-    if ! grep -Fq -- "$expected" "$file"; then
+    if [[ "$(<"$file")" != *"$expected"* ]]; then
         printf 'expected output to contain: %s\n' "$expected" >&2
         printf 'actual output:\n' >&2
         cat "$file" >&2
@@ -212,6 +257,7 @@ assert_contains() {
         XDG_DATA_HOME="$home_dir/.local/share" \
         XDG_STATE_HOME="$home_dir/.local/state" \
         GOMODCACHE="$go_mod_dir" \
+        OC_SANDBOX_TEST_CDP_AVAILABLE=true \
         OC_SANDBOX_TEST_CONFIG_LINK="$home_dir/.config/opencode/config-link" \
         OC_SANDBOX_TEST_CONFIG_SIBLING="$outside_dir/config-sibling.txt" \
         OC_SANDBOX_TEST_OUTSIDE="$outside_dir/blocked.txt" \
@@ -223,6 +269,16 @@ assert_contains "$output_file" "arg-0=probe"
 assert_contains "$output_file" "arg-1=two words"
 assert_contains "$output_file" "config-content=present"
 assert_contains "$output_file" "npm-cache=$home_dir/.cache/npm"
+assert_contains "$output_file" "playwright-sockets=$home_dir/Library/Caches/playwright-cli"
+sandbox_tmp=$(grep '^tmpdir=' "$output_file" | cut -d= -f2-)
+assert_contains "$output_file" "playwright-command=$sandbox_tmp/bin/playwright-cli"
+assert_contains "$output_file" "playwright-real=$fake_bin/playwright-cli"
+assert_contains "$output_file" $'playwright-arg-count=2\nplaywright-arg=<open>\nplaywright-arg=<https://example.com>'
+assert_contains "$output_file" $'playwright-arg-count=3\nplaywright-arg=<open>\nplaywright-arg=<https://example.com>\nplaywright-arg=<--config='"$work_dir/explicit config.json>"
+assert_contains "$output_file" 'playwright-config={"testIdAttribute":"project-sentinel"}'
+assert_contains "$output_file" 'playwright-config={"testIdAttribute":"explicit-sentinel"}'
+assert_contains "$output_file" 'playwright-cdp=http://127.0.0.1:9222'
+assert_contains "$output_file" 'playwright-browser=chromium'
 assert_contains "$output_file" "config-link-read=config-target-readable"
 assert_contains "$output_file" "config-link-write=blocked"
 assert_contains "$output_file" "macos-cache-write=allowed"
@@ -255,7 +311,6 @@ assert_contains "$output_file" "path-read=path-readable"
 IFS= read -r config_target_value <"$outside_dir/config-target.txt"
 [[ "$config_target_value" == "config-target-readable" ]]
 
-sandbox_tmp=$(grep '^tmpdir=' "$output_file" | cut -d= -f2-)
 [[ "$sandbox_tmp" == *"oc-sandbox-"* ]]
 [[ ! -e "$sandbox_tmp" ]]
 
@@ -290,6 +345,22 @@ failure_log="$signal_output"
 )
 assert_contains "$signal_output" "parent-signal=allowed"
 
+playwright_missing_output="$tmp_dir/playwright-missing.log"
+failure_log="$playwright_missing_output"
+(
+    cd "$work_dir"
+    PATH="$fake_bin:/usr/bin:/bin" \
+        HOME="$home_dir" \
+        XDG_CONFIG_HOME="$home_dir/.config" \
+        XDG_CACHE_HOME="$home_dir/.cache" \
+        XDG_DATA_HOME="$home_dir/.local/share" \
+        XDG_STATE_HOME="$home_dir/.local/state" \
+        GOMODCACHE="$go_mod_dir" \
+        "$repo_dir/bin/oc" playwright-missing-probe >"$playwright_missing_output" 2>&1
+)
+assert_contains "$playwright_missing_output" "playwright-cli: Chrome CDP is unavailable at http://127.0.0.1:9222."
+assert_contains "$playwright_missing_output" "Run \`chrome-cdp\` in a terminal outside oc, then retry."
+
 bypass_output="$tmp_dir/bypass-output.log"
 failure_log="$bypass_output"
 (
@@ -311,6 +382,7 @@ assert_contains "$bypass_output" "arg-count=2"
 assert_contains "$bypass_output" "arg-0=probe"
 assert_contains "$bypass_output" "arg-1=without sandbox"
 assert_contains "$bypass_output" "config-content=missing"
+assert_contains "$bypass_output" "playwright-sockets=unset"
 assert_contains "$bypass_output" "outside-write=allowed"
 [[ -f "$outside_dir/bypass.txt" ]]
 

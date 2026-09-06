@@ -94,7 +94,9 @@
     },
     "chrome-devtools": {
       "type": "local",
-      "command": ["npx", "-y", "chrome-devtools-mcp@latest"],
+      // Chrome runs outside oc's Seatbelt sandbox via bin/chrome-cdp; the MCP
+      // attaches over CDP because launching Chrome inside the sandbox crashes.
+      "command": ["npx", "-y", "chrome-devtools-mcp@latest", "--browserUrl=http://127.0.0.1:9222"],
       "enabled": false,
     },
   },

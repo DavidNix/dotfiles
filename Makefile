@@ -4,7 +4,7 @@
 
 SHELL := /bin/zsh
 
-SHELL_SCRIPTS := bin/agent-init bin/oc bin/worktree bin/zed-toggle-test-file script/macos-defaults.sh test/oc.test.sh tmux-init.sh
+SHELL_SCRIPTS := bin/agent-init bin/chrome-cdp bin/oc bin/worktree bin/zed-toggle-test-file script/macos-defaults.sh test/oc.test.sh tmux-init.sh
 PYTHON_SCRIPTS := bin/image-gen bin/image-edit
 
 default: help
@@ -164,6 +164,7 @@ vet: shellcheck python-check opencode-check ## Run all repo lint, type, and synt
 opencode-check: ## Run opencode plugin checks
 	node --check opencode/plugins/safe-commands.js
 	node --test opencode/test/*.test.js
+	node --test test/oc-playwright.test.js
 
 OPT_OWNER ?= nix
 OPT_GROUP ?= staff

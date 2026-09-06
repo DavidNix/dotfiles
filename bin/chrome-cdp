@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Chrome cannot launch reliably inside oc's macOS Seatbelt sandbox. Run this
+# outside oc so browser tools can attach through the Chrome DevTools Protocol.
+profile_dir="${XDG_CACHE_HOME:-$HOME/.cache}/chrome-cdp"
+mkdir -p "$profile_dir"
+
+# A dedicated profile is required for remote debugging and protects the normal
+# Chrome profile from browser automation.
+exec open -na "Google Chrome" --args \
+    --remote-debugging-port=9222 \
+    --user-data-dir="$profile_dir"
