@@ -5,7 +5,7 @@ set -euo pipefail
 repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 gh_bin=$(command -v gh 2>/dev/null || true)
 [[ -n "$gh_bin" ]] || { printf 'gh is required for oc tests\n' >&2; exit 1; }
-tmp_dir=$(mktemp -d)
+tmp_dir=$(mktemp -d "${TMPDIR:-/tmp}/oc-test.XXXXXX")
 
 fake_bin="$tmp_dir/bin"
 home_dir="$tmp_dir/home"
@@ -119,6 +119,7 @@ case "${OPENCODE_CONFIG_CONTENT:-}" in
 esac
 
 printf 'tmpdir=%s\n' "$TMPDIR"
+printf 'npm-cache=%s\n' "$NPM_CONFIG_CACHE"
 printf 'workspace-write\n' >"$PWD/workspace-write.txt"
 printf 'temp-write\n' >"$TMPDIR/temp-write.txt"
 printf 'cache-write\n' >"$XDG_CACHE_HOME/write-probe.txt"
@@ -221,6 +222,7 @@ assert_contains "$output_file" "arg-count=2"
 assert_contains "$output_file" "arg-0=probe"
 assert_contains "$output_file" "arg-1=two words"
 assert_contains "$output_file" "config-content=present"
+assert_contains "$output_file" "npm-cache=$home_dir/.cache/npm"
 assert_contains "$output_file" "config-link-read=config-target-readable"
 assert_contains "$output_file" "config-link-write=blocked"
 assert_contains "$output_file" "macos-cache-write=allowed"

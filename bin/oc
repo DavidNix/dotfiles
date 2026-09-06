@@ -138,6 +138,7 @@ main() {
     export XDG_CACHE_HOME="$xdg_cache_home"
     export XDG_DATA_HOME="$xdg_data_home"
     export XDG_STATE_HOME="$xdg_state_home"
+    export NPM_CONFIG_CACHE="$xdg_cache_home/npm"
     export OC_SANDBOX_OPENCODE_DATA_DIR="$opencode_data_dir"
     export OPENCODE_CONFIG_CONTENT
     OPENCODE_CONFIG_CONTENT=$(<"$config_file")
