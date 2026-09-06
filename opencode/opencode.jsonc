@@ -306,6 +306,7 @@
       "rustfmt *": "allow",
 
       // Node.js tooling
+      "playwright-cli *": "allow",
       "npm astro *": "allow",
       "npm audit *": "allow",
       "npm ci *": "allow",
