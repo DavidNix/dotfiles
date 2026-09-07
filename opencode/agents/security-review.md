@@ -2,7 +2,7 @@
 description: Reviews security by invoking the security-review skill exactly as written.
 mode: subagent
 hidden: true
-
+model: openai/gpt-6-astra-fast
 variant: max
 permission:
   "*": deny
