@@ -135,7 +135,8 @@ main() {
     }
     trap cleanup EXIT
 
-    mkdir -p "$sandbox_tmp/bin" "$sandbox_tmp/go-build" "$sandbox_tmp/go-tmp"
+    mkdir -p "$sandbox_tmp/ansible" "$sandbox_tmp/bin" "$sandbox_tmp/go-build" "$sandbox_tmp/go-tmp"
+    export ANSIBLE_LOCAL_TEMP="$sandbox_tmp/ansible"
     export TMPDIR="$sandbox_tmp"
     export TMP="$sandbox_tmp"
     export TEMP="$sandbox_tmp"

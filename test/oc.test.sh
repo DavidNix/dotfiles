@@ -157,6 +157,7 @@ case "${OPENCODE_CONFIG_CONTENT:-}" in
 esac
 
 printf 'tmpdir=%s\n' "$TMPDIR"
+printf 'ansible-local-temp=%s\n' "${ANSIBLE_LOCAL_TEMP:-unset}"
 printf 'npm-cache=%s\n' "$NPM_CONFIG_CACHE"
 printf 'playwright-sockets=%s\n' "${PWTEST_SOCKETS_DIR:-unset}"
 if [[ "${OC_SANDBOX_TEST_CDP_AVAILABLE:-false}" == true ]]; then
@@ -271,6 +272,7 @@ assert_contains "$output_file" "config-content=present"
 assert_contains "$output_file" "npm-cache=$home_dir/.cache/npm"
 assert_contains "$output_file" "playwright-sockets=$home_dir/Library/Caches/playwright-cli"
 sandbox_tmp=$(grep '^tmpdir=' "$output_file" | cut -d= -f2-)
+assert_contains "$output_file" "ansible-local-temp=$sandbox_tmp/ansible"
 assert_contains "$output_file" "playwright-command=$sandbox_tmp/bin/playwright-cli"
 assert_contains "$output_file" "playwright-real=$fake_bin/playwright-cli"
 assert_contains "$output_file" $'playwright-arg-count=2\nplaywright-arg=<open>\nplaywright-arg=<https://example.com>'

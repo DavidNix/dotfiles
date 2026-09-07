@@ -78,6 +78,12 @@ before(() => {
         "printf 'oc-socketdir=%s\\n' \"${PWTEST_SOCKETS_DIR:-unset}\"",
         "printf 'oc-clibin=%s\\n' \"${OC_PLAYWRIGHT_CLI_BIN:-unset}\"",
         "printf 'oc-cliconfig=%s\\n' \"${OC_PLAYWRIGHT_CLI_CONFIG:-unset}\"",
+        "printf 'oc-ansible-local-temp=%s\\n' \"${ANSIBLE_LOCAL_TEMP:-unset}\"",
+        'if [[ -n "${ANSIBLE_LOCAL_TEMP:-}" && -d "$ANSIBLE_LOCAL_TEMP" && -w "$ANSIBLE_LOCAL_TEMP" ]]; then',
+        "  printf 'oc-ansible-local-temp-writable=yes\\n'",
+        'else',
+        "  printf 'oc-ansible-local-temp-writable=no\\n'",
+        'fi',
         "printf 'oc-argc=%s\\n' \"$#\"",
         'i=0',
         'for a in "$@"; do printf \'oc-arg-%s=<%s>\\n\' "$i" "$a"; i=$((i+1)); done',
@@ -176,6 +182,13 @@ test('nested wrappers reach the real CLI', () => {
     assert.match(r.stdout, /nested-ok/);
     assert.match(r.stdout, /real-cli=hit/);
     assert.match(r.stdout, /real-version=1\.2\.3-test/);
+});
+
+test('ansible local temp is writable inside the sandbox temp root', () => {
+    const r = runOc(['probe']);
+    assert.equal(r.status, 0, r.stderr);
+    assert.match(r.stdout, /oc-ansible-local-temp=.*\/oc-sandbox-[^/]+\/ansible/);
+    assert.match(r.stdout, /oc-ansible-local-temp-writable=yes/);
 });
 
 test('--without-sandbox adds no PWTEST_SOCKETS_DIR or playwright env', () => {
