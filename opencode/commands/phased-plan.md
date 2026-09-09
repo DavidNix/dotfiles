@@ -137,6 +137,8 @@ AC-3: `npm run build` -> exit 0 with no new type errors
 
 Every criterion must be independently checkable by the orchestrator from the terminal. Inspect the repository to identify appropriate commands. If no test exists, require the relevant phase to create one. Use a manual check only when automation is impractical; state exact steps and the expected observation.
 
+Separate full-project verification from the targeted checks in each phase. The orchestrator runs the full suite after the last user-selected phase, even when later phases are deferred; acceptance criteria depending on deferred work remain unmet, not passed.
+
 Reject subjective criteria such as "the code is clean," "performance is good," or "the UI feels smooth."
 
 ## 8. Phased plan
@@ -147,7 +149,7 @@ Recommend one to six phases. Each phase must be:
 - Core-first: it proves the project's essential claim before ancillary work.
 - Data-model-first when applicable: define entities, fields, identifiers, relationships, constraints, ownership, lifecycle, indexes or query patterns, and migration/backfill/rollback needs before dependent behavior. Do not invent data-model work when no persisted or shared state changes.
 - Risk-aware: move a blocking library or external API spike into the earliest sensible phase.
-- Orchestrator-verifiable: it ends with commands and expected results.
+- Builder-verifiable: it ends with targeted commands and expected results that the orchestrator assigns and checks against reported evidence.
 
 Use core-first order unless the user explicitly requires another order. Ask about ordering only when viable sequences carry materially different risks.
 
@@ -160,7 +162,7 @@ In file mode, use this template inline for every phase:
 **Outcome:** One sentence describing what this phase proves or delivers.
 **Changes:**
 - Deliverable
-**Verification (orchestrator-owned):** Exact command(s), expected output, and expected exit code. Use a precise manual check only when no command is practical.
+**Verification (builder-run, orchestrator-specified):** Exact phase-scoped command(s), working directory, prerequisites, expected output, and exit code. Use a precise manual check only when no command is practical.
 ```
 
 In GitHub mode, the parent issue's `## 8. Phased plan` section is an ordered list of phase issue links. Each managed sub-issue uses this body:
@@ -176,8 +178,8 @@ One sentence describing what this phase proves or delivers.
 ## Changes
 - Deliverable
 
-## Verification (orchestrator-owned)
-Exact command(s), expected output, and expected exit code.
+## Verification (builder-run, orchestrator-specified)
+Exact phase-scoped command(s), working directory, prerequisites, expected output, and exit code.
 ```
 
 Put `Depends on`, `Out of scope`, or `Est. size` in the phase only when it changes execution.
@@ -189,18 +191,21 @@ Collect only blocking `[NEEDS CLARIFICATION]` items so the user can answer in on
 # 5. Status protocol
 
 - Every phase starts as `[ ] NOT STARTED`.
-- Before delegation, the orchestrator gives each builder the entire current phase verbatim plus relevant goals, constraints, interfaces, acceptance criteria, assigned scope, exclusions, and repository state.
+- Before delegation, the orchestrator gives each builder the entire current phase verbatim plus relevant goals, constraints, interfaces, acceptance criteria, assigned scope, exclusions, repository state, and exact verification instructions.
 - Before coding, record `[~] IN PROGRESS` using the backend's protocol: the designated builder includes the file update in its first implementation commit, while the orchestrator edits a GitHub phase issue before delegation.
-- Builders must not run tests, builds, linters, format checks, type checks, acceptance commands, or other verification. They may use LSP and must fix every diagnostic in changed code files.
-- After builder work, the orchestrator runs the phase's exact verification once. If a command fails, the responsible builder fixes it and the orchestrator reruns only that failed command.
-- After verification passes, the orchestrator runs one code review over the complete phase commit range. Builders fix all findings in one pass. Do not review or verify the phase again after those fixes; the final branch review is the backstop.
+- The orchestrator decides whether each implementation or fix assignment needs `ai-tdd` and states the decision in the handoff, following `/phased-build`. When assigned, builders load it and follow RED/GREEN. Regardless of that decision, they implement and run assigned phase verification in the same assignment, report evidence, and fix LSP diagnostics in changed files. For mixed phases, assign shared integration checks to the builder whose work completes the dependency.
+- The orchestrator confirms builder evidence without rerunning phase checks. If evidence is missing or a check fails, resume the same builder to fix it and run missing, failed, or fix-affected checks. Do not repeat unaffected successful checks.
+- After verification passes, run one code review over each non-final phase's complete commit range. Builders fix findings in one pass with targeted verification; do not repeat the phase review. The last selected phase gets no separate phase review and remains active until the final gate, unless it was already complete before a scope reduction; preserve existing history in that case.
+- After the last selected phase's implementation and checks finish, the orchestrator runs full verification. Then dispatch final code and security reviews in parallel against the same selected range. Wait for both, combine verification failures and findings by responsible builder, and assign fixes with targeted checks. The orchestrator reruns failed and fix-affected checks before finalizing; do not repeat unaffected checks or reviews.
 - The orchestrator marks a phase `[x] COMPLETE` only after verification passes and every review finding is fixed, accepted, or invalidated.
 - A completion record includes the date, command and result, and phase-review outcome, for example: `[x] COMPLETE (2026-07-19, verified by: npm test -- store.test.ts -> 14 passed; code review: 2 findings fixed)`.
 - A resuming orchestrator reads the entire selected plan artifact and continues from the earliest incomplete phase without re-verifying completed phases.
 
-In file mode, the file is the source of truth and status updates follow the existing commit protocol used by `/phased-build`.
+During implementation, the orchestrator maintains one flat todo list using `[agent-type] Phase N: Short action` and `[agent-type] Final: Short action`, following `/phased-build`. Each builder work item includes verification; review items remain separate. Do not add separate verification, handoff, or bookkeeping items per phase.
 
-In GitHub mode, the issue hierarchy is the source of truth. The orchestrator edits the phase body for pending and active states, adds completion evidence as a comment, then records `[x] COMPLETE` and closes the phase issue. The parent remains open until all final gates pass.
+In file mode, the file is the source of truth and status updates follow the existing commit protocol used by `/phased-build`. Retain it while any phase remains incomplete or deferred.
+
+In GitHub mode, the issue hierarchy is the source of truth. The orchestrator edits the phase body for pending and active states, adds completion evidence as a comment, then records `[x] COMPLETE` and closes the phase issue. The parent remains open until every managed phase is complete and all final gates pass.
 
 # 6. GitHub persistence contract
 
@@ -266,7 +271,7 @@ In creation mode, create the parent, create each managed phase issue sequentiall
 - Do not dictate variable names, internal file layout, or choices an implementation agent can safely make.
 - Do not omit Non-Goals, use subjective acceptance criteria, hide assumptions, defer dependent data-model work, or create a "build everything, then test everything" sequence.
 - Do not change code before creating or amending the selected plan artifact.
-- Do not mark a phase complete before exact verification and its single phase review finish.
+- Do not mark a phase complete before exact verification and its applicable review gate finish; the last selected phase uses the final gate.
 - Do not alter completed phases or the scope/order of active phases; add pending follow-up work instead.
 
 # 8. Persist and report
