@@ -113,6 +113,7 @@ install_skills() {
     echo ""
     echo "Installing skills..."
 
+    # Use OpenCode's built-in customize-opencode skill instead of a local equivalent.
     echo -e "  Installing local repo skills from ${LOCAL_SKILLS_SOURCE}..."
     try_or_warn_quiet "Installing local skills" npx --yes skills add "$LOCAL_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode"
 
