@@ -27,9 +27,11 @@ Ask: "Would a senior engineer call this overcomplicated?" If yes, simplify.
 
 # Comments
 
-Default to ZERO comments. Let naming and structure explain the code.
+Comments are ONLY for WHY, or for genuinely non-obvious or tricky code. They explain a tradeoff, a gotcha, an external constraint, or hidden intent — the reasoning a reader cannot reconstruct from the code itself.
 
-Comment only WHY the code can't show on its own: a tradeoff, a gotcha, an external constraint, or hidden intent. Never WHAT it does.
+Never comment WHAT the code does. The code already says what it does. Never describe mechanics, restate names, or narrate each line. Never add a comment for code that is obvious.
+
+If you're tempted to write a WHAT comment, fix the code instead (better name, extract a function) and delete the comment.
 
 Hold docstrings and headers to the same bar: omit unless they carry non-obvious contract info.
 
