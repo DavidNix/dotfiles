@@ -32,7 +32,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "opus",
+  "model": "fable[1m]",
   "hooks": {
     "Notification": [
       {
@@ -80,6 +80,5 @@
   "skipDangerousModePermissionPrompt": true,
   "editorMode": "vim",
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": false,
-  "model": "claude-fable-5[1m]"
+  "voiceEnabled": false
 }
