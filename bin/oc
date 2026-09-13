@@ -4,18 +4,21 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: oc [--without-sandbox] [--] [OPENCODE_ARGS...]
+Usage: oc [--without-sandbox] [--ds] [--] [OPENCODE_ARGS...]
 
 Run OpenCode with filesystem writes sandboxed by default.
 
 OPTIONS:
     -h, --help       Show this help message
     --without-sandbox  Run OpenCode directly without the macOS sandbox
+    --ds             Replace gpt astra models with opencode-go/deepseek-v4.1-flash
+                     in the OpenCode config
     --               Pass all remaining arguments to OpenCode
 
 EXAMPLES:
     oc
     oc --model openai/gpt-5.6-sol
+    oc --ds
     oc --without-sandbox --version
     oc -- --help
 EOF
@@ -65,12 +68,25 @@ main() {
     fi
 
     local without_sandbox=false
-    if [[ "${1:-}" == "--without-sandbox" ]]; then
-        without_sandbox=true
-        shift
-    elif [[ "${1:-}" == "--" ]]; then
-        shift
-    fi
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --without-sandbox)
+                without_sandbox=true
+                shift
+                ;;
+            --ds)
+                export OC_DEEPSEEK=1
+                shift
+                ;;
+            --)
+                shift
+                break
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
 
     local opencode_bin playwright_cli_bin
     opencode_bin=$(command -v opencode 2>/dev/null || true)
@@ -86,7 +102,6 @@ main() {
     fi
 
     if [[ "$without_sandbox" == true ]]; then
-        [[ "${1:-}" == "--" ]] && shift
         exec "$opencode_bin" "$@"
     fi
 

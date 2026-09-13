@@ -14,6 +14,20 @@ const TIMEOUT_MS = 20000;
 
 let f;
 
+test('--ds enables model switching in both launch modes and respects --', () => {
+    for (const flags of [['--ds'], ['--ds', '--without-sandbox'], ['--without-sandbox', '--ds']]) {
+        const result = runOc([...flags, 'probe', 'two words']);
+        assert.equal(result.status, 0, result.stderr);
+        assert.match(result.stdout, /oc-deepseek=1/);
+        assert.match(result.stdout, /oc-argc=2/);
+        assert.match(result.stdout, /oc-arg-1=<two words>/);
+    }
+    const passthrough = runOc(['--', '--ds']);
+    assert.equal(passthrough.status, 0, passthrough.stderr);
+    assert.match(passthrough.stdout, /oc-deepseek=unset/);
+    assert.match(passthrough.stdout, /oc-arg-0=<--ds>/);
+});
+
 before(() => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-pw-test.'));
     const fakeBin = path.join(root, 'bin');
@@ -74,6 +88,7 @@ before(() => {
         '  exit $?',
         'fi',
         "printf 'oc-cdp=%s\\n' \"${PLAYWRIGHT_MCP_CDP_ENDPOINT:-unset}\"",
+        "printf 'oc-deepseek=%s\\n' \"${OC_DEEPSEEK:-unset}\"",
         "printf 'oc-browser=%s\\n' \"${PLAYWRIGHT_MCP_BROWSER:-unset}\"",
         "printf 'oc-socketdir=%s\\n' \"${PWTEST_SOCKETS_DIR:-unset}\"",
         "printf 'oc-clibin=%s\\n' \"${OC_PLAYWRIGHT_CLI_BIN:-unset}\"",
