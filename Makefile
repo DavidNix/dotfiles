@@ -28,8 +28,14 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	@# Link all the dotfiles
 	find $$PWD -name ".[^.]*" -type f -print0 | xargs -0tJ % ln -sf %  ~
 	mkdir -p ~/.config
-	ln -sf $$PWD/.config/*/ ~/.config
-	ln -sf $$PWD/.config/* ~/.config
+	@# Link config subdirs/files, except herdr (managed separately below)
+	for f in $$PWD/.config/*; do \
+		[ "$$(basename "$$f")" = "herdr" ] && continue; \
+		ln -sf "$$f" ~/.config; \
+	done
+	@# herdr: symlink only config.toml (daemon owns the rest of ~/.config/herdr)
+	mkdir -p ~/.config/herdr
+	ln -sf $$PWD/.config/herdr/config.toml ~/.config/herdr/config.toml
 	@# opencode (separate from .config/* to avoid conflicts)
 	mkdir -p ~/.config/opencode
 	ln -sf $$PWD/opencode/* ~/.config/opencode
