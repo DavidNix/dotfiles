@@ -26,7 +26,19 @@ test('flag replaces only Astra model selections in the merged config', async () 
     await (await deepseek()).config?.(active);
     const expected = structuredClone(original);
     expected.model = expected.small_model = expected.agent.review.model =
-      expected.agent.custom.model = 'opencode-go/deepseek-v4.1-flash';
+      expected.agent.custom.model = 'fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash';
+    expected.variant = 'max';
+    expected.agent.review.variant = 'max';
+    expected.agent.custom.variant = 'max';
+    expected.provider = {
+      'fireworks-ai': {
+        models: {
+          'accounts/fireworks/models/deepseek-v4p1-flash': {
+            variants: { max: { reasoningEffort: 'max' } },
+          },
+        },
+      },
+    };
     assert.deepEqual(active, expected);
   } finally {
     if (previous === undefined) delete process.env.OC_DEEPSEEK;

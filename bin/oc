@@ -11,7 +11,7 @@ Run OpenCode with filesystem writes sandboxed by default.
 OPTIONS:
     -h, --help       Show this help message
     --without-sandbox  Run OpenCode directly without the macOS sandbox
-    --ds             Replace gpt astra models with opencode-go/deepseek-v4.1-flash
+    --ds             Replace gpt astra models with fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash
                      in the OpenCode config
     --               Pass all remaining arguments to OpenCode
 
