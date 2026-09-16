@@ -4,7 +4,7 @@ set -euo pipefail
 
 # Do not let an enclosing oc session hide missing exports or supply its shim target.
 unset PWTEST_SOCKETS_DIR OC_PLAYWRIGHT_CLI_BIN PLAYWRIGHT_MCP_CDP_ENDPOINT PLAYWRIGHT_MCP_BROWSER
-unset OC_DEEPSEEK
+unset OC_ORCH
 
 repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 gh_bin=$(command -v gh 2>/dev/null || true)
@@ -157,7 +157,7 @@ case "${OPENCODE_CONFIG_CONTENT:-}" in
     *) printf 'config-content=missing\n' ;;
 esac
 
-printf 'deepseek=%s\n' "${OC_DEEPSEEK:-unset}"
+printf 'orch=%s\n' "${OC_ORCH:-unset}"
 
 printf 'tmpdir=%s\n' "$TMPDIR"
 printf 'ansible-local-temp=%s\n' "${ANSIBLE_LOCAL_TEMP:-unset}"
@@ -272,7 +272,7 @@ assert_contains "$output_file" "arg-count=2"
 assert_contains "$output_file" "arg-0=probe"
 assert_contains "$output_file" "arg-1=two words"
 assert_contains "$output_file" "config-content=present"
-assert_contains "$output_file" "deepseek=unset"
+assert_contains "$output_file" "orch=unset"
 assert_contains "$output_file" "npm-cache=$home_dir/.cache/npm"
 assert_contains "$output_file" "playwright-sockets=$home_dir/Library/Caches/playwright-cli"
 sandbox_tmp=$(grep '^tmpdir=' "$output_file" | cut -d= -f2-)
@@ -340,7 +340,29 @@ failure_log="$ds_output"
 assert_contains "$ds_output" "arg-count=1"
 assert_contains "$ds_output" "arg-0=probe"
 assert_contains "$ds_output" "config-content=present"
-assert_contains "$ds_output" "deepseek=1"
+assert_contains "$ds_output" "orch=fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash"
+
+builder_output="$tmp_dir/builder-output.log"
+failure_log="$builder_output"
+(
+    cd "$work_dir"
+    PATH="$fake_bin:/usr/bin:/bin" \
+        HOME="$home_dir" \
+        XDG_CONFIG_HOME="$home_dir/.config" \
+        XDG_CACHE_HOME="$home_dir/.cache" \
+        XDG_DATA_HOME="$home_dir/.local/share" \
+        XDG_STATE_HOME="$home_dir/.local/state" \
+        GOMODCACHE="$go_mod_dir" \
+        OC_SANDBOX_TEST_CDP_AVAILABLE=true \
+        OC_SANDBOX_TEST_CONFIG_LINK="$home_dir/.config/opencode/config-link" \
+        OC_SANDBOX_TEST_CONFIG_SIBLING="$outside_dir/config-sibling.txt" \
+        OC_SANDBOX_TEST_OUTSIDE="$outside_dir/blocked.txt" \
+        "$repo_dir/bin/oc" --builder openai/gpt-5.6-sol probe >"$builder_output" 2>&1
+)
+assert_contains "$builder_output" "arg-count=1"
+assert_contains "$builder_output" "arg-0=probe"
+assert_contains "$builder_output" "config-content=present"
+assert_contains "$builder_output" "orch=openai/gpt-5.6-sol"
 
 tls_output="$tmp_dir/tls-output.log"
 failure_log="$tls_output"
@@ -410,7 +432,7 @@ assert_contains "$bypass_output" "arg-count=2"
 assert_contains "$bypass_output" "arg-0=probe"
 assert_contains "$bypass_output" "arg-1=without sandbox"
 assert_contains "$bypass_output" "config-content=missing"
-assert_contains "$bypass_output" "deepseek=1"
+assert_contains "$bypass_output" "orch=fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash"
 assert_contains "$bypass_output" "playwright-sockets=unset"
 assert_contains "$bypass_output" "outside-write=allowed"
 [[ -f "$outside_dir/bypass.txt" ]]
