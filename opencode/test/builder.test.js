@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import builder from '../plugins/builder.js';
 
-test('flag overrides the builder subagent models in the merged config', async () => {
+test('flag overrides the builder, frontend-builder, explore and general subagent models', async () => {
   const previous = process.env.OC_ORCH;
   try {
     const original = {
@@ -11,6 +11,8 @@ test('flag overrides the builder subagent models in the merged config', async ()
         build: { model: 'openai/gpt-6-astra-fast', variant: 'low' },
         explore: { model: 'nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731', variant: 'low' },
         general: { model: 'nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731', variant: 'low' },
+        builder: { model: 'openai/gpt-6-astra-fast' },
+        'frontend-builder': { model: 'openai/gpt-6-astra-fast' },
         summary: { model: 'openai/gpt-5.6-luna' },
         inherited: { mode: 'subagent' },
       },
@@ -25,9 +27,32 @@ test('flag overrides the builder subagent models in the merged config', async ()
     const active = structuredClone(original);
     await (await builder()).config?.(active);
     const expected = structuredClone(original);
-    expected.agent.build.model = expected.agent.explore.model = expected.agent.general.model =
-      'openai/gpt-5.6-sol';
+    for (const name of ['builder', 'frontend-builder', 'explore', 'general']) {
+      expected.agent[name].model = 'openai/gpt-5.6-sol';
+    }
     assert.deepEqual(active, expected);
+  } finally {
+    if (previous === undefined) delete process.env.OC_ORCH;
+    else process.env.OC_ORCH = previous;
+  }
+});
+
+test('flag creates missing builder subagent entries', async () => {
+  const previous = process.env.OC_ORCH;
+  try {
+    process.env.OC_ORCH = 'openai/gpt-5.6-sol';
+    const original = { agent: { build: { model: 'openai/gpt-6-astra-fast' } } };
+    const clone = structuredClone(original);
+    await (await builder()).config?.(clone);
+    assert.deepEqual(clone, {
+      agent: {
+        build: { model: 'openai/gpt-6-astra-fast' },
+        builder: { model: 'openai/gpt-5.6-sol' },
+        'frontend-builder': { model: 'openai/gpt-5.6-sol' },
+        explore: { model: 'openai/gpt-5.6-sol' },
+        general: { model: 'openai/gpt-5.6-sol' },
+      },
+    });
   } finally {
     if (previous === undefined) delete process.env.OC_ORCH;
     else process.env.OC_ORCH = previous;

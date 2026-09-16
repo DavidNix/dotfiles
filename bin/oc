@@ -11,9 +11,9 @@ Run OpenCode with filesystem writes sandboxed by default.
 OPTIONS:
     -h, --help       Show this help message
     --without-sandbox  Run OpenCode directly without the macOS sandbox
-    --ds             Override the builder subagent models (build, explore, general)
+    --ds             Override the builder subagent models (builder, frontend-builder, explore, general)
                      to fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash
-    --builder MODEL  Override the builder subagent models (build, explore, general) to MODEL
+    --builder MODEL  Override the builder subagent models (builder, frontend-builder, explore, general) to MODEL
     --               Pass all remaining arguments to OpenCode
 
 EXAMPLES:
