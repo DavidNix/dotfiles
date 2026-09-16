@@ -60,6 +60,7 @@ brew "neovim"
 brew "oven-sh/bun/bun"
 brew "playwright-cli"
 brew "pandoc"
+brew "poppler" # pdftotext
 brew "procs"
 brew "rdap"
 brew "rename"
