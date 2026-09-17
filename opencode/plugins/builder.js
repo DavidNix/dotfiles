@@ -1,13 +1,22 @@
 export default async () => {
   const model = process.env.OC_ORCH;
-  if (!model) return {};
+  const primaryModel = process.env.OC_PRIMARY;
+  if (!model && !primaryModel) return {};
 
   return {
     config: async (config) => {
       const agents = config.agent ??= {};
-      for (const name of ['builder', 'frontend-builder', 'explore', 'general']) {
-        const agent = agents[name] ??= {};
-        agent.model = model;
+      if (primaryModel) {
+        for (const name of ['plan', 'build']) {
+          const agent = agents[name] ??= {};
+          agent.model = primaryModel;
+        }
+      }
+      if (model) {
+        for (const name of ['builder', 'frontend-builder', 'explore', 'general']) {
+          const agent = agents[name] ??= {};
+          agent.model = model;
+        }
       }
     },
   };

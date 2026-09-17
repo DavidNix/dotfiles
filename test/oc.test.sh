@@ -5,6 +5,7 @@ set -euo pipefail
 # Do not let an enclosing oc session hide missing exports or supply its shim target.
 unset PWTEST_SOCKETS_DIR OC_PLAYWRIGHT_CLI_BIN PLAYWRIGHT_MCP_CDP_ENDPOINT PLAYWRIGHT_MCP_BROWSER
 unset OC_ORCH
+unset OC_PRIMARY
 
 repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 gh_bin=$(command -v gh 2>/dev/null || true)
@@ -158,6 +159,7 @@ case "${OPENCODE_CONFIG_CONTENT:-}" in
 esac
 
 printf 'orch=%s\n' "${OC_ORCH:-unset}"
+printf 'primary=%s\n' "${OC_PRIMARY:-unset}"
 
 printf 'tmpdir=%s\n' "$TMPDIR"
 printf 'ansible-local-temp=%s\n' "${ANSIBLE_LOCAL_TEMP:-unset}"
@@ -340,7 +342,8 @@ failure_log="$ds_output"
 assert_contains "$ds_output" "arg-count=1"
 assert_contains "$ds_output" "arg-0=probe"
 assert_contains "$ds_output" "config-content=present"
-assert_contains "$ds_output" "orch=fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash"
+assert_contains "$ds_output" "primary=fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash"
+assert_contains "$ds_output" "orch=unset"
 
 builder_output="$tmp_dir/builder-output.log"
 failure_log="$builder_output"
@@ -432,7 +435,8 @@ assert_contains "$bypass_output" "arg-count=2"
 assert_contains "$bypass_output" "arg-0=probe"
 assert_contains "$bypass_output" "arg-1=without sandbox"
 assert_contains "$bypass_output" "config-content=missing"
-assert_contains "$bypass_output" "orch=fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash"
+assert_contains "$bypass_output" "primary=fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash"
+assert_contains "$bypass_output" "orch=unset"
 assert_contains "$bypass_output" "playwright-sockets=unset"
 assert_contains "$bypass_output" "outside-write=allowed"
 [[ -f "$outside_dir/bypass.txt" ]]

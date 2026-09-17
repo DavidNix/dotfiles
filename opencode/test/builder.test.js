@@ -2,12 +2,36 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import builder from '../plugins/builder.js';
 
+test('primary override changes only plan and build', async () => {
+  const previous = process.env.OC_PRIMARY;
+  const previousBuilder = process.env.OC_ORCH;
+  try {
+    process.env.OC_PRIMARY = 'fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash';
+    delete process.env.OC_ORCH;
+    const config = {
+      model: 'openai/gpt-6-astra-fast',
+      agent: Object.fromEntries(['plan', 'build', 'builder', 'frontend-builder', 'explore', 'general']
+        .map(name => [name, { model: 'openai/gpt-6-astra-fast', variant: 'low' }])),
+    };
+    const expected = structuredClone(config);
+    for (const name of ['plan', 'build']) expected.agent[name].model = process.env.OC_PRIMARY;
+    await (await builder()).config?.(config);
+    assert.deepEqual(config, expected);
+  } finally {
+    if (previous === undefined) delete process.env.OC_PRIMARY;
+    else process.env.OC_PRIMARY = previous;
+    if (previousBuilder === undefined) delete process.env.OC_ORCH;
+    else process.env.OC_ORCH = previousBuilder;
+  }
+});
+
 test('flag overrides the builder, frontend-builder, explore and general subagent models', async () => {
   const previous = process.env.OC_ORCH;
   try {
     const original = {
       model: 'openai/gpt-6-astra-fast',
       agent: {
+        plan: { model: 'openai/gpt-6-astra-fast' },
         build: { model: 'openai/gpt-6-astra-fast', variant: 'low' },
         explore: { model: 'nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731', variant: 'low' },
         general: { model: 'nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731', variant: 'low' },

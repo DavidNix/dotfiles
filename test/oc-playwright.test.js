@@ -14,11 +14,12 @@ const TIMEOUT_MS = 20000;
 
 let f;
 
-test('--ds and --builder set the orchestrator model in both launch modes and respect --', () => {
+test('--ds and --builder set separate model overrides in both launch modes and respect --', () => {
     for (const flags of [['--ds'], ['--ds', '--without-sandbox'], ['--without-sandbox', '--ds']]) {
         const result = runOc([...flags, 'probe', 'two words']);
         assert.equal(result.status, 0, result.stderr);
-        assert.match(result.stdout, /oc-orch=fireworks-ai\/accounts\/fireworks\/models\/deepseek-v4p1-flash/);
+        assert.match(result.stdout, /oc-primary=fireworks-ai\/accounts\/fireworks\/models\/deepseek-v4p1-flash/);
+        assert.match(result.stdout, /oc-orch=unset/);
         assert.match(result.stdout, /oc-argc=2/);
         assert.match(result.stdout, /oc-arg-1=<two words>/);
     }
@@ -95,6 +96,7 @@ before(() => {
         'fi',
         "printf 'oc-cdp=%s\\n' \"${PLAYWRIGHT_MCP_CDP_ENDPOINT:-unset}\"",
         "printf 'oc-orch=%s\\n' \"${OC_ORCH:-unset}\"",
+        "printf 'oc-primary=%s\\n' \"${OC_PRIMARY:-unset}\"",
         "printf 'oc-browser=%s\\n' \"${PLAYWRIGHT_MCP_BROWSER:-unset}\"",
         "printf 'oc-socketdir=%s\\n' \"${PWTEST_SOCKETS_DIR:-unset}\"",
         "printf 'oc-clibin=%s\\n' \"${OC_PLAYWRIGHT_CLI_BIN:-unset}\"",
