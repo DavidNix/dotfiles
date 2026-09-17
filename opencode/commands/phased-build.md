@@ -88,10 +88,10 @@ If selected work needs a dirty path, stop and ask how to proceed. Ignore unrelat
 Before delegation, use `todowrite` to create one flat, orchestrator-owned list covering all selected phases and the final gate. Do not create separate subagent lists or umbrella phase todos.
 
 - Label every item `[agent-type] Phase N: <brief phase outcome>`, using the actual phase number. Derive the title from the phase's name and outcome so the list explains what each phase delivers. Use `[agent-type] Final: <check and project subject>` for the selected-range gate.
-- Include the agent type exactly once: `builder`, `frontend-builder`, `orchestrator`, `code-review`, or `security-review`. Omit issue IDs, duplicated owners, and other prefixes.
+- Include the agent type exactly once: `builder`, `frontend-builder`, `orchestrator`, `code-review`, `security-review`, or `comment-pruner`. Omit issue IDs, duplicated owners, and other prefixes.
 - Create one item per work unit: implement, verify, and commit. TDD, when warranted, is internal to that builder assignment. Keep backend and frontend assignments separate when they need different builders.
 - Add one code-review item per non-final phase. The final code review covers the last selected phase, so it needs no separate phase-review item.
-- End with three items: orchestrator full verification, final code review, and final security review. The two final reviews run in parallel against the same range; list order does not make them sequential.
+- End with four items: orchestrator full verification, final code review, final security review, and final comment pruning. The two final reviews run in parallel against the same range; list order does not make them sequential. Comment pruning runs once after both reviews and any required fixes finish.
 - Keep descriptions to roughly 4–8 words after the prefix. Name the feature or behavior: `Persist completed classifications`, not `Implement storage to GREEN, verify, and commit`. Omit workflow boilerplate such as RED/GREEN, test-writing, verification, and commits from builder titles; those remain assignment requirements.
 - Review titles must name the phase's subject, such as `Review classification storage and reader safety`, never just `Review changes`. If a phase has multiple work units, retain its recognizable subject and briefly distinguish each slice. Fix titles name the affected behavior rather than generic `Fix findings`. Put exact commands, prerequisites, acceptance criteria, issue references, and evidence in handoffs and the plan.
 - Handle evidence submission and confirmation, commits, status updates, follow-up recording, issue closure, and plan cleanup within the existing items. Do not add separate test-writing, verification, commit, or handoff todos.
@@ -111,6 +111,7 @@ Example for five phases of a candidate-matching plan:
 [orchestrator] Final: Verify the candidate-matching workflow
 [code-review] Final: Review the candidate-matching implementation
 [security-review] Final: Audit candidate-matching security
+[comment-pruner] Final: Prune candidate-matching code comments
 ```
 
 Keep exactly one todo in progress while executing and mark completed only after evidence confirmation, including the required commit for builder items. Keep assignment failures within the existing builder item. Triage review findings before assigning fixes; deferred follow-ups need no execution todos. When blocking findings or final verification failures require new work, group them by builder type and add one item per fix work unit. For example: `[builder] Phase 2: Correct classification reason handling`. Do not create speculative, per-finding, repeat-review, or re-verification items.
@@ -225,9 +226,15 @@ Apply the phase code-review gate to final code-review findings. Resolve Critical
 
 Fix every actionable security finding, including `SEC-C`, `SEC-H`, `SEC-M`, and `SEC-L`. Do not ask the user merely because a security finding is Critical or High. Include `SEC-Q` investigation in the responsible builder's assignment when repository evidence can resolve it. Treat external unknowns as residual testing gaps. Never invent security assumptions.
 
-After resolving blocking questions and recording deferrals, combine verification failures, blocking code-review findings, and actionable security findings by builder type into scoped fix work units. Use one fresh builder and one atomic fix commit per work unit. Supply the grouped findings, TDD decision, and targeted checks; explicitly instruct the builder to load `ai-tdd` when warranted. If no fixes remain, proceed directly to finalization.
+After resolving blocking questions and recording deferrals, combine verification failures, blocking code-review findings, and actionable security findings by builder type into scoped fix work units. Use one fresh builder and one atomic fix commit per work unit. Supply the grouped findings, TDD decision, and targeted checks; explicitly instruct the builder to load `ai-tdd` when warranted. If no fixes remain, proceed directly to final comment pruning.
 
 After builders commit fixes, rerun failed verification commands and checks affected by the fixes yourself until green. Do not repeat unaffected successful checks, the full suite by default, or either review. Resume the same builder for an incomplete fix; use a fresh assignment for new work with TDD when warranted. Finalize only when applicable verification passes and every finding is fixed and verified, explicitly accepted, confirmed invalid, or durably deferred under the minor-follow-up policy. Keep actual blockers and unverified gaps visible; never mark them as passed.
+
+## Final comment pruning
+
+After both final reviews and all required fixes and verification finish, invoke `comment-pruner` once in a fresh session before finalizing the plan. Limit its assignment to code comments introduced or modified by the selected phases and their fixes. Supply the selected commit range, changed paths, repository instructions, and dirty-path baseline. Instruct it to follow its comment-only rules, preserve behavior and functional directives, and leave unrelated work untouched. This required pass is separate from deferred review follow-ups; do not use it to implement them.
+
+Have the pruner return its changed paths and a concise summary of comments removed or shortened. Inspect the diff to confirm the edits are comment-only and preserve required explanations. Run any checks affected by the edits yourself, then have the pruner inspect status, diff, and recent history, stage only its authorized changes, and commit them. Skip the commit if nothing changed. Record the summary, verification evidence, and commit SHA when present with the final-gate evidence. Complete the existing comment-pruning todo only after confirming that evidence; do not repeat either final review.
 
 # 8. Finalize the plan
 
