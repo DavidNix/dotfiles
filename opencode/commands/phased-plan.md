@@ -146,12 +146,15 @@ Reject subjective criteria such as "the code is clean," "performance is good," o
 Recommend one to six phases. Each phase must be:
 
 - Atomic: it leaves the repository working and committable.
-- Core-first: it proves the project's essential claim before ancillary work.
-- Data-model-first when applicable: define entities, fields, identifiers, relationships, constraints, ownership, lifecycle, indexes or query patterns, and migration/backfill/rollback needs before dependent behavior. Do not invent data-model work when no persisted or shared state changes.
+- Core-first: it proves the project's essential claim in isolation before ancillary work or production integration.
+- Data-model-first for feature work: the first phase defines and implements the data model, including entities, fields, identifiers, relationships, constraints, ownership, lifecycle, indexes or query patterns, and migration/backfill/rollback needs, before dependent behavior. Do not invent data-model work when no persisted or shared state changes.
+- Zero-impact as far as practical: early phases add independently testable foundations and behavior without changing live production behavior. Keep new paths disconnected or disabled until the final phase; identify any unavoidable production effects explicitly.
 - Risk-aware: move a blocking library or external API spike into the earliest sensible phase.
 - Builder-verifiable: it ends with targeted commands and expected results that the orchestrator assigns and checks against reported evidence.
 
-Use core-first order unless the user explicitly requires another order. Ask about ordering only when viable sequences carry materially different risks.
+For feature work, use this default sequence: define and implement the data model first, build and verify dependent behavior in isolation next, then wire the feature into production in the final phase. The final phase owns production entrypoints, activation, and end-to-end verification. State each phase's production impact and how verification establishes that inactive work leaves existing behavior unchanged.
+
+Adapt this sequence when the task requires it, such as a bugfix, work with no data-model changes, or a blocking feasibility spike. Explain any departure in the plan rather than forcing artificial phases. Preserve locked phases when revising an existing plan. Ask about ordering only when viable sequences carry materially different risks.
 
 In file mode, use this template inline for every phase:
 
