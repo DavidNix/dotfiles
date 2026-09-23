@@ -1,6 +1,5 @@
 ---
 description: Implement selected phases from a file or GitHub issue hierarchy with delegated builds and review gates
-agent: build
 subtask: false
 ---
 
