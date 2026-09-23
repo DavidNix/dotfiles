@@ -2,10 +2,38 @@
 
 set -e
 
+typeset -a failures
+
+apply() {
+    local setting=$1
+    shift
+    if "$@"; then
+        return
+    fi
+    echo "Warning: could not change $setting" >&2
+    failures+=("$setting")
+}
+
+apply_screensaver() {
+    local key=$1 value=$2 actual
+    if defaults write com.apple.screensaver "$key" -int "$value"; then
+        if actual=$(defaults read com.apple.screensaver "$key") && [[ "$actual" == "$value" ]]; then
+            return
+        fi
+        echo "Warning: com.apple.screensaver $key did not read back as $value (got: ${actual:-unavailable})" >&2
+    fi
+    echo "Warning: could not change com.apple.screensaver $key" >&2
+    failures+=("com.apple.screensaver $key")
+}
+
+disable_remote_login() {
+    echo yes | sudo systemsetup -setremotelogin off
+}
+
 echo "Configuring macOS defaults..."
 
 # Close System Preferences to prevent it from overriding our changes
-osascript -e 'tell application "System Preferences" to quit'
+apply "closing System Preferences" osascript -e 'tell application "System Preferences" to quit'
 
 # Ask for the administrator password upfront
 sudo -v
@@ -15,28 +43,28 @@ sudo -v
 ###############################################################################
 
 # Fast key repeat rate (2 = fast but not causing repeated characters)
-defaults write NSGlobalDomain KeyRepeat -int 1
+apply "NSGlobalDomain KeyRepeat" defaults write NSGlobalDomain KeyRepeat -int 1
 
 # Short delay before key repeat kicks in (12 = responsive without typos)
-defaults write NSGlobalDomain InitialKeyRepeat -int 12
+apply "NSGlobalDomain InitialKeyRepeat" defaults write NSGlobalDomain InitialKeyRepeat -int 12
 
 # Mouse tracking speed (2.5 = fast but controllable)
-defaults write NSGlobalDomain com.apple.mouse.scaling -float 2.5
+apply "NSGlobalDomain com.apple.mouse.scaling" defaults write NSGlobalDomain com.apple.mouse.scaling -float 2.5
 
 # Trackpad tracking speed (2.0 = fast but precise)
-defaults write NSGlobalDomain com.apple.trackpad.scaling -float 2.0
+apply "NSGlobalDomain com.apple.trackpad.scaling" defaults write NSGlobalDomain com.apple.trackpad.scaling -float 2.0
 
 # Disable press-and-hold for keys in favor of key repeat
-defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+apply "NSGlobalDomain ApplePressAndHoldEnabled" defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
 # Enable full keyboard access for all controls (e.g. Tab in modal dialogs)
-defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
+apply "NSGlobalDomain AppleKeyboardUIMode" defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
 
 # Disable smart quotes (annoying when typing code)
-defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+apply "NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled" defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 
 # Disable smart dashes (annoying when typing code)
-defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+apply "NSGlobalDomain NSAutomaticDashSubstitutionEnabled" defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
 # Caps Lock -> Control can't be set via defaults write
 echo ""
@@ -49,31 +77,31 @@ echo ""
 ###############################################################################
 
 # Auto-hide the Dock
-defaults write com.apple.dock autohide -bool true
+apply "Dock auto-hide" defaults write com.apple.dock autohide -bool true
 
 # Remove the auto-hide delay
-defaults write com.apple.dock autohide-delay -float 0
+apply "Dock auto-hide delay" defaults write com.apple.dock autohide-delay -float 0
 
 # Remove the auto-hide animation
-defaults write com.apple.dock autohide-time-modifier -float 0
+apply "Dock auto-hide animation" defaults write com.apple.dock autohide-time-modifier -float 0
 
 # Set icon size to 36 pixels
-defaults write com.apple.dock tilesize -int 36
+apply "Dock icon size" defaults write com.apple.dock tilesize -int 36
 
 # Speed up Mission Control animations
-defaults write com.apple.dock expose-animation-duration -float 0.1
+apply "Mission Control animation duration" defaults write com.apple.dock expose-animation-duration -float 0.1
 
 # Group windows by application in Mission Control
-defaults write com.apple.dock "expose-group-by-app" -bool true
+apply "Mission Control group by app" defaults write com.apple.dock "expose-group-by-app" -bool true
 
 # Don't bounce icons in the Dock
-defaults write com.apple.dock no-bouncing -bool TRUE
+apply "Dock icon bouncing" defaults write com.apple.dock no-bouncing -bool TRUE
 
 # Don't automatically rearrange Spaces based on most recent use
-defaults write com.apple.dock mru-spaces -bool false
+apply "Mission Control Spaces order" defaults write com.apple.dock mru-spaces -bool false
 
 # Use scale effect for minimizing windows
-defaults write com.apple.dock mineffect -string "scale"
+apply "Dock minimize effect" defaults write com.apple.dock mineffect -string "scale"
 
 ###############################################################################
 # Safari                                                                       #
@@ -88,38 +116,38 @@ echo "  3. Disable auto-open safe downloads: Safari > Settings > General > unche
 echo ""
 
 # Add Web Inspector context menu item to all web views (this one is global, not sandboxed)
-defaults write NSGlobalDomain WebKitDeveloperExtras -bool true
+apply "WebKitDeveloperExtras" defaults write NSGlobalDomain WebKitDeveloperExtras -bool true
 
 ###############################################################################
 # Photos                                                                       #
 ###############################################################################
 
 # Prevent Photos from opening automatically when devices are plugged in
-defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
+apply "Image Capture auto-open" defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
 
 ###############################################################################
 # Messages                                                                     #
 ###############################################################################
 
 # Disable smart quotes in Messages (annoying for messages that contain code)
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
+apply "Messages smart quotes" defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
 
 ###############################################################################
 # Finder                                                                       #
 ###############################################################################
 
 # Show all file extensions
-defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+apply "Show all file extensions" defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
 ###############################################################################
 # Google Chrome                                                                #
 ###############################################################################
 
 # Use the system-native print preview dialog
-defaults write com.google.Chrome DisablePrintPreview -bool true
+apply "Chrome native print dialog" defaults write com.google.Chrome DisablePrintPreview -bool true
 
 # Expand the print dialog by default
-defaults write com.google.Chrome PMPrintingExpandedStateForPrint2 -bool true
+apply "Chrome expanded print dialog" defaults write com.google.Chrome PMPrintingExpandedStateForPrint2 -bool true
 
 ###############################################################################
 # Accessibility                                                                #
@@ -135,64 +163,66 @@ echo ""
 ###############################################################################
 
 # Wake when opening the lid
-sudo pmset -a lidwake 1
+apply "Wake on lid open" sudo pmset -a lidwake 1
 
 # Restart automatically on power loss
-sudo pmset -a autorestart 1
+apply "Restart after power loss" sudo pmset -a autorestart 1
 
 # On battery: display sleep after 5 minutes, machine sleep after 10
-sudo pmset -b displaysleep 5
-sudo pmset -b sleep 10
+apply "Battery display sleep" sudo pmset -b displaysleep 5
+apply "Battery system sleep" sudo pmset -b sleep 10
 
 # On AC: display sleep after 15 minutes
-sudo pmset -c displaysleep 15
+apply "AC display sleep" sudo pmset -c displaysleep 15
 
 # Set standby delay to 24 hours (default is 1 hour)
-sudo pmset -a standbydelay 86400
+apply "Standby delay" sudo pmset -a standbydelay 86400
 
 # Restart automatically if the computer freezes (must come after pmset to avoid warnings)
-sudo systemsetup -setrestartfreeze on
+apply "Restart after freeze" sudo systemsetup -setrestartfreeze on
 
 ###############################################################################
 # Security & Privacy                                                           #
 ###############################################################################
 
 # Enable the firewall
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+apply "Firewall" sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
 
 # Enable stealth mode (don't respond to ICMP pings)
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+apply "Firewall stealth mode" sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
 
 # Restart the firewall to pick up changes
-sudo pkill -HUP socketfilterfw
+apply "Firewall reload" sudo pkill -HUP socketfilterfw
 
 # Require password immediately after sleep or screen saver begins
-defaults write com.apple.screensaver askForPassword -int 1
-defaults write com.apple.screensaver askForPasswordDelay -int 0
+apply_screensaver askForPassword 1
+apply_screensaver askForPasswordDelay 0
 
 # Disable remote login (SSH) — does not affect Tailscale SSH
-echo "yes" | sudo systemsetup -setremotelogin off
+apply "Disable remote login" disable_remote_login
 
 # AirDrop: contacts only
-defaults write com.apple.sharingd DiscoverableMode -string "Contacts Only"
+apply "AirDrop contacts only" defaults write com.apple.sharingd DiscoverableMode -string "Contacts Only"
 
 # Auto-check for software updates
-defaults write com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+apply "Automatic update checks" defaults write com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
 
 # Auto-download updates in the background
-defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1
+apply "Automatic update downloads" defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1
 
 # Install critical security updates automatically
-defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
+apply "Critical security updates" defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
 
 # Disable Siri
-defaults write com.apple.assistant.support "Assistant Enabled" -bool false
+apply "Disable Siri" defaults write com.apple.assistant.support "Assistant Enabled" -bool false
 
 # Disable Siri analytics
-defaults write com.apple.assistant.support 'Siri Data Store Opt-In Status' -int 2
+apply "Disable Siri analytics" defaults write com.apple.assistant.support 'Siri Data Store Opt-In Status' -int 2
 
 # Disable automatic login
-sudo defaults delete /Library/Preferences/com.apple.loginwindow autoLoginUser 2>/dev/null || true
+if sudo defaults read /Library/Preferences/com.apple.loginwindow autoLoginUser >/dev/null 2>&1; then
+    apply "Disable automatic login" sudo defaults delete /Library/Preferences/com.apple.loginwindow autoLoginUser
+fi
 
 ###############################################################################
 # Restart affected services                                                    #
@@ -202,4 +232,8 @@ killall Finder 2>/dev/null || true
 killall Dock 2>/dev/null || true
 
 echo "Done!"
+if (( ${#failures} )); then
+    echo "${#failures} setting(s) could not be changed:"
+    printf '  - %s\n' "${failures[@]}"
+fi
 echo "Note: Some changes require logout/restart to take effect."
