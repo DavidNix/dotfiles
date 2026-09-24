@@ -52,7 +52,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git pkgs tmux superhuman krew agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac. Work Mac: GIT_EMAIL=you@work.com
+setup: relink ~/.ssh xcode homebrew git pkgs superhuman krew agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac. Work Mac: GIT_EMAIL=you@work.com
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -97,18 +97,6 @@ krew: ## Installs kubectl krew plugins
 	$(KREW) install ctx
 	$(KREW) install ns
 	$(KREW) install stern
-
-.PHONY: tmux
-tmux: ## Install tmux plugin manager and plugins
-	@echo "Installing tmux plugin manager..."
-	@mkdir -p ~/.tmux/plugins
-	@if [ ! -d ~/.tmux/plugins/tpm/.git ]; then \
-		git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm; \
-	else \
-		git -C ~/.tmux/plugins/tpm pull --ff-only; \
-	fi
-	@echo "Installing tmux plugins..."
-	@~/.tmux/plugins/tpm/bin/install_plugins
 
 .PHONY: superhuman
 superhuman:

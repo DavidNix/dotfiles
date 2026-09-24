@@ -32,9 +32,6 @@ zinit snippet OMZP::colored-man-pages
 zinit ice wait"0" lucid
 zinit snippet OMZP::jsontools
 
-zinit ice wait"0" lucid
-zinit snippet OMZP::tmux
-
 # Fast syntax highlighting (faster than zsh-syntax-highlighting)
 zinit ice wait"0" lucid
 zinit light zdharma-continuum/fast-syntax-highlighting
