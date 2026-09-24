@@ -62,8 +62,9 @@ EOF
 
 echo "Configuring macOS defaults..."
 
-# Close System Preferences to prevent it from overriding our changes
-apply "closing System Preferences" osascript -e 'tell application "System Preferences" to quit'
+# Close System Settings to prevent it from overriding our changes.
+# Target the bundle id: the app was renamed from System Preferences in macOS 13.
+apply "closing System Settings" osascript -e 'tell application id "com.apple.systempreferences" to quit'
 
 # Ask for the administrator password upfront
 sudo -v
