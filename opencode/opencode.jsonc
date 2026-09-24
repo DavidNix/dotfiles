@@ -68,7 +68,7 @@
   "agent": {
     "plan": {
       "mode": "primary",
-      "model": "openai/gpt-6-sol-fast",
+      "model": "openai/gpt-6-astra-fast",
     },
     "build": {
       "model": "openai/gpt-6-sol-fast",
