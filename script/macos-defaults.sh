@@ -30,6 +30,36 @@ disable_remote_login() {
     echo yes | sudo systemsetup -setremotelogin off
 }
 
+# hidutil remaps keys on every keyboard but resets on reboot, so a LaunchAgent
+# reapplies the mapping at login. Loading the agent applies it immediately.
+capslock_to_control() {
+    local label=local.capslock-to-control
+    local plist=$HOME/Library/LaunchAgents/$label.plist
+    local mapping='{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x7000000E0}]}'
+    mkdir -p "${plist:h}" || return
+    cat > "$plist" <<EOF || return
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>$label</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/hidutil</string>
+        <string>property</string>
+        <string>--set</string>
+        <string>$mapping</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+</dict>
+</plist>
+EOF
+    launchctl bootout "gui/$UID/$label" 2>/dev/null || true
+    launchctl bootstrap "gui/$UID" "$plist"
+}
+
 echo "Configuring macOS defaults..."
 
 # Close System Preferences to prevent it from overriding our changes
@@ -66,11 +96,8 @@ apply "NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled" defaults write NSGlob
 # Disable smart dashes (annoying when typing code)
 apply "NSGlobalDomain NSAutomaticDashSubstitutionEnabled" defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
-# Caps Lock -> Control can't be set via defaults write
-echo ""
-echo "Manual keyboard setup required:"
-echo "  1. Caps Lock -> Control: System Settings > Keyboard > Keyboard Shortcuts > Modifier Keys"
-echo ""
+# Caps Lock -> Control on all keyboards (defaults write can't do this)
+apply "Caps Lock -> Control" capslock_to_control
 
 ###############################################################################
 # Dock                                                                         #
