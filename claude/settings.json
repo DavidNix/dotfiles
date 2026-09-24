@@ -32,7 +32,6 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "fable[1m]",
   "statusLine": {
     "type": "command",
     "command": "npx -y ccstatusline@latest",
@@ -65,7 +64,13 @@
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
+  "theme": "dark",
   "editorMode": "vim",
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": false
+  "voiceEnabled": false,
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "xhigh"
+    }
+  }
 }
