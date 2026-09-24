@@ -52,7 +52,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git pkgs zsh tmux superhuman krew agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac. Work Mac: GIT_EMAIL=you@work.com
+setup: relink ~/.ssh xcode homebrew git pkgs tmux superhuman krew agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac. Work Mac: GIT_EMAIL=you@work.com
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -97,14 +97,6 @@ krew: ## Installs kubectl krew plugins
 	$(KREW) install ctx
 	$(KREW) install ns
 	$(KREW) install stern
-
-~/.oh-my-zsh:
-	@echo "Installing ohmyzsh"
-	@$(SHELL) -c "$$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
-.PHONY: zsh
-zsh:  ~/.oh-my-zsh
-	 @$(SHELL) -c "source ~/.zshrc && zplug install"
 
 .PHONY: tmux
 tmux: ## Install tmux plugin manager and plugins
