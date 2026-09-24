@@ -33,19 +33,6 @@
     "defaultMode": "auto"
   },
   "model": "fable[1m]",
-  "hooks": {
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "osascript -e 'display notification \"Claude Code\" with title \"Claude needs your input\" sound name \"Funk\"'"
-          }
-        ]
-      }
-    ]
-  },
   "statusLine": {
     "type": "command",
     "command": "npx -y ccstatusline@latest",
