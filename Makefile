@@ -3,6 +3,7 @@
 # https://github.com/manilarome/the-glorious-dotfiles
 
 SHELL := /bin/zsh
+export PATH := /opt/homebrew/bin:/opt/homebrew/sbin:$(PATH)
 
 SHELL_SCRIPTS := bin/agent-init bin/chrome-cdp bin/oc bin/worktree bin/zed-toggle-test-file script/macos-defaults.sh test/oc.test.sh tmux-init.sh
 PYTHON_SCRIPTS := bin/image-gen bin/image-edit
@@ -66,7 +67,7 @@ xcode:
 .PHONY: homebrew
 homebrew:
 	@echo "Installing homebrew..."
-	@$(SHELL) -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+	@/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 	@brew update
 
 .PHONY: git
