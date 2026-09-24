@@ -36,7 +36,8 @@ test('--ds and --builder set separate model overrides in both launch modes and r
 });
 
 before(() => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-pw-test.'));
+    // Resolve symlinks (macOS /var -> /private/var) because oc realpaths the CLI it exports.
+    const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'oc-pw-test.')));
     const fakeBin = path.join(root, 'bin');
     const homeDir = path.join(root, 'home');
     const workDir = path.join(root, 'workspace');
