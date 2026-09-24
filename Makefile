@@ -173,7 +173,7 @@ opencode-check: ## Run opencode plugin checks
 	node --test opencode/test/*.test.js
 	node --test test/oc-playwright.test.js
 
-OPT_OWNER ?= nix
+OPT_OWNER ?= $(shell id -un)
 OPT_GROUP ?= staff
 
 .PHONY: opt-perms
