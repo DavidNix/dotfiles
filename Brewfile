@@ -1,29 +1,19 @@
-tap "homebrew/bundle"
-tap "homebrew/cask"
-tap "homebrew/core"
-tap "homebrew/services"
-tap "homebrew/cask-fonts"
-tap "microsoft/git"
-
 # cask "claude-code" # The brew version of claude code does not get updates quickly, use their official install path
 cask "1password-cli"
-cask "docker"
+cask "codex"
+cask "docker-desktop"
 cask "font-fira-code-nerd-font"
 
-tap "anomalyco/tap"
-tap "buildpacks/tap"
 tap "cjbassi/ytop"
-tap "derailed/k9s"
 
 brew "cjbassi/ytop/ytop"
-brew "derailed/k9s/k9s"
 
 # brew "air" This is NOT the golang filewatcher, but something related to R
 brew "angle-grinder"
 brew "ansible"
 brew "atuin"
 brew "bat"
-brew "codex"
+brew "bun"
 brew "colima"
 brew "coreutils"
 brew "direnv"
@@ -46,6 +36,7 @@ brew "graphviz"
 brew "hcloud"
 brew "hyperfine"
 brew "jq"
+brew "k9s"
 brew "krew"
 brew "kustomize"
 brew "lazygit"
@@ -56,7 +47,6 @@ brew "merman-cli"
 brew "mise" # asdf replacement
 brew "mole"
 brew "neovim"
-brew "oven-sh/bun/bun"
 brew "playwright-cli"
 brew "pandoc"
 brew "poppler" # pdftotext
