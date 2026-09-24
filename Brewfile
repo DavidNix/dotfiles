@@ -31,6 +31,7 @@ brew "gnupg"
 brew "golang-migrate"
 brew "graphviz"
 brew "hcloud"
+brew "herdr" # agent multiplexer
 brew "hyperfine"
 brew "jq"
 brew "k9s"
