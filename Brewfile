@@ -4,15 +4,12 @@ cask "codex"
 cask "docker-desktop"
 cask "font-fira-code-nerd-font"
 
-tap "cjbassi/ytop"
-
-brew "cjbassi/ytop/ytop"
-
 # brew "air" This is NOT the golang filewatcher, but something related to R
 brew "angle-grinder"
 brew "ansible"
 brew "atuin"
 brew "bat"
+brew "bottom" # btm, ytop replacement
 brew "bun"
 brew "colima"
 brew "coreutils"
