@@ -52,7 +52,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git pkgs zsh tmux superhuman krew agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git pkgs zsh tmux superhuman krew agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac. Work Mac: GIT_EMAIL=you@work.com
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -70,16 +70,16 @@ homebrew:
 	@/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 	@brew update
 
+GIT_EMAIL ?=
 .PHONY: git
-git:
-	@echo "Installing Git..."
-	git config --global user.name "David Nix"
-	git config --global user.email hello@davidnix.io
-	git config --global push.default current
-	git config --global fetch.prune true
-	# https://help.github.com/en/github/using-git/caching-your-github-password-in-git
-	git config --global credential.helper osxkeychain
-	@echo "Installing brew git utilities..."
+git: ## Configure git. GIT_EMAIL overrides the global email in untracked ~/.gitconfig.local
+	@if [ -n "$(GIT_EMAIL)" ]; then \
+		git config --file ~/.gitconfig.local user.email "$(GIT_EMAIL)"; \
+		echo "Git email set to $(GIT_EMAIL) in ~/.gitconfig.local"; \
+	fi
+	@# This repo is open source: always commit and push as the personal account
+	git -C $$PWD config user.email "$$(git config --file $$PWD/.gitconfig user.email)"
+	git -C $$PWD remote set-url origin https://DavidNix@github.com/DavidNix/dotfiles.git
 
 .PHONY: pkgs
 pkgs: ## Installs command line tools

@@ -12,6 +12,7 @@ Personal dotfiles repository. Uses symlinks (not chezmoi) so edits in `~/` immed
 make help      # Show all commands
 make relink    # Symlink dotfiles to ~/
 make setup     # Full new Mac setup (NOT idempotent)
+make setup GIT_EMAIL=you@work.com # Work Mac: global git email in ~/.gitconfig.local
 make defaults  # Apply macOS preferences (requires reboot)
 make pkgs      # Install Homebrew packages
 make vet       # Run all lint, type, and syntax checks

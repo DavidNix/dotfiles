@@ -102,3 +102,6 @@
 	postBuffer = 524288000
 [safe]
 	directory = /opt/homebrew
+[include]
+	# Machine-specific overrides (untracked), e.g. a work email. Keep this last.
+	path = ~/.gitconfig.local
