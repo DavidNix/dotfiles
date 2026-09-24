@@ -90,7 +90,7 @@ pkgs: ## Installs command line tools
 	mise install
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 
-KREW = kubectl krew
+KREW = mise exec -- kubectl krew
 .PHONY: krew
 krew: ## Installs kubectl krew plugins
 	$(KREW) upgrade
