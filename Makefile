@@ -52,7 +52,7 @@ defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all ma
 
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git pkgs zsh tmux superhuman krew npm agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
+setup: relink ~/.ssh xcode homebrew git pkgs zsh tmux superhuman krew agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac.
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
