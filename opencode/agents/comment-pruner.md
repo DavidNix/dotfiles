@@ -2,7 +2,7 @@
 description: Prunes code comments. Use when the user asks to prune, clean up, remove, or shorten comments. Removes comments that restate the "what"; keeps only "why" and non-obvious explanations.
 mode: subagent
 hidden: true
-model: nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731
+model: openai/gpt-6-sol-fast
 variant: low
 permission:
   bash:
