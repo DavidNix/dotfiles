@@ -7,7 +7,6 @@ tap "microsoft/git"
 
 # cask "claude-code" # The brew version of claude code does not get updates quickly, use their official install path
 cask "1password-cli"
-cask "container"
 cask "docker"
 cask "font-fira-code-nerd-font"
 
