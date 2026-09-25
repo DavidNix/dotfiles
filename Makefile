@@ -50,6 +50,15 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.
 	@$$PWD/script/macos-defaults.sh
 
+HOURS ?=
+.PHONY: caffeinate
+caffeinate: ## Keep the Mac awake for HOURS=<n> hours. Ctrl-C to stop early.
+	@if ! [[ "$(HOURS)" =~ ^[1-9][0-9]*$$ ]]; then \
+		echo "Usage: make caffeinate HOURS=4"; \
+		exit 1; \
+	fi
+	@echo "Keeping Mac awake for $(HOURS) hours (until $$(date -v+$(HOURS)H '+%H:%M')). Ctrl-C to stop."
+	@caffeinate -dims -t $$(( $(HOURS) * 3600 ))
 
 .PHONY: setup
 setup: relink ~/.ssh xcode homebrew git pkgs superhuman krew agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac. Work Mac: GIT_EMAIL=you@work.com
