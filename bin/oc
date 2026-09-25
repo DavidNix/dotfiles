@@ -227,6 +227,12 @@ EOF
     add_write_root "$opencode_state_dir"
     add_write_root "$HOME/.opencode"
 
+    local zoxide_data_dir
+    zoxide_data_dir="$HOME/Library/Application Support/zoxide"
+    mkdir -p "$zoxide_data_dir"
+    zoxide_data_dir=$(cd -P "$zoxide_data_dir" && pwd)
+    add_write_root "$zoxide_data_dir"
+
     local git_common_dir
     git_common_dir=$(git -C "$work_dir" rev-parse --git-common-dir 2>/dev/null || true)
     if [[ -n "$git_common_dir" ]]; then
