@@ -3,9 +3,9 @@ description: Implement selected phases from a file or GitHub issue hierarchy wit
 subtask: false
 ---
 
-Orchestrate selected phases from a file or GitHub parent issue. Builders own tests, implementation, commits, and assigned phase verification. When TDD is warranted, instruct the builder to load `ai-tdd` and complete its full cycle in one session. You specify checks, confirm evidence, and own reviews and completion decisions. After the last selected phase, run full verification yourself and coordinate fixes. Delegate implementation rather than writing code yourself.
+Orchestrate selected phases from a file or GitHub parent issue. Builders own tests, implementation, commits, and focused verification of their assigned changes. When TDD is warranted, instruct the builder to load `ai-tdd` and complete its full cycle in one session. You specify checks, confirm evidence, and own reviews and completion decisions. After the last selected phase and its fixes, run full verification yourself immediately before the final reviews. Delegate implementation rather than writing code yourself.
 
-Optimize for completing the selected scope. Record minor, non-blocking follow-ups for later instead of launching polish, refactor, or optional-test fix cycles. Deferral under the policy below is authorized without asking the user.
+Fix actionable findings within the selected scope as they arise, including Medium and Low findings. Do not create follow-up files, issues, or a deferred fix pass; do not wait for the user to ask for fixes.
 
 # 0. Resolve the target
 
@@ -36,7 +36,7 @@ GitHub mode:
 - Use `builder` for general work and `frontend-builder` for frontend work.
 - Keep the orchestrator's model and reasoning settings inherited from the invoking session. Implementation builders use their configured low-reasoning variant; resolve cross-cutting design decisions before handing them work.
 - Split mixed phases by assigned builder. Give each builder the entire phase but a narrow work unit.
-- Review each non-final phase once, after its implementation and verification. The last selected phase gets no phase-level review; the final gate review covers it. Do not review individual commits or review a phase again after fixes.
+- Review each non-final phase once, after its implementation and focused verification. The last selected phase gets no phase-level review; the final gate review covers it. Do not review individual commits or review a phase again after fixes.
 - Run phases and work units sequentially. They share a worktree, plan state, and history.
 - Start each work unit in a fresh builder session by omitting `task_id`, including review and final-gate fixes. Keep the full test/implementation/verification cycle in that session. Resume a task to finish or correct that assignment; start new assignments in new sessions.
 - Preserve pre-existing work. Never revert, overwrite, stage, or commit unrelated changes.
@@ -51,20 +51,6 @@ GitHub mode:
 - Keep tightly coupled schema and behavior changes together. Each unit owns its tests, implementation, and verification in one session and one commit. Avoid splitting by individual file, function, or TDD stage.
 - Keep units under the original phase number in the todo list and handoffs. A phase completes only after all its units pass. Splitting adds no per-unit reviews; retain the existing phase and final review gates.
 - If a builder encounters a blocking design question, have it return the specific question and evidence promptly. Resolve it yourself or refine the assignment before resuming that builder, rather than leaving it to explore alternatives indefinitely.
-
-## Minor follow-ups
-
-- Defer optional Medium (`M`) and Low (`L`) findings: naming/style preferences, refactors, documentation polish, speculative edge cases, and additional tests beyond required coverage. Apply this to builder discoveries and both phase and final code reviews.
-- Fix findings needed to satisfy selected acceptance criteria, pass required checks, correct demonstrated behavioral regressions or data-integrity defects, or unblock a selected phase, regardless of severity. Critical/High findings and actionable security findings retain their gates below.
-- Record deferred items as `DEFERRED`, not fixed or verified. They do not block phase completion or the final gate and do not become new plan phases, active todos, or builder assignments. Do not fix them incidentally during a blocker fix pass.
-- Reuse recorded deferrals on resume and in later reviews. Reconsider only when new evidence makes an item blocking or the user selects it for implementation.
-
-Use an existing repository-designated backlog when available. Otherwise use these defaults, creating a destination only when there is something to record:
-
-- **File mode:** repository-root `FOLLOWUPS.md`, separate from the disposable plan. Group entries under the plan name. You own these metadata edits; commit them with the next phase-status or cleanup commit. Preserve existing entries and apply the dirty-path conflict rule before editing.
-- **GitHub mode:** one standalone open issue titled `Follow-ups: <parent title> (#<parent number>)`, with the source parent URL in its body. Reuse the issue linked from the parent; otherwise search for an existing match before creating one. Append checklist entries to its body, preserving existing content and checked items. Link it from phase completion comments and the parent. Keep it outside the managed phase hierarchy, without phased-plan markers or blocking relationships, so the parent can close while follow-ups remain open.
-
-Keep each entry short: finding ID/severity, source plan and phase, file/symbol or commit reference, suggested action, and why it is safe to defer. Deduplicate by underlying issue across builders and reviews. Batch persistence with completion bookkeeping; do not spawn a builder or create a separate commit just to record follow-ups. Persist entries before completing their phase or stopping the run. Chat, tool todos, and a plan scheduled for deletion are not durable backlog storage.
 
 # 2. Preflight
 
@@ -90,10 +76,10 @@ Before delegation, use `todowrite` to create one flat, orchestrator-owned list c
 - Include the agent type exactly once: `builder`, `frontend-builder`, `orchestrator`, `code-review`, `security-review`, or `comment-pruner`. Omit issue IDs, duplicated owners, and other prefixes.
 - Create one item per work unit: implement, verify, and commit. TDD, when warranted, is internal to that builder assignment. Keep backend and frontend assignments separate when they need different builders.
 - Add one code-review item per non-final phase. The final code review covers the last selected phase, so it needs no separate phase-review item.
-- End with four items: orchestrator full verification, final code review, final security review, and final comment pruning. The two final reviews run in parallel against the same range; list order does not make them sequential. Comment pruning runs once after both reviews and any required fixes finish.
+- End with four items: orchestrator full verification, final code review, final security review, and final comment pruning. The two final reviews and comment pruning run concurrently after full verification; list order does not make them sequential.
 - Keep descriptions to roughly 4–8 words after the prefix. Name the feature or behavior: `Persist completed classifications`, not `Implement storage to GREEN, verify, and commit`. Omit workflow boilerplate such as RED/GREEN, test-writing, verification, and commits from builder titles; those remain assignment requirements.
 - Review titles must name the phase's subject, such as `Review classification storage and reader safety`, never just `Review changes`. If a phase has multiple work units, retain its recognizable subject and briefly distinguish each slice. Fix titles name the affected behavior rather than generic `Fix findings`. Put exact commands, prerequisites, acceptance criteria, issue references, and evidence in handoffs and the plan.
-- Handle evidence submission and confirmation, commits, status updates, follow-up recording, issue closure, and plan cleanup within the existing items. Do not add separate test-writing, verification, commit, or handoff todos.
+- Handle evidence submission and confirmation, commits, status updates, issue closure, and plan cleanup within the existing items. Do not add separate test-writing, verification, commit, or handoff todos.
 
 Example for five phases of a candidate-matching plan:
 
@@ -113,7 +99,7 @@ Example for five phases of a candidate-matching plan:
 [comment-pruner] Final: Prune candidate-matching code comments
 ```
 
-Keep exactly one todo in progress while executing and mark completed only after evidence confirmation, including the required commit for builder items. Keep assignment failures within the existing builder item. Triage review findings before assigning fixes; deferred follow-ups need no execution todos. When blocking findings or final verification failures require new work, group them by builder type and add one item per fix work unit. For example: `[builder] Phase 2: Correct classification reason handling`. Do not create speculative, per-finding, repeat-review, or re-verification items.
+Keep exactly one todo in progress while executing and mark completed only after evidence confirmation, including the required commit for builder items. Keep assignment failures within the existing builder item. Triage review findings before assigning fixes. Group actionable findings and verification failures by builder type and add one item per fix work unit as they arise. For example: `[builder] Phase 2: Correct classification reason handling`. Do not create speculative, per-finding, repeat-review, or re-verification items.
 
 Preserve completed history on resume without reopening or re-verifying it. If the user defers phases, remove their unstarted todos and move the final gate to the last remaining selected phase; leave deferred phases pending in the plan. Remove the newly final phase's review item only if it has not started; retain reviews already run and let an active review finish once. If that phase was already complete, preserve its completion record and record final-gate evidence separately instead of reopening it. Proceed without repeating the tool-backed list in chat or asking for approval unless scope or assignment is ambiguous.
 
@@ -141,12 +127,12 @@ Give each builder:
 - The plan target and entire current phase verbatim, including status, outcome, changes, dependencies, exclusions, and verification criteria. Never summarize or omit part of the phase.
 - Relevant project goals, non-goals, constraints, interface sketches, and acceptance criteria.
 - The exact assigned work unit and excluded scope. For a mixed phase, give every builder the same complete phase followed by its specific slice.
-- The minor-follow-up policy: complete only assigned work and required fixes. Return non-blocking discoveries for orchestrator-owned backlog recording; do not implement them or expand verification for them.
+- Fix actionable discoveries within the assigned scope as they arise and verify them with focused checks. Report discoveries outside the assignment to the orchestrator for triage before proceeding to the next work unit.
 - Repository instructions, known files or symbols, prior-phase decisions and verification evidence, starting commit, and dirty-path baseline.
 - Backend-specific status instructions. In GitHub mode state that issue persistence is orchestrator-owned and already updated.
 - The exact commit message or commit-message intent.
 - Your TDD decision and brief reason under the policy below. When warranted, explicitly instruct: "Load the `ai-tdd` skill before implementation and follow its appropriate mode through RED and GREEN in this assignment." Otherwise state that TDD is not warranted and assign suitable validation. Each builder runs its assigned checks and fixes LSP diagnostics in changed files.
-- The verification to run for this work unit: tests, builds, linters, format or type checks, migration/integration checks, or browser/manual QA as required by the plan and repository. Supply exact commands with flags, arguments, environment variables, working directories, prerequisites, and expected results; do not invent missing commands. For mixed phases, assign shared integration checks to the builder whose work completes the dependency. Keep checks phase-scoped and reserve full-project verification for your final gate, except checks explicitly required by repository instructions.
+- The verification to run for this work unit: only focused tests, builds, linters, format or type checks, migration/integration checks, or browser/manual QA directly relevant to its changes. Supply exact commands with flags, arguments, environment variables, working directories, prerequisites, and expected results; do not invent missing commands. For mixed phases, assign shared integration checks to the builder whose work completes the dependency. Builders must not run a phase-wide or repository-wide suite merely to finish a phase or fix; obey any explicit repository-required checks. Reserve full-project verification for the orchestrator immediately before the final reviews.
 - Instructions to inspect status, diff, and recent history; stage only assigned paths; create one atomic commit after assigned checks pass; and return the commit SHA, changed paths, verification results (exact commands, exit codes, and relevant output, including RED/GREEN evidence when TDD applies), LSP issues fixed, and blockers. Put a concise evidence summary in the commit message so the trail survives the session. A successful assignment must return its commit, not merely promise to commit later.
 
 Supply this context directly. Do not make builders read the full plan or rediscover existing decisions. Tell them the orchestrator maintains the only todo list.
@@ -171,36 +157,36 @@ If TDD was warranted but implementation preceded RED, preserve the work and reco
 
 After every work unit in a phase is implemented:
 
-1. Confirm the builder's reported verification evidence against the phase's exact criteria. Do not re-run builder verification.
+1. Confirm the builder's reported focused verification evidence against its assigned checks and applicable phase criteria. Reserve any repository-wide criteria for the final gate. Do not re-run builder verification.
 2. If evidence is missing or shows a failure within an assignment, resume that builder with a concrete correction request. Have it run missing checks, rerun failed checks, and check behavior affected by its fix before reporting its commit. Use a fresh assignment for new fixes, applying the TDD policy above. Do not repeat unaffected successful checks.
 3. Collect the ordered commit list from the phase's starting commit through its latest implementation or verification-fix commit.
-4. Invoke `code-review` exactly once for the whole phase. Skip this review for the last selected phase; the final gate review covers it. Limit review to that commit range and the complete phase requirements. Exclude unrelated history and dirty changes. Supply the minor-follow-up policy and existing deferrals so optional improvements do not become completion requirements.
+4. Invoke `code-review` exactly once for the whole phase. Skip this review for the last selected phase; the final gate review covers it. Limit review to that commit range and the complete phase requirements. Exclude unrelated history and dirty changes.
 
 Handle historical TDD-ordering findings under the recovery policy above. Apply this code-review gate to the remaining findings:
 
 - Critical (`C`): stop all work. Show only Critical findings, possible solutions, and your recommendation. Ask the user how to proceed.
 - High (`H`): apply the best repository-consistent solution automatically. Prefer the reviewer's recommendation when it preserves approved architecture, public interfaces, and phase scope. If every credible fix needs a major architectural change or large refactor, promote the finding to Critical and ask the user.
 - Question (`Q`): investigate from repository evidence and choose the safest reversible answer. Promote it to Critical only when it needs a major architectural change, large design refactor, irreversible public-interface change, or cannot be resolved safely.
-- Medium (`M`) or Low (`L`): defer under the minor-follow-up policy. If an item meets the blocking criteria, include it in the responsible builder's grouped fix pass. A small fix is not a reason to bypass deferral.
+- Medium (`M`) or Low (`L`): fix automatically in the current review-fix pass before completing the phase.
 - No findings: continue.
 
-Only Critical findings may produce user questions. When blocked, persist minor follow-ups and retain blocking findings for the later builder fix pass. After the user answers, group the decision and remaining blocking findings by responsible builder.
+Only Critical findings may produce user questions. When blocked, retain the findings for the builder fix pass. After the user answers, group the decision and remaining actionable findings by responsible builder.
 
 Record accepted risk:
 
 - File mode: have the phase's designated builder record the accepted risk in the plan and commit it separately.
 - GitHub mode: record the accepted risk in one phase issue comment with `gh issue comment "$phase" --body-file -`.
 
-Group only blocking review findings by builder type into scoped fix work units, with your TDD decision and targeted checks. Use one fresh builder per work unit to fix, verify, and commit, instructing it to load `ai-tdd` when warranted. Do not enumerate automatically handled findings in orchestrator chat. After builders return fixes and evidence, do not repeat unaffected phase checks or the phase review. Each finding must have a verified fix, explicit user acceptance, reviewer confirmation that it is invalid, or a durable deferral under the minor-follow-up policy. If only deferred items remain, continue immediately. The final gate is the backstop.
+Group all actionable review findings by builder type into scoped fix work units, with your TDD decision and targeted checks. Use one fresh builder per work unit to fix, verify, and commit, instructing it to load `ai-tdd` when warranted. Do not enumerate automatically handled findings in orchestrator chat. After builders return fixes and evidence, do not repeat unaffected phase checks or the phase review. Each finding must have a verified fix, explicit user acceptance, or reviewer confirmation that it is invalid before completing the phase.
 
 # 6. Complete non-final phases
 
-After a non-final phase passes exact verification and its review findings are fixed, accepted, confirmed invalid, or durably deferred under the minor-follow-up policy, record the date, command and result, review outcome, relevant commit range, and follow-up location.
+After a non-final phase passes focused verification and its review findings are fixed, accepted, or confirmed invalid, record the date, command and result, review outcome, and relevant commit range.
 
 File mode:
 
 1. Mark the phase `[x] COMPLETE` yourself with the completion evidence. Do not rerun verification.
-2. Inspect the diff, stage only the plan and any authorized follow-up additions, and commit the state update.
+2. Inspect the diff, stage only the plan, and commit the state update.
 3. Verify the plan and update the existing todos without adding a completion item.
 
 GitHub mode:
@@ -215,25 +201,25 @@ Keep the last selected phase `[~] IN PROGRESS` and, in GitHub mode, open until t
 
 # 7. Final gate
 
-Run the final gate after the last selected phase's implementation and assigned checks finish, regardless of whether that is the project's final phase. Do not reopen completed phases when the selection changes.
+Run the final gate after the last selected phase's implementation and focused checks finish, regardless of whether that is the project's final phase. Do not reopen completed phases when the selection changes.
 
 1. Find the merge base with the resolved main or master branch and record the full selected commit range and its ending SHA, not just the last phase. Exclude unrelated history and dirty changes.
-2. Run the complete verification suite yourself: tests, builds, linters, type checks, and project acceptance. Do not delegate this to a verification builder. Run the repository-wide suite, but exclude acceptance criteria that depend on deferred work and record those exclusions rather than claiming full project completion.
-3. Dispatch `code-review` and `security-review` concurrently against the same recorded range. Give both the complete selected plan, scope, minor-follow-up policy, and existing deferrals. In GitHub mode provide the parent body, every managed phase body, and relevant evidence comments. Wait for both results before assigning fixes; do not change reviewed code while either review is running.
+2. Run the complete verification suite yourself immediately before dispatching final reviews: tests, builds, linters, type checks, and project acceptance. Do not delegate this to a verification builder or run it at the end of each phase. Record criteria dependent on unselected phases as unmet, not passed. If verification fails, assign focused builder fixes, rerun failed and affected checks yourself until green, and update the ending SHA before dispatching reviews.
+3. Dispatch `code-review`, `security-review`, and `comment-pruner` concurrently against the same pinned commit range. Give the reviews the complete selected plan and scope. In GitHub mode provide the parent body, every managed phase body, and relevant evidence comments. Reviewers must inspect the pinned committed snapshot rather than the worktree while pruning is in progress. Wait for all three results and triage Critical code-review findings before committing pruning changes or assigning fixes; only the pruner may edit comments during the reviews. After any Critical decision, inspect and commit its comment-only edits before assigning review fixes, as described below.
 
-Apply the phase code-review gate to final code-review findings. Resolve Critical findings with the user; fix other blocking findings automatically and persist minor follow-ups without a fix assignment.
+Apply the phase code-review gate to final code-review findings. Critical (`C`) findings still stop work and require the user's decision; automatically fix other actionable findings, including Medium and Low.
 
 Fix every actionable security finding, including `SEC-C`, `SEC-H`, `SEC-M`, and `SEC-L`. Do not ask the user merely because a security finding is Critical or High. Include `SEC-Q` investigation in the responsible builder's assignment when repository evidence can resolve it. Treat external unknowns as residual testing gaps. Never invent security assumptions.
 
-After resolving blocking questions and recording deferrals, combine verification failures, blocking code-review findings, and actionable security findings by builder type into scoped fix work units. Use one fresh builder and one atomic fix commit per work unit. Supply the grouped findings, TDD decision, and targeted checks; explicitly instruct the builder to load `ai-tdd` when warranted. If no fixes remain, proceed directly to final comment pruning.
+After resolving blocking questions, combine final code-review and actionable security findings by builder type into scoped fix work units. Use one fresh builder and one atomic fix commit per work unit. Supply the grouped findings, TDD decision, and focused checks; explicitly instruct the builder to load `ai-tdd` when warranted. If no fixes remain, proceed directly to finalization.
 
-After builders commit fixes, rerun failed verification commands and checks affected by the fixes yourself until green. Do not repeat unaffected successful checks, the full suite by default, or either review. Resume the same builder for an incomplete fix; use a fresh assignment for new work with TDD when warranted. Finalize only when applicable verification passes and every finding is fixed and verified, explicitly accepted, confirmed invalid, or durably deferred under the minor-follow-up policy. Keep actual blockers and unverified gaps visible; never mark them as passed.
+After builders commit fixes, rerun checks affected by the fixes yourself until green. Do not repeat unaffected successful checks, the full suite by default, or either review. Resume the same builder for an incomplete fix; use a fresh assignment for new work with TDD when warranted. Finalize only when applicable verification passes and every in-scope actionable finding is fixed and verified, explicitly accepted by the user, or confirmed invalid. Keep actual blockers and unverified gaps visible; never mark them as passed.
 
 ## Final comment pruning
 
-After both final reviews and all required fixes and verification finish, invoke `comment-pruner` once in a fresh session before finalizing the plan. Limit its assignment to code comments introduced or modified by the selected phases and their fixes. Supply the selected commit range, changed paths, repository instructions, and dirty-path baseline. Instruct it to follow its comment-only rules, preserve behavior and functional directives, and leave unrelated work untouched. This required pass is separate from deferred review follow-ups; do not use it to implement them.
+Invoke `comment-pruner` once in a fresh session concurrently with the two final reviews, after orchestrator full verification passes. Limit its assignment to code comments introduced or modified by the selected phases and pre-final fixes. Supply the pinned commit range, changed paths, repository instructions, and dirty-path baseline. Instruct it to follow its comment-only rules, preserve behavior and functional directives, and leave unrelated work untouched. It must not implement review findings or commit while reviews are running. Builders assigned post-review fixes should keep their own comments concise and purposeful.
 
-Have the pruner return its changed paths and a concise summary of comments removed or shortened. Inspect the diff to confirm the edits are comment-only and preserve required explanations. Run any checks affected by the edits yourself, then have the pruner inspect status, diff, and recent history, stage only its authorized changes, and commit them. Skip the commit if nothing changed. Record the summary, verification evidence, and commit SHA when present with the final-gate evidence. Complete the existing comment-pruning todo only after confirming that evidence; do not repeat either final review.
+After all three agents return and any Critical code-review decision is resolved, have the pruner report its changed paths and a concise summary of comments removed or shortened. Inspect the diff to confirm the edits are comment-only and preserve required explanations. Run any checks affected by the edits yourself, then have the pruner inspect status, diff, and recent history, stage only its authorized changes, and commit them. Skip the commit if nothing changed. Record the summary, verification evidence, and commit SHA when present with the final-gate evidence. Complete the existing comment-pruning todo only after confirming that evidence; do not repeat either final review.
 
 # 8. Finalize the plan
 
@@ -241,15 +227,15 @@ File mode:
 
 1. Mark the last selected phase complete yourself with evidence already collected. If it was already complete before a scope reduction, append final-gate evidence without changing its completion record. Do not rerun verification.
 2. Confirm all selected phases are complete and no blocking question remains.
-3. Confirm follow-ups are stored outside the plan. If any phase remains incomplete or deferred, retain the plan, stage only its status update and authorized follow-up additions, commit them, and stop finalization here. Otherwise invoke the last selected phase's designated builder to delete the plan instead of committing a standalone final-status update. Identify your final status edit and exact follow-up additions as authorized dirty changes.
-4. Have the builder inspect status and diff, stage only the deletion and authorized follow-up additions, and create one atomic cleanup commit. Retain the backlog file.
+3. If any phase remains incomplete or deferred, retain the plan, stage only its status update, commit it, and stop finalization here. Otherwise invoke the last selected phase's designated builder to delete the plan instead of committing a standalone final-status update. Identify your final status edit as an authorized dirty change.
+4. Have the builder inspect status and diff, stage only the deletion, and create one atomic cleanup commit.
 5. Record the deletion commit SHA. The completed plan file must not remain in the repository.
 
 GitHub mode:
 
 1. Add the final phase's completion evidence as a comment, edit its body to `[x] COMPLETE`, and close it with reason `completed` without rerunning verification. If it was already complete before a scope reduction, add only the final-gate evidence comment; leave its completed body and closed state unchanged.
 2. Confirm every selected phase is closed as completed and no blocking question remains.
-3. Add one parent comment summarizing selected-range acceptance, phase and final reviews, implementation and fix commits, accepted risks, residual gaps, remaining phases, and the follow-up issue URL when present. Leave that standalone issue open; its checklist does not affect managed-phase completion.
+3. Add one parent comment summarizing selected-range acceptance, phase and final reviews, implementation and fix commits, accepted risks, residual gaps, and remaining phases.
 4. If any managed phase remains incomplete or deferred, leave it and the parent open and stop finalization here. Otherwise, if unrelated open sub-issues make closing the parent ambiguous, ask before closing it. Leave unrelated issues untouched.
 5. Close the parent with `gh issue close "$parent" --reason completed`.
 6. Read the parent back with `gh issue view "$parent" --json state,stateReason,subIssuesSummary,url` and require `CLOSED` with reason `COMPLETED`.
@@ -261,8 +247,6 @@ Use only compatible native commands for issue lifecycle operations:
 
 ```bash
 gh issue view "$issue" --json number,title,body,state,stateReason,parent,subIssues,subIssuesSummary,comments,url
-gh issue list --state open --search "$followup_search" --json number,title,body,url
-gh issue create --title "$followup_title" --body-file -
 gh issue edit "$issue" --body-file -
 gh issue comment "$issue" --body-file -
 gh issue close "$issue" --reason completed
@@ -276,4 +260,4 @@ Before a sub-issue operation, verify that `gh issue create --help` exposes `--pa
 
 When blocked, leave the current phase active in its selected backend and keep the current todo in progress. Report the target, phase, work unit, commit SHAs, session IDs, review IDs, and verification results. Ask concise numbered questions with recommended answers only for genuinely unclear or blocking decisions. Resume the saved builder for the same assignment after the user responds; start new work units in fresh sessions and preserve the current single-pass review gate.
 
-When selected work finishes, report the plan path or parent issue URL, completed phases, a brief verification/review result, remaining phases or gaps, and the count and path/URL of deferred follow-ups. Keep it to a few short bullets; link the backlog instead of listing every minor item. Store detailed commands, outputs, commit SHAs, and issue evidence in the plan or completion comments rather than repeating them in chat. Before deleting a completed file plan, include its completion evidence and backlog location in the cleanup commit message. Leave the todo list accurate. Do not push.
+When selected work finishes, report the plan path or parent issue URL, completed phases, a brief verification/review result, and remaining phases or gaps. Keep it to a few short bullets. Store detailed commands, outputs, commit SHAs, and issue evidence in the plan or completion comments rather than repeating them in chat. Before deleting a completed file plan, include its completion evidence in the cleanup commit message. Leave the todo list accurate. Do not push.
