@@ -225,7 +225,7 @@ EOF
     add_write_root "$macos_cache_dir"
     add_write_root "$opencode_data_dir"
     add_write_root "$opencode_state_dir"
-    add_write_root "$HOME/.opencode/bin"
+    add_write_root "$HOME/.opencode"
 
     local git_common_dir
     git_common_dir=$(git -C "$work_dir" rev-parse --git-common-dir 2>/dev/null || true)
