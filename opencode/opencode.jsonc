@@ -96,6 +96,11 @@
       "url": "https://mcp.context7.com/mcp",
       "enabled": true,
     },
+    "stripe": {
+      "type": "remote",
+      "url": "https://mcp.stripe.com",
+      "enabled": false,
+    },
     "chrome-devtools": {
       "type": "local",
       // Chrome runs outside oc's Seatbelt sandbox via bin/chrome-cdp; the MCP

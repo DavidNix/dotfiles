@@ -123,6 +123,10 @@ install_skills() {
     echo -e "  Installing emilkowalski skills..."
     try_or_warn_quiet "Installing emilkowalski skills" npx --yes skills add "emilkowalski/skill" -g -y -a "claude-code" -a "opencode"
 
+    # Stripe (payments, billing, invoicing, identity)
+    echo -e "  Installing Stripe skills..."
+    try_or_warn_quiet "Installing Stripe skills" npx --yes skills add "https://docs.stripe.com" -g -y -a "claude-code" -a "opencode"
+
     # Meta
     install_skill "https://github.com/anthropics/skills" "skill-creator"
 
