@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import builder from '../plugins/builder.js';
 
-test('primary override changes only plan and build', async () => {
+test('primary override changes plan, build and prototype', async () => {
   const previous = process.env.OC_PRIMARY;
   const previousBuilder = process.env.OC_ORCH;
   try {
@@ -10,11 +10,11 @@ test('primary override changes only plan and build', async () => {
     delete process.env.OC_ORCH;
     const config = {
       model: 'openai/gpt-6-astra-fast',
-      agent: Object.fromEntries(['plan', 'build', 'builder', 'frontend-builder', 'explore', 'general']
+      agent: Object.fromEntries(['plan', 'build', 'prototype', 'builder', 'frontend-builder', 'explore', 'general']
         .map(name => [name, { model: 'openai/gpt-6-astra-fast', variant: 'low' }])),
     };
     const expected = structuredClone(config);
-    for (const name of ['plan', 'build']) expected.agent[name].model = process.env.OC_PRIMARY;
+    for (const name of ['plan', 'build', 'prototype']) expected.agent[name].model = process.env.OC_PRIMARY;
     await (await builder()).config?.(config);
     assert.deepEqual(config, expected);
   } finally {

@@ -7,7 +7,7 @@ export default async () => {
     config: async (config) => {
       const agents = config.agent ??= {};
       if (primaryModel) {
-        for (const name of ['plan', 'build']) {
+        for (const name of ['plan', 'build', 'prototype']) {
           const agent = agents[name] ??= {};
           agent.model = primaryModel;
         }
