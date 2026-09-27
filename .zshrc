@@ -93,6 +93,11 @@ export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 # ==============================================================================
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/bin"
 
+# Keep the Claude installer-managed binary intact; interactive sessions use the sandbox wrapper.
+claude() {
+  command claude-sandbox "$@"
+}
+
 # Get psql without postgres (using Postgres.app instead)
 export PATH="/Applications/Postgres.app/Contents/Versions/18/bin:$PATH"
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"

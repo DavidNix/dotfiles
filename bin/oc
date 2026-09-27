@@ -31,38 +31,6 @@ die() {
     exit 1
 }
 
-resolve_script_dir() {
-    local source dir target
-    source=${BASH_SOURCE[0]}
-
-    while [[ -L "$source" ]]; do
-        dir=$(cd -P "$(dirname "$source")" && pwd)
-        target=$(readlink "$source")
-        if [[ "$target" == /* ]]; then
-            source=$target
-        else
-            source=$dir/$target
-        fi
-    done
-
-    cd -P "$(dirname "$source")" && pwd
-}
-
-declare -a write_roots=()
-sandbox_tmp=""
-
-add_write_root() {
-    local candidate resolved existing
-    candidate=$1
-    [[ -d "$candidate" ]] || return 0
-    resolved=$(cd -P "$candidate" && pwd)
-
-    for existing in "${write_roots[@]:-}"; do
-        [[ "$existing" == "$resolved" ]] && return 0
-    done
-    write_roots+=("$resolved")
-}
-
 main() {
     if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
         usage
@@ -90,225 +58,40 @@ main() {
                 shift
                 break
                 ;;
-            *)
-                break
-                ;;
+            *) break ;;
         esac
     done
 
-    local opencode_bin playwright_cli_bin
+    local opencode_bin
     opencode_bin=$(command -v opencode 2>/dev/null || true)
     [[ -n "$opencode_bin" ]] || die "opencode is not on PATH"
     opencode_bin=$(realpath "$opencode_bin")
-    # A nested oc inherits the real executable, not the outer session's PATH shim.
-    playwright_cli_bin=${OC_PLAYWRIGHT_CLI_BIN:-}
-    if [[ ! -x "$playwright_cli_bin" ]]; then
-        playwright_cli_bin=$(command -v playwright-cli 2>/dev/null || true)
-    fi
-    if [[ -n "$playwright_cli_bin" ]]; then
-        playwright_cli_bin=$(realpath "$playwright_cli_bin")
-    fi
-
     if [[ "$without_sandbox" == true ]]; then
         exec "$opencode_bin" "$@"
     fi
 
-    [[ "$(uname -s)" == "Darwin" ]] || die "sandbox-exec is only available on macOS"
-    [[ -x /usr/bin/sandbox-exec ]] || die "/usr/bin/sandbox-exec is unavailable"
-
-    local work_dir script_dir repo_dir config_file
-    work_dir=$(pwd -P)
-    script_dir=$(resolve_script_dir)
+    local script_dir repo_dir config_file
+    script_dir=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
+    # shellcheck disable=SC1091
+    source "$script_dir/../script/agent-sandbox.sh"
     repo_dir=$(cd "$script_dir/.." && pwd -P)
     config_file="$repo_dir/opencode/oc-sandbox.jsonc"
     [[ -r "$config_file" ]] || die "sandbox config is unavailable: $config_file"
 
-    local xdg_config_home xdg_cache_home xdg_data_home xdg_state_home
-    xdg_config_home=${XDG_CONFIG_HOME:-$HOME/.config}
-    xdg_cache_home=${XDG_CACHE_HOME:-$HOME/.cache}
-    xdg_data_home=${XDG_DATA_HOME:-$HOME/.local/share}
-    xdg_state_home=${XDG_STATE_HOME:-$HOME/.local/state}
-    for root in "$xdg_config_home" "$xdg_cache_home" "$xdg_data_home" "$xdg_state_home"; do
-        [[ "$root" == /* ]] || die "XDG directories must be absolute: $root"
-    done
-
-    local macos_cache_dir opencode_config_dir opencode_data_dir opencode_state_dir
-    macos_cache_dir="$HOME/Library/Caches"
-    opencode_config_dir="$xdg_config_home/opencode"
-    opencode_data_dir="$xdg_data_home/opencode"
-    opencode_state_dir="$xdg_state_home/opencode"
-    mkdir -p "$macos_cache_dir" "$opencode_config_dir" "$xdg_cache_home/opencode" "$opencode_data_dir" "$opencode_state_dir"
-    macos_cache_dir=$(cd -P "$macos_cache_dir" && pwd)
-    xdg_config_home=$(cd -P "$xdg_config_home" && pwd)
-    xdg_cache_home=$(cd -P "$xdg_cache_home" && pwd)
-    xdg_data_home=$(cd -P "$xdg_data_home" && pwd)
-    xdg_state_home=$(cd -P "$xdg_state_home" && pwd)
-    opencode_config_dir="$xdg_config_home/opencode"
-    opencode_data_dir="$xdg_data_home/opencode"
-    opencode_state_dir="$xdg_state_home/opencode"
-
-    local host_tmp work_hash
-    host_tmp=${TMPDIR:-/tmp}
-    [[ "$host_tmp" == /* && -d "$host_tmp" ]] || die "TMPDIR must be an existing absolute directory"
-    work_hash=$(printf '%s' "$work_dir" | /sbin/md5 -q | cut -c1-12)
-    sandbox_tmp=$(mktemp -d "${host_tmp%/}/oc-sandbox-${work_hash}.XXXXXX")
-    sandbox_tmp=$(cd -P "$sandbox_tmp" && pwd)
-    cleanup() {
-        rm -rf -- "$sandbox_tmp"
-    }
-    trap cleanup EXIT
-
-    mkdir -p "$sandbox_tmp/ansible" "$sandbox_tmp/bin" "$sandbox_tmp/go-build" "$sandbox_tmp/go-tmp"
-    export ANSIBLE_LOCAL_TEMP="$sandbox_tmp/ansible"
-    export TMPDIR="$sandbox_tmp"
-    export TMP="$sandbox_tmp"
-    export TEMP="$sandbox_tmp"
-    export TMPPREFIX="$sandbox_tmp/zsh"
-    export PWTEST_SOCKETS_DIR="$macos_cache_dir/playwright-cli"
-    export PLAYWRIGHT_MCP_CDP_ENDPOINT=http://127.0.0.1:9222
-    export PLAYWRIGHT_MCP_BROWSER=chromium
-    export GOCACHE="$sandbox_tmp/go-build"
-    export GOTMPDIR="$sandbox_tmp/go-tmp"
-    export XDG_CONFIG_HOME="$xdg_config_home"
-    export XDG_CACHE_HOME="$xdg_cache_home"
-    export XDG_DATA_HOME="$xdg_data_home"
-    export XDG_STATE_HOME="$xdg_state_home"
-    export NPM_CONFIG_CACHE="$xdg_cache_home/npm"
-    export OC_SANDBOX_OPENCODE_DATA_DIR="$opencode_data_dir"
+    sandbox_init oc
+    local config_dir data_dir state_dir
+    config_dir="$XDG_CONFIG_HOME/opencode"
+    data_dir="$XDG_DATA_HOME/opencode"
+    state_dir="$XDG_STATE_HOME/opencode"
+    mkdir -p "$config_dir" "$XDG_CACHE_HOME/opencode" "$data_dir" "$state_dir"
+    export OC_SANDBOX_OPENCODE_DATA_DIR="$data_dir"
     export OPENCODE_CONFIG_CONTENT
     OPENCODE_CONFIG_CONTENT=$(<"$config_file")
-
-    if [[ -n "$playwright_cli_bin" ]]; then
-        export OC_PLAYWRIGHT_CLI_BIN="$playwright_cli_bin"
-        cat >"$sandbox_tmp/bin/playwright-cli" <<'EOF'
-#!/usr/bin/env bash
-
-set -euo pipefail
-
-case "${1:-}" in
-    ""|-h|--help|-V|--version)
-        exec "$OC_PLAYWRIGHT_CLI_BIN" "$@"
-        ;;
-esac
-
-cli_command=""
-for arg in "$@"; do
-    if [[ "$arg" != -* ]]; then
-        cli_command=$arg
-        break
-    fi
-done
-
-case "$cli_command" in
-    attach|close|close-all|delete-data|detach|install|install-browser|kill-all|list)
-        exec "$OC_PLAYWRIGHT_CLI_BIN" "$@"
-        ;;
-esac
-
-cdp_endpoint=http://127.0.0.1:9222
-if ! curl --connect-timeout 1 --max-time 2 -fsS "$cdp_endpoint/json/version" >/dev/null 2>&1; then
-    printf 'playwright-cli: Chrome CDP is unavailable at %s.\n' "$cdp_endpoint" >&2
-    printf 'Run `chrome-cdp` in a terminal outside oc, then retry.\n' >&2
-    exit 1
-fi
-
-exec "$OC_PLAYWRIGHT_CLI_BIN" "$@"
-EOF
-        chmod +x "$sandbox_tmp/bin/playwright-cli"
-        export PATH="$sandbox_tmp/bin:$PATH"
-    fi
-
-    add_write_root "$work_dir"
-    add_write_root "$sandbox_tmp"
-    add_write_root "$opencode_config_dir"
-    add_write_root "$xdg_cache_home"
-    add_write_root "$macos_cache_dir"
-    add_write_root "$opencode_data_dir"
-    add_write_root "$opencode_state_dir"
-    add_write_root "$HOME/.opencode"
-
-    local zoxide_data_dir
-    zoxide_data_dir="$HOME/Library/Application Support/zoxide"
-    mkdir -p "$zoxide_data_dir"
-    zoxide_data_dir=$(cd -P "$zoxide_data_dir" && pwd)
-    add_write_root "$zoxide_data_dir"
-
-    local git_common_dir
-    git_common_dir=$(git -C "$work_dir" rev-parse --git-common-dir 2>/dev/null || true)
-    if [[ -n "$git_common_dir" ]]; then
-        if [[ "$git_common_dir" != /* ]]; then
-            git_common_dir="$work_dir/$git_common_dir"
-        fi
-        add_write_root "$git_common_dir"
-    fi
-
-    local go_path go_bin go_mod_cache
-    go_path=${GOPATH:-$HOME/go}
-    go_path=${go_path%%:*}
-    go_bin=${GOBIN:-$go_path/bin}
-    go_mod_cache=${GOMODCACHE:-$go_path/pkg/mod}
-
-    if [[ -d "$go_path" || -d "$go_bin" || -d "$go_mod_cache" ]] || command -v go >/dev/null 2>&1; then
-        mkdir -p "$go_path" "$go_bin" "$go_mod_cache"
-        go_path=$(cd -P "$go_path" && pwd)
-        go_bin=$(cd -P "$go_bin" && pwd)
-        go_mod_cache=$(cd -P "$go_mod_cache" && pwd)
-        export GOMODCACHE="$go_mod_cache"
-        add_write_root "$go_path"
-        add_write_root "$go_bin"
-        add_write_root "$go_mod_cache"
-    fi
-
-    local developer_dir
-    developer_dir=$(/usr/bin/xcode-select -p 2>/dev/null || true)
-    if [[ -n "$developer_dir" && -d "$developer_dir" ]]; then
-        developer_dir=$(cd -P "$developer_dir" && pwd)
-        export DEVELOPER_DIR="$developer_dir"
-    fi
-
-    local profile
-    profile='(version 1)
-(deny default)
-
-(allow process-exec)
-(allow process-fork)
-; OpenCode implements Ctrl+Z by signaling its process group, including this wrapper.
-(allow signal)
-(allow process-info* (target same-sandbox))
-(allow sysctl-read)
-
-; Reads are unrestricted. Seatbelt enforces write isolation only.
-(allow file-read* file-test-existence)
-(allow file-map-executable)
-
-; Terminal and inherited file descriptors.
-(allow pseudo-tty)
-(allow file-read-data file-test-existence file-write-data (subpath "/dev/fd"))
-(allow file-read* file-write* file-ioctl (literal "/dev/ptmx"))
-(allow file-read* file-write* (literal "/dev/null"))
-(allow file-read* file-write* (literal "/dev/tty"))
-(allow file-read-metadata (literal "/dev"))
-(allow file-read* file-write* (regex #"^/dev/ttys[0-9]+$"))
-(allow file-ioctl (regex #"^/dev/ttys[0-9]+$"))
-
-; Network access is always enabled so OpenCode can reach model providers.
-(allow network-outbound)
-(allow network-inbound)
-
-; Native tools rely on macOS services; file writes remain constrained separately.
-(allow mach-lookup)'
-
-    local -a definitions=()
-    local index key root
-    index=0
-    for root in "${write_roots[@]}"; do
-        key="WRITABLE_ROOT_$index"
-        profile+=$'\n'"(allow file-write* (subpath (param \"$key\")))"
-        definitions+=("-D$key=$root")
-        index=$((index + 1))
-    done
-
-    /usr/bin/sandbox-exec -p "$profile" "${definitions[@]}" -- "$opencode_bin" "$@"
+    sandbox_allow_dir "$config_dir"
+    sandbox_allow_dir "$data_dir"
+    sandbox_allow_dir "$state_dir"
+    sandbox_allow_dir "$HOME/.opencode"
+    sandbox_run "$opencode_bin" "$@"
 }
 
 main "$@"

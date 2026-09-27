@@ -5,7 +5,7 @@
 SHELL := /bin/zsh
 export PATH := /opt/homebrew/bin:/opt/homebrew/sbin:$(PATH)
 
-SHELL_SCRIPTS := bin/agent-init bin/chrome-cdp bin/oc bin/worktree bin/zed-toggle-test-file script/macos-defaults.sh test/oc.test.sh tmux-init.sh
+SHELL_SCRIPTS := bin/agent-init bin/chrome-cdp bin/claude-sandbox bin/oc bin/worktree bin/zed-toggle-test-file script/agent-sandbox.sh script/macos-defaults.sh test/oc.test.sh tmux-init.sh
 PYTHON_SCRIPTS := bin/image-gen bin/image-edit
 
 default: help
@@ -19,8 +19,11 @@ install-scripts: ## Symlink custom scripts to ~/.local/bin
 	@echo "Symlinking scripts to ~/.local/bin..."
 	@mkdir -p ~/.local/bin
 	@rm -f ~/.local/bin/oc-sandbox
-	@chmod +x $$PWD/bin/*
-	@ln -sf $$PWD/bin/* ~/.local/bin/
+	@for script in $$PWD/bin/*; do \
+		[ -f "$$script" ] || continue; \
+		chmod +x "$$script"; \
+		ln -sf "$$script" ~/.local/bin/; \
+	done
 	@echo "Scripts installed successfully"
 
 .PHONY: relink
@@ -154,13 +157,17 @@ python-check: ## Run Python lint, type, and syntax checks on scripts
 	@echo "python-check passed"
 
 .PHONY: vet
-vet: shellcheck python-check opencode-check ## Run all repo lint, type, and syntax checks
+vet: shellcheck python-check opencode-check agent-sandbox-check ## Run all repo lint, type, and syntax checks
 
 .PHONY: opencode-check
 opencode-check: ## Run opencode plugin checks
 	node --check opencode/plugins/safe-commands.js
 	node --test opencode/test/*.test.js
 	node --test test/oc-playwright.test.js
+
+.PHONY: agent-sandbox-check
+agent-sandbox-check: ## Run Claude sandbox wrapper tests
+	node --test test/claude-sandbox.test.js
 
 OPT_OWNER ?= $(shell id -un)
 OPT_GROUP ?= staff
