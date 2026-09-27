@@ -2,7 +2,7 @@
 description: Preferred for all frontend work. Implements UI, styling, interactions, responsive behavior, and other frontend changes after the parent agent has planned the work.
 mode: subagent
 hidden: true
-model: nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731
+model: nixlab-large/nixlab/large1
 variant: low
 permission:
   bash:

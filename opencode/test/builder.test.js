@@ -33,8 +33,8 @@ test('flag overrides the builder, frontend-builder, explore and general subagent
       agent: {
         plan: { model: 'openai/gpt-6-astra-fast' },
         build: { model: 'openai/gpt-6-astra-fast', variant: 'low' },
-        explore: { model: 'nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731', variant: 'low' },
-        general: { model: 'nixlab-large/deepseek-ai/DeepSeek-V4-Flash-0731', variant: 'low' },
+        explore: { model: 'nixlab-large/nixlab/large1', variant: 'low' },
+        general: { model: 'nixlab-large/nixlab/large1', variant: 'low' },
         builder: { model: 'openai/gpt-6-astra-fast' },
         'frontend-builder': { model: 'openai/gpt-6-astra-fast' },
         summary: { model: 'openai/gpt-5.6-luna' },
