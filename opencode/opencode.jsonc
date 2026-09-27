@@ -4,7 +4,7 @@
   "default_agent": "plan",
   "disabled_providers": ["opencode", "baseten"],
   "model": "openai/gpt-6-sol-fast",
-  "small_model": "nixlab-small/qwen3.6-35b-a3b-nvfp4",
+  "small_model": "nixlab-small/nixlab/small1",
   "provider": {
     "nixlab-small": {
       "npm": "@ai-sdk/openai-compatible",
@@ -14,8 +14,8 @@
         "apiKey": "local",
       },
       "models": {
-        "qwen3.6-35b-a3b-nvfp4": {
-          "name": "Qwen3.6-35B-A3B",
+        "nixlab/small1": {
+          "name": "Nixlab Small 1",
           "reasoning": true,
           "limit": {
             "context": 131072,
