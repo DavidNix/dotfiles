@@ -45,6 +45,9 @@ const allowedCommands = [
 const blockedCommands = [
   ["git push", /git push commands are blocked/],
   ["git push origin feature", /git push commands are blocked/],
+  ["terraform apply -auto-approve", /terraform apply commands are blocked/],
+  ["tofu apply -auto-approve", /tofu apply commands are blocked/],
+  ["cd infra && tofu apply", /tofu apply commands are blocked/],
   ["go install example.com/tool@latest", /go install is blocked/],
   ["go env -w GOPROXY=direct", /go env -w\/-u is blocked/],
   ["go env -u GOPROXY", /go env -w\/-u is blocked/],

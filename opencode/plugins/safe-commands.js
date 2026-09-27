@@ -173,6 +173,10 @@ export const getUnsafeCommandReason = (command) => {
     return "terraform apply commands are blocked because they can make destructive infrastructure changes that are difficult to reverse. The AI agent is not permitted to modify live infrastructure automatically.";
   }
 
+  if (/tofu\s+apply/i.test(command)) {
+    return "tofu apply commands are blocked because they can make destructive infrastructure changes that are difficult to reverse. The AI agent is not permitted to modify live infrastructure automatically.";
+  }
+
   if (commandReferencesOpenCodePrivateData(command)) {
     return openCodePrivateDataReason;
   }

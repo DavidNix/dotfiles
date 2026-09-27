@@ -363,6 +363,11 @@
       "terraform plan *": "allow",
       "terraform state list *": "allow",
       "terraform validate *": "allow",
+      "tofu fmt *": "allow",
+      "tofu init *": "allow",
+      "tofu plan *": "allow",
+      "tofu state list *": "allow",
+      "tofu validate *": "allow",
       "uv run ansible-lint *": "allow",
 
       // Container tooling
