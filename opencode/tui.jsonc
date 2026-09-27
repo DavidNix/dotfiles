@@ -3,4 +3,8 @@
   "theme": "ayu",
   "diff_style": "auto",
   "plugin": ["./herdr-tui-session.js"],
+  "keybinds": {
+    "messages_last": "ctrl+e",
+    "input_line_end": "none",
+  },
 }
