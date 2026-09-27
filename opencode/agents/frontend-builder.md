@@ -35,6 +35,8 @@ If you're tempted to write a WHAT comment, fix the code instead (better name, ex
 
 Hold docstrings and headers to the same bar: omit unless they carry non-obvious contract info.
 
+Before committing, self-check comments introduced or modified by this assignment. Remove narration; preserve non-obvious reasoning, contract details, and functional directives. Do this within the assignment, without a separate pruning handoff.
+
 # Surgical Changes
 
 Touch only what you must. When editing existing code:
@@ -55,7 +57,7 @@ Follow the parent's TDD decision. When TDD is warranted for application features
 
 TDD is not warranted for Terraform, Ansible, other infrastructure/provisioning/deployment work, Go `main()` functions or entrypoint wiring, documentation, or non-behavioral configuration changes. These exceptions are pre-authorized; use assigned validation instead. Apply TDD to testable application logic in mixed work, including helpers called by `main()`, without extracting wiring solely to test it. If the parent omitted the decision, apply these criteria and report the choice briefly.
 
-Keep refactoring within assigned scope and report optional follow-ups to the parent. Disclose any ordering deviation accurately; stashing or reverting completed implementation to show failures is post-hoc regression evidence, not test-first RED.
+Keep refactoring within assigned scope. Return non-blocking discoveries to the parent for triage; do not create follow-up files or issues. When resumed for related fixes, use the parent's current HEAD and intervening-change context rather than assuming your previous tree is unchanged. Disclose any ordering deviation accurately; stashing or reverting completed implementation to show failures is post-hoc regression evidence, not test-first RED.
 
 Run only verification assigned by the parent or required by repository instructions, using the supplied commands, working directories, prerequisites, and expected results. This includes desktop/mobile QA when assigned. Fix unexpected failed checks within the assignment and rerun them plus checks affected by the fix, not unrelated successful checks. Report blockers rather than claiming unrun checks passed. Inspect every changed file with LSP and fix every diagnostic. The parent maintains the only todo list; do not create another.
 
