@@ -25,9 +25,21 @@ before(() => {
     fs.writeFileSync(path.join(bin, 'claude'), [
         '#!/bin/bash',
         'set -euo pipefail',
+        'if [[ "${1:-}" == mktemp-probe ]]; then',
+        '  printf "tmpdir=%s\\n" "$TMPDIR"',
+        '  printf "bare=%s\\n" "$(mktemp)"',
+        '  d=$(mktemp -d); [[ -d "$d" ]]; printf "dir=%s\\n" "$d"',
+        '  printf "prefix=%s\\n" "$(mktemp -t probe)"',
+        '  d=$(mktemp -dqt probe); [[ -d "$d" ]]; printf "combined=%s\\n" "$d"',
+        '  d=$(mktemp --directory); [[ -d "$d" ]]; printf "long=%s\\n" "$d"',
+        '  printf "tmpdir-relative=%s\\n" "$(mktemp --tmpdir rel.XXXXXX)"',
+        '  printf "explicit=%s\\n" "$(mktemp explicit.XXXXXX)"',
+        '  exit 0',
+        'fi',
         'printf "argc=%s\\n" "$#"',
         'i=0; for arg in "$@"; do printf "arg-%s=<%s>\\n" "$i" "$arg"; i=$((i+1)); done',
         'printf "tmpdir=%s\\n" "${TMPDIR:-unset}"',
+        'printf "cctmp=%s\\n" "${CLAUDE_CODE_TMPDIR:-unset}"',
         'printf "configdir=%s\\n" "${CLAUDE_CONFIG_DIR:-unset}"',
         'exit "${CC_TEST_EXIT:-0}"',
         '',
@@ -85,6 +97,7 @@ test('Claude runs in the shared write-isolation profile with only Claude state w
     assert.doesNotMatch(r.profile, /-DWRITABLE_ROOT_\d+=.*\/outside\n/);
     const tmp = r.stdout.match(/tmpdir=(.*)/)?.[1];
     assert.ok(tmp);
+    assert.ok(r.stdout.includes(`cctmp=${tmp}\n`), 'Claude temp dir is inside the writable sandbox temp dir');
     assert.equal(fs.existsSync(tmp), false);
 });
 
@@ -100,6 +113,22 @@ test('without sandbox launches directly without modifying environment', () => {
     assert.equal(r.profile, '');
     assert.match(r.stdout, /arg-0=<--version>/);
     assert.match(r.stdout, new RegExp(`tmpdir=${fixture.root}\\n`));
+    assert.match(r.stdout, /cctmp=unset\n/);
+});
+
+test('mktemp without a template uses the sandbox temp dir instead of the blocked per-user temp dir', () => {
+    const r = run(['mktemp-probe']);
+    assert.equal(r.status, 0, r.stderr);
+    const out = Object.fromEntries(r.stdout.trim().split('\n').map((line) => {
+        const i = line.indexOf('=');
+        return [line.slice(0, i), line.slice(i + 1)];
+    }));
+    for (const key of ['bare', 'dir', 'prefix', 'combined', 'long', 'tmpdir-relative']) {
+        assert.equal(path.dirname(out[key]), out.tmpdir, key);
+    }
+    assert.match(path.basename(out.prefix), /^probe\.\w{10}$/);
+    assert.match(path.basename(out['tmpdir-relative']), /^rel\.\w{6}$/);
+    assert.match(out.explicit, /^explicit\.\w{6}$/, 'relative templates stay relative to the working directory');
 });
 
 test('custom Claude config directory is writable without making its parent writable', () => {

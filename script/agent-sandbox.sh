@@ -55,6 +55,56 @@ sandbox_cleanup() {
     fi
 }
 
+sandbox_mktemp_shim() {
+    cat >"$sandbox_tmp/bin/mktemp" <<'EOF'
+#!/usr/bin/env bash
+
+# Apple's mktemp creates -t and template-less files in the per-user /var/folders temp dir
+# before considering TMPDIR, and the sandbox blocks writes there. Build those templates in TMPDIR.
+set -euo pipefail
+
+original=("$@")
+flags=()
+prefix=tmp
+generate=false
+tmpdir=""
+relative=false
+while getopts ":dqut:p:-:" opt; do
+    case "$opt" in
+        d|q|u) flags+=("-$opt") ;;
+        t) generate=true; prefix=$OPTARG ;;
+        p) relative=true; tmpdir=$OPTARG ;;
+        -)
+            case "$OPTARG" in
+                directory|quiet|dry-run) flags+=("--$OPTARG") ;;
+                tmpdir) relative=true; tmpdir="" ;;
+                tmpdir=*) relative=true; tmpdir=${OPTARG#tmpdir=} ;;
+                *) exec /usr/bin/mktemp "${original[@]}" ;;
+            esac
+            ;;
+        *) exec /usr/bin/mktemp "${original[@]}" ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+[[ $# -gt 0 ]] || generate=true
+templates=()
+if [[ "$generate" == true ]]; then
+    base=${TMPDIR:-${tmpdir:-/tmp}}
+    templates+=("${base%/}/$prefix.XXXXXXXXXX")
+fi
+for template in "$@"; do
+    if [[ "$relative" == true && "$template" != /* ]]; then
+        base=${tmpdir:-${TMPDIR:-/tmp}}
+        template="${base%/}/$template"
+    fi
+    templates+=("$template")
+done
+exec /usr/bin/mktemp ${flags[@]+"${flags[@]}"} -- "${templates[@]}"
+EOF
+    chmod +x "$sandbox_tmp/bin/mktemp"
+}
+
 sandbox_playwright_shim() {
     local playwright_cli_bin
     playwright_cli_bin=${OC_PLAYWRIGHT_CLI_BIN:-}
@@ -99,7 +149,6 @@ fi
 exec "$OC_PLAYWRIGHT_CLI_BIN" "$@"
 EOF
     chmod +x "$sandbox_tmp/bin/playwright-cli"
-    export PATH="$sandbox_tmp/bin:$PATH"
 }
 
 sandbox_init() {
@@ -142,6 +191,8 @@ sandbox_init() {
     export XDG_DATA_HOME="$xdg_data_home" XDG_STATE_HOME="$xdg_state_home"
     export NPM_CONFIG_CACHE="$xdg_cache_home/npm"
     export SANDBOX_AGENT_NAME="$sandbox_name"
+    export SANDBOX_BIN="$sandbox_tmp/bin" PATH="$sandbox_tmp/bin:$PATH"
+    sandbox_mktemp_shim
     sandbox_playwright_shim
 
     sandbox_allow_dir "$sandbox_work_dir"

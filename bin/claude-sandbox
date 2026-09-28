@@ -39,6 +39,8 @@ main() {
     # shellcheck disable=SC1091
     source "$script_dir/../script/agent-sandbox.sh"
     sandbox_init cc
+    # Claude Code ignores TMPDIR for its per-session temp dirs (Bash state, scratchpad, agent output).
+    export CLAUDE_CODE_TMPDIR="$sandbox_tmp"
 
     config_dir=${CLAUDE_CONFIG_DIR:-$HOME/.claude}
     [[ "$config_dir" == /* ]] || sandbox_die "CLAUDE_CONFIG_DIR must be absolute: $config_dir"

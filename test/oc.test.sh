@@ -230,6 +230,13 @@ else
     printf 'zsh-heredoc=blocked\n'
 fi
 
+if mktemp_file=$(mktemp) && mktemp_dir=$(mktemp -d) && mktemp_prefix=$(mktemp -t probe) &&
+    [[ "$mktemp_file" == "$TMPDIR"/* && "$mktemp_dir" == "$TMPDIR"/* && "$mktemp_prefix" == "$TMPDIR"/* ]]; then
+    printf 'mktemp=allowed\n'
+else
+    printf 'mktemp=blocked\n'
+fi
+
 IFS= read -r go_value <"$GOMODCACHE/probe.txt"
 IFS= read -r path_value <"$(dirname "$0")/path-probe.txt"
 printf 'go-read=%s\n' "$go_value"
@@ -301,6 +308,7 @@ assert_contains "$output_file" "opencode-private-read=allowed"
 assert_contains "$output_file" "ssh-user-lookup=allowed"
 assert_contains "$output_file" "outside-write=blocked"
 assert_contains "$output_file" "zsh-heredoc=allowed"
+assert_contains "$output_file" "mktemp=allowed"
 assert_contains "$output_file" "go-read=go-module-readable"
 assert_contains "$output_file" "go-module-write=allowed"
 assert_contains "$output_file" "path-read=path-readable"

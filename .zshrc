@@ -217,3 +217,8 @@ eval "$(atuin init zsh --disable-up-arrow)"
 
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
+
+# Agent sandboxes (script/agent-sandbox.sh) put tool shims here; the PATH reset above drops them.
+if [[ -n "${SANDBOX_BIN:-}" ]]; then
+  export PATH="$SANDBOX_BIN:$PATH"
+fi
