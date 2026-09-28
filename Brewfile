@@ -13,6 +13,7 @@ brew "bottom" # btm, ytop replacement
 brew "bun"
 brew "colima"
 brew "coreutils"
+brew "diffutils" # GNU diff reads pipes in memory; Apple's diff needs a temp file the agent sandbox blocks
 brew "direnv"
 brew "dive"
 brew "dust"
