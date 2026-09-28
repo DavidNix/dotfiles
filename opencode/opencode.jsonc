@@ -55,7 +55,6 @@
             "output": 32000,
           },
           "variants": {
-            "none": { "reasoningEffort": "none" },
             "low": { "reasoningEffort": "low" },
             "medium": { "disabled": true },
             "high": { "reasoningEffort": "high" },
