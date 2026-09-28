@@ -93,11 +93,6 @@ export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 # ==============================================================================
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/bin"
 
-# Keep the Claude installer-managed binary intact; interactive sessions use the sandbox wrapper.
-claude() {
-  command claude-sandbox "$@"
-}
-
 # Get psql without postgres (using Postgres.app instead)
 export PATH="/Applications/Postgres.app/Contents/Versions/18/bin:$PATH"
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
@@ -218,7 +213,7 @@ eval "$(atuin init zsh --disable-up-arrow)"
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
 
-# Agent sandboxes (script/agent-sandbox.sh) put tool shims here; the PATH reset above drops them.
+# OpenCode's sandbox puts tool shims here; the PATH reset above drops them.
 if [[ -n "${SANDBOX_BIN:-}" ]]; then
   export PATH="$SANDBOX_BIN:$PATH"
 fi
