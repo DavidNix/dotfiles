@@ -50,8 +50,12 @@
         "nixlab/large1": {
           "name": "Nixlab Large 1",
           "reasoning": true,
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"],
+          },
           "limit": {
-            "context": 262144,
+            "context": 524288,
             "output": 32000,
           },
           "variants": {
