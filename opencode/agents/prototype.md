@@ -1,7 +1,7 @@
 ---
 description: Builds quick prototypes for users to test manually.
 mode: primary
-model: openai/gpt-6-sol-fast
+model: openai/gpt-6.1-sol-fast
 variant: low
 color: "#3B82F6"
 ---

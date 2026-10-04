@@ -3,7 +3,7 @@
   "lsp": true,
   "default_agent": "plan",
   "disabled_providers": ["opencode", "baseten"],
-  "model": "openai/gpt-6-sol-fast",
+  "model": "openai/gpt-6.1-sol-fast",
   "small_model": "nixlab-small/nixlab/small1",
   "provider": {
     "nixlab-small": {
@@ -74,7 +74,7 @@
       "model": "openai/gpt-6-astra-fast",
     },
     "build": {
-      "model": "openai/gpt-6-sol-fast",
+      "model": "openai/gpt-6.1-sol-fast",
       "variant": "low",
     },
     "explore": {
