@@ -92,33 +92,43 @@ test("validateSafeCommand blocks unsafe commands", () => {
   }
 });
 
-test("plugin hook uses validateSafeCommand", async () => {
-  const plugin = await SafeCommandsPlugin();
-  const beforeExecute = plugin["tool.execute.before"];
+async function hooks() {
+  const registered = {};
+  await SafeCommandsPlugin.setup({
+    permission: { hook: async (name, callback) => { registered[`permission.${name}`] = callback; } },
+    shell: { hook: async (name, callback) => { registered[`shell.${name}`] = callback; } },
+  });
+  return registered;
+}
 
-  await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, { args: { command: "go test ./..." } }));
-  await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, { args: { command: "go run ." } }));
-  await assert.doesNotReject(() => beforeExecute({ tool: "read" }, { args: { command: "go run ." } }));
+test("V2 permission hook denies dangerous shell commands with the reason", async () => {
+  const evaluate = (await hooks())["permission.evaluate"];
+  assert.equal(typeof evaluate, "function");
+  for (const command of allowedCommands) {
+    const event = { action: "shell", resources: [command], effect: "allow" };
+    evaluate(event);
+    assert.equal(event.effect, "allow", command);
+  }
+  for (const [command, message] of blockedCommands) {
+    const event = { action: "shell", resources: ["git status", command], effect: "allow" };
+    evaluate(event);
+    assert.equal(event.effect, "deny", command);
+    assert.match(event.message, message, command);
+  }
+  const read = { action: "read", resources: ["git push"], effect: "allow" };
+  evaluate(read);
+  assert.equal(read.effect, "allow");
 });
 
-test("plugin hook tolerates missing or non-string command args", async () => {
-  const plugin = await SafeCommandsPlugin();
-  const beforeExecute = plugin["tool.execute.before"];
-
-  await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, { args: {} }));
-  await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, {}));
-  await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, { args: { command: { command: "go test ./..." } } }));
-});
-
-test("plugin hook inspects string-array command args", async () => {
-  const plugin = await SafeCommandsPlugin();
-  const beforeExecute = plugin["tool.execute.before"];
-
-  await assert.doesNotReject(() => beforeExecute({ tool: "bash" }, { args: { command: ["go", "test", "./..."] } }));
-  await assert.rejects(
-    () => beforeExecute({ tool: "bash" }, { args: { command: ["git", "push"] } }),
-    /git push commands are blocked/,
-  );
+test("V2 shell hook blocks dangerous commands before a process is created", async () => {
+  const beforeCreate = (await hooks())["shell.create.before"];
+  assert.equal(typeof beforeCreate, "function");
+  for (const command of allowedCommands) {
+    assert.doesNotThrow(() => beforeCreate({ command }), command);
+  }
+  for (const [command, message] of blockedCommands) {
+    assert.throws(() => beforeCreate({ command }), message, command);
+  }
 });
 
 test("validateSafeCommand blocks OpenCode private data", () => {

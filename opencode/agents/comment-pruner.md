@@ -2,15 +2,12 @@
 description: Prunes code comments. Use when the user asks to prune, clean up, remove, or shorten comments. Removes comments that restate the "what"; keeps only "why" and non-obvious explanations.
 mode: subagent
 hidden: true
-model: openai/gpt-6.1-sol-fast
-variant: low
-permission:
-  bash:
-    "*": deny
-    "git *": allow
-  task: deny
-  todowrite: deny
-  question: deny
+model: openai/gpt-6.1-sol-fast#low
+permissions:
+  - { action: shell, resource: "*", effect: deny }
+  - { action: shell, resource: "git *", effect: allow }
+  - { action: subagent, resource: "*", effect: deny }
+  - { action: question, resource: "*", effect: deny }
 ---
 
 You are a comment-pruning subagent. Reduce comment noise; never change behavior.

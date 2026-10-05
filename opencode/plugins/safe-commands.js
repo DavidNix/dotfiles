@@ -1,4 +1,4 @@
-// Safe Commands Plugin - Blocks dangerous bash commands
+// Safe Commands Plugin - Blocks dangerous shell commands
 // Blocks dangerous shell commands, secret access, and destructive macOS operations.
 
 import os from "node:os";
@@ -240,12 +240,22 @@ export const validateSafeCommand = (command) => {
   }
 };
 
-export const SafeCommandsPlugin = async () => {
-  return {
-    "tool.execute.before": async (input, output) => {
-      if (input.tool !== "bash") return;
-      const command = output.args?.command;
-      validateSafeCommand(Array.isArray(command) ? command.join(" ") : typeof command === "string" ? command : "");
-    },
-  };
+export const SafeCommandsPlugin = {
+  id: "dotfiles.safe-commands",
+  async setup(ctx) {
+    // A permission denial reaches the model as a normal tool error with the reason.
+    await ctx.permission.hook("evaluate", (event) => {
+      if (event.action !== "shell") return;
+      const reason = event.resources.map((command) => getUnsafeCommandReason(command)).find(Boolean);
+      if (!reason) return;
+      event.effect = "deny";
+      event.message = reason;
+    });
+    // Backstop for the raw command, including user-run shell commands that skip permissions.
+    await ctx.shell.hook("create.before", (event) => {
+      validateSafeCommand(event.command);
+    });
+  },
 };
+
+export default SafeCommandsPlugin;

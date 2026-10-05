@@ -1,0 +1,16 @@
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "theme": {
+    "name": "ayu"
+  },
+  "diffs": {
+    "view": "auto"
+  },
+  "plugins": ["./cli-plugins/herdr-session.js"],
+  "keybinds": {
+    "agent.cycle": "tab",
+    "agent.cycle.reverse": "shift+tab",
+    "session.last": "ctrl+e",
+    "input.line.end": "none"
+  }
+}

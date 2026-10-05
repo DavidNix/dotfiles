@@ -43,6 +43,7 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	ln -sf $$PWD/.config/herdr/config.toml ~/.config/herdr/config.toml
 	@# opencode (separate from .config/* to avoid conflicts)
 	mkdir -p ~/.config/opencode
+	@if [ -L ~/.config/opencode/tui.jsonc ]; then rm ~/.config/opencode/tui.jsonc; fi
 	ln -sf $$PWD/opencode/* ~/.config/opencode
 	@#Claude Code
 	mkdir -p ~/.claude/commands ~/.claude/agents
@@ -162,7 +163,7 @@ vet: shellcheck python-check opencode-check ## Run all repo lint, type, and synt
 
 .PHONY: opencode-check
 opencode-check: ## Run opencode plugin checks
-	node --check opencode/plugins/safe-commands.js
+	@for plugin in opencode/plugins/*.js opencode/cli-plugins/*.js; do node --check "$$plugin" || exit; done
 	node --test opencode/test/*.test.js
 	node --test test/oc-playwright.test.js
 

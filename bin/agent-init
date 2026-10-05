@@ -86,16 +86,28 @@ install_claude() {
     echo -e "${GREEN}Claude Code installed${NC}"
 }
 
-# Install OpenCode via official installer (if not already installed)
+# The V2 installer replaces curl-installed V1 binaries in ~/.opencode/bin.
 install_opencode() {
     echo ""
-    if command -v opencode &>/dev/null; then
-        echo -e "${GRAY}OpenCode already installed, skipping${NC}"
-        return 0
+    local version=""
+    if command -v opencode >/dev/null 2>&1; then
+        version=$(opencode --version 2>/dev/null || true)
+        version=${version##* }
+        version=${version#v}
+        if [[ "$version" == 2.* ]]; then
+            echo -e "${GRAY}OpenCode V2 already installed, skipping${NC}"
+            return 0
+        fi
+        if command -v brew >/dev/null 2>&1 && brew list --versions opencode >/dev/null 2>&1; then
+            brew uninstall opencode
+        fi
     fi
-    echo "Installing OpenCode..."
-    curl -fsSL https://opencode.ai/install | bash
-    echo -e "${GREEN}OpenCode installed${NC}"
+    echo "Installing OpenCode V2..."
+    curl -fsSL https://opencode.ai/v2/install | bash -s -- --no-modify-path
+    # The upstream installer also adds a retired side-by-side command.
+    rm -f "$HOME/.opencode/bin/opencode2"
+    export PATH="$HOME/.opencode/bin:$PATH"
+    echo -e "${GREEN}OpenCode V2 installed${NC}"
 }
 
 # Install a skill via npx skills

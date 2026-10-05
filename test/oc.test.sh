@@ -90,6 +90,12 @@ cat >"$fake_bin/opencode" <<'FAKE'
 
 set -euo pipefail
 
+args=()
+for arg in "$@"; do
+    [[ "$arg" == --standalone ]] || args+=("$arg")
+done
+set -- ${args[@]+"${args[@]}"}
+
 probe_outside_write() {
     if (printf 'outside-write\n' >"$OC_SANDBOX_TEST_OUTSIDE") 2>/dev/null; then
         printf 'outside-write=allowed\n'
@@ -154,7 +160,7 @@ for arg in "$@"; do
 done
 
 case "${OPENCODE_CONFIG_CONTENT:-}" in
-    *'"permission"'*) printf 'config-content=present\n' ;;
+    *'"permissions"'*) printf 'config-content=present\n' ;;
     *) printf 'config-content=missing\n' ;;
 esac
 

@@ -6,19 +6,23 @@ usage() {
     cat <<'EOF'
 Usage: oc [--without-sandbox] [--ds] [--builder MODEL] [--] [OPENCODE_ARGS...]
 
-Run OpenCode with filesystem writes sandboxed by default.
+Run OpenCode V2 with filesystem writes sandboxed by default.
 
 OPTIONS:
     -h, --help       Show this help message
     --without-sandbox  Run OpenCode directly without the macOS sandbox
     --ds             Override the primary agent models (plan, build, prototype)
                      to fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash
-    --builder MODEL  Override the builder subagent models (builder, frontend-builder, explore, general) to MODEL
+    --builder MODEL  Override the builder subagent models (builder, frontend-builder, explore, general)
+                     to MODEL (provider/model[#variant])
+    --server URL     Requires --without-sandbox (tools run on the selected server)
     --               Pass all remaining arguments to OpenCode
+
+Sandboxed launches, model overrides, and Herdr panes use a private server.
 
 EXAMPLES:
     oc
-    oc --model openai/gpt-5.6-sol
+    oc run --model openai/gpt-6.1-sol-fast "Explain this repository"
     oc --ds
     oc --builder openai/gpt-6-astra-fast
     oc --without-sandbox --version
@@ -31,13 +35,29 @@ die() {
     exit 1
 }
 
+# Sets opencode_args. V2 rejects --standalone before the subcommand, so it goes
+# after the arguments but ahead of any literal --.
+standalone_args() {
+    opencode_args=("$@")
+    case "${1:-}" in
+        acp|debug|mcp|pair|plugin|serve|service|uninstall|update|upgrade) return 0 ;;
+        auth|session) [[ $# -ge 2 && "$2" != -* ]] || return 0 ;;
+    esac
+    opencode_args=()
+    while [[ $# -gt 0 && "$1" != -- ]]; do
+        opencode_args+=("$1")
+        shift
+    done
+    opencode_args+=(--standalone "$@")
+}
+
 main() {
     if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
         usage
         exit 0
     fi
 
-    local without_sandbox=false
+    local without_sandbox=false model_pattern='^[^/#]+/[^#]*[^/#](#[^#]+)?$'
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --without-sandbox)
@@ -50,6 +70,7 @@ main() {
                 ;;
             --builder)
                 [[ $# -ge 2 ]] || die "--builder requires a MODEL argument"
+                [[ "$2" =~ $model_pattern ]] || die "--builder MODEL must be provider/model[#variant]: $2"
                 shift
                 export OC_ORCH="$1"
                 shift
@@ -66,9 +87,28 @@ main() {
     opencode_bin=$(command -v opencode 2>/dev/null || true)
     [[ -n "$opencode_bin" ]] || die "opencode is not on PATH"
     opencode_bin=$(realpath "$opencode_bin")
+    local -a opencode_args=()
     if [[ "$without_sandbox" == true ]]; then
+        # The shared service ignores this process's model overrides, and its
+        # plugins would report to whichever Herdr pane started it.
+        if [[ -n "${OC_ORCH:-}${OC_PRIMARY:-}" || "${HERDR_ENV:-}" == 1 ]]; then
+            standalone_args "$@"
+            exec "$opencode_bin" "${opencode_args[@]}"
+        fi
         exec "$opencode_bin" "$@"
     fi
+
+    # A service started here would keep this sandbox and config for later clients.
+    case "${1:-}" in
+        serve|service) die "$1 manages the shared background service; use --without-sandbox" ;;
+    esac
+    local arg
+    for arg in "$@"; do
+        case "$arg" in
+            --) break ;;
+            --server|--server=*) die "--server requires --without-sandbox" ;;
+        esac
+    done
 
     local script_dir repo_dir config_file
     script_dir=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
@@ -91,7 +131,9 @@ main() {
     sandbox_allow_dir "$data_dir"
     sandbox_allow_dir "$state_dir"
     sandbox_allow_dir "$HOME/.opencode"
-    sandbox_run "$opencode_bin" "$@"
+    # The shared V2 service would execute tools outside this process's sandbox.
+    standalone_args "$@"
+    sandbox_run "$opencode_bin" "${opencode_args[@]}"
 }
 
 main "$@"

@@ -14,6 +14,81 @@ const TIMEOUT_MS = 20000;
 
 let f;
 
+test('sandboxed launches use a private V2 server', () => {
+    const result = runOc(['probe', 'two words']);
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /oc-standalone=yes/);
+    assert.match(result.stdout, /oc-arg-1=<two words>/);
+});
+
+test('model overrides reach a private server even without the sandbox', () => {
+    const result = runOc(['--without-sandbox', '--builder', 'openai/gpt-5.6-sol', 'probe']);
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /oc-standalone=yes/);
+});
+
+test('sandboxed launches reject an explicit external server', () => {
+    const result = runOc(['--server', 'http://localhost:4096']);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /--server requires --without-sandbox/);
+});
+
+test('the shared background service is never started inside the sandbox', () => {
+    for (const args of [['service', 'restart'], ['serve']]) {
+        const sandboxed = runOc(args);
+        assert.equal(sandboxed.status, 1);
+        assert.match(sandboxed.stderr, /manages the shared background service; use --without-sandbox/);
+        const direct = runOc(['--without-sandbox', ...args]);
+        assert.equal(direct.status, 0, direct.stderr);
+        assert.match(direct.stdout, /oc-standalone=no/);
+    }
+});
+
+test('local diagnostics do not receive the unsupported standalone flag', () => {
+    for (const args of [['debug', 'paths'], ['acp'], ['session'], ['auth', '--help']]) {
+        const result = runOc(args);
+        assert.equal(result.status, 0, result.stderr);
+        assert.match(result.stdout, /oc-standalone=no/);
+        assert.match(result.stdout, new RegExp(`oc-arg-0=<${args[0]}>`));
+    }
+});
+
+test('the private-server flag follows subcommands and precedes a literal --', () => {
+    for (const args of [['run', '--model', 'openai/gpt-5.6-sol', 'hello'], ['session', 'list'], ['-c']]) {
+        const result = runOc(args);
+        assert.equal(result.status, 0, result.stderr);
+        assert.match(result.stdout, /oc-standalone=yes/);
+        assert.match(result.stdout, new RegExp(`oc-argc=${args.length}\\n`));
+        assert.match(result.stdout, new RegExp(`oc-arg-0=<${args[0]}>`));
+    }
+    const literal = runOc(['run', '--', '--standalone']);
+    assert.equal(literal.status, 0, literal.stderr);
+    assert.match(literal.stdout, /oc-standalone=yes/);
+    assert.match(literal.stdout, /oc-argc=3\n/);
+    assert.match(literal.stdout, /oc-arg-1=<-->/);
+    assert.match(literal.stdout, /oc-arg-2=<--standalone>/);
+});
+
+test('Herdr panes use a private server even without the sandbox', () => {
+    const shared = runOc(['--without-sandbox', 'probe']);
+    assert.equal(shared.status, 0, shared.stderr);
+    assert.match(shared.stdout, /oc-standalone=no/);
+    const herdr = runOc(['--without-sandbox', 'probe'], { HERDR_ENV: '1' });
+    assert.equal(herdr.status, 0, herdr.stderr);
+    assert.match(herdr.stdout, /oc-standalone=yes/);
+});
+
+test('--builder rejects a model without a provider', () => {
+    for (const model of ['gpt-5.6-sol', 'openai/', 'openai/gpt#']) {
+        const result = runOc(['--builder', model, 'probe']);
+        assert.equal(result.status, 1);
+        assert.match(result.stderr, /--builder MODEL must be provider\/model\[#variant\]/);
+    }
+    const variant = runOc(['--builder', 'openai/gpt-5.6-sol#high', 'probe']);
+    assert.equal(variant.status, 0, variant.stderr);
+    assert.match(variant.stdout, /oc-orch=openai\/gpt-5\.6-sol#high/);
+});
+
 test('--ds and --builder set separate model overrides in both launch modes and respect --', () => {
     for (const flags of [['--ds'], ['--ds', '--without-sandbox'], ['--without-sandbox', '--ds']]) {
         const result = runOc([...flags, 'probe', 'two words']);
@@ -78,6 +153,30 @@ before(() => {
     fs.writeFileSync(path.join(fakeBin, 'opencode'), [
         '#!/bin/bash',
         'set -euo pipefail',
+        // Mirror V2: --standalone must follow the subcommand and is rejected by
+        // commands without a private server.
+        'standalone=no',
+        'literal=no',
+        'args=()',
+        'for arg in "$@"; do',
+        '  if [[ "$literal" == no && "$arg" == --standalone ]]; then standalone=yes; continue; fi',
+        '  [[ "$arg" != -- ]] || literal=yes',
+        '  if [[ "$standalone" == yes && ${#args[@]} -eq 0 && "$arg" != -* ]]; then',
+        "    printf 'Unrecognized flag: --standalone in command opencode %s\\n' \"$arg\" >&2",
+        '    exit 1',
+        '  fi',
+        '  args+=("$arg")',
+        'done',
+        'if [[ "$standalone" == yes ]]; then',
+        '  case "${args[0]:-}" in',
+        '    acp|debug|mcp|pair|plugin|serve|service|uninstall|update|upgrade)',
+        "      printf 'Unrecognized flag: --standalone in command opencode %s\\n' \"${args[0]}\" >&2",
+        '      exit 1',
+        '      ;;',
+        '  esac',
+        'fi',
+        'set -- ${args[@]+"${args[@]}"}',
+        "printf 'oc-standalone=%s\\n' \"$standalone\"",
         'if [[ "${1:-}" == "playwright-call" ]]; then',
         '  shift',
         '  exec playwright-cli "$@"',

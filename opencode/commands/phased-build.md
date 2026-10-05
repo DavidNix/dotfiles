@@ -1,6 +1,6 @@
 ---
 description: Implement selected phases from a file or GitHub issue hierarchy with delegated builds and review gates
-subtask: false
+subagent: false
 ---
 
 Orchestrate selected phases from a file or GitHub parent issue. Builders own tests, implementation, commits, and focused verification of their assigned changes. When TDD is warranted, instruct the builder to load `ai-tdd` and complete its full cycle in one session. You specify checks, confirm evidence, and own reviews and completion decisions. After the last selected phase and its fixes, run full verification yourself immediately before the final reviews. Delegate implementation rather than writing code yourself.
@@ -140,9 +140,9 @@ Give each builder:
 - Repository instructions, known files or symbols, prior-phase decisions and verification evidence, starting commit, and dirty-path baseline.
 - Backend-specific status instructions. In GitHub mode state that issue persistence is orchestrator-owned and already updated.
 - The exact commit message or commit-message intent.
-- Your TDD decision and brief reason under the policy below. When warranted, explicitly instruct: "Load the `ai-tdd` skill before implementation and follow its appropriate mode through RED and GREEN in this assignment." Otherwise state that TDD is not warranted and assign suitable validation. Each builder runs its assigned checks and fixes LSP diagnostics in changed files.
+- Your TDD decision and brief reason under the policy below. When warranted, explicitly instruct: "Load the `ai-tdd` skill before implementation and follow its appropriate mode through RED and GREEN in this assignment." Otherwise state that TDD is not warranted and assign suitable validation. Each builder runs its assigned lint, typecheck, or compiler checks and fixes diagnostics in changed files.
 - The verification to run for this work unit: only focused tests, builds, linters, format or type checks, migration/integration checks, or browser/manual QA directly relevant to its changes. Supply exact commands with flags, arguments, environment variables, working directories, prerequisites, and expected results; do not invent missing commands. For mixed phases, assign shared integration checks to the builder whose work completes the dependency. Builders must not run a phase-wide or repository-wide suite merely to finish a phase or fix; obey any explicit repository-required checks. Reserve full-project verification for the orchestrator immediately before the final reviews.
-- Instructions to inspect status, diff, and recent history; stage only assigned paths; create one atomic commit after assigned checks pass; and return the commit SHA, changed paths, verification results (exact commands, exit codes, and relevant output, including RED/GREEN evidence when TDD applies), LSP issues fixed, and blockers. Put a concise evidence summary in the commit message so the trail survives the session. A successful assignment must return its commit, not merely promise to commit later.
+- Instructions to inspect status, diff, and recent history; stage only assigned paths; create one atomic commit after assigned checks pass; and return the commit SHA, changed paths, verification results (exact commands, exit codes, and relevant output, including RED/GREEN evidence when TDD applies), diagnostics fixed, and blockers. Put a concise evidence summary in the commit message so the trail survives the session. A successful assignment must return its commit, not merely promise to commit later.
 - Before committing, self-check comments introduced or modified by the assignment: remove narration and retain non-obvious reasoning, contract details, and functional directives. This is part of the implementation assignment, not a separate pruning pass.
 
 Supply this context directly. Do not make builders read the full plan or rediscover existing decisions. Tell them the orchestrator maintains the only todo list.
