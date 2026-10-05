@@ -32,6 +32,20 @@
     ],
     "defaultMode": "auto"
   },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "^(startup|resume|clear|compact|fork)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/ondo/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
   "statusLine": {
     "type": "command",
     "command": "npx -y ccstatusline@latest",
@@ -62,7 +76,7 @@
   "effortLevel": "xhigh",
   "modelSettings": {
     "claude-opus-5-5": {
-      "effortLevel": "xhigh"
+      "effortLevel": "high"
     }
   },
   "promptSuggestionEnabled": false,
@@ -72,6 +86,5 @@
   "theme": "dark",
   "editorMode": "vim",
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": false,
-  "hooks": {"SessionStart":[{"matcher":"^(startup|resume|clear|compact|fork)$","hooks":[{"type":"command","command":"bash '/Users/ondo/.claude/hooks/herdr-agent-state.sh' session","timeout":10}]}]}
+  "voiceEnabled": false
 }
