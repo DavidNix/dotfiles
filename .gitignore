@@ -8,3 +8,6 @@
 
 __pycache__
 .venv/
+
+# Private agent skills (work or personal); installed by bin/agent-init, never committed
+skills-private/

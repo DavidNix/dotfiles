@@ -21,6 +21,8 @@ done
 SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 DOTFILES_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 LOCAL_SKILLS_SOURCE="${DOTFILES_ROOT}/skills"
+# Gitignored; holds work or personal skills that must not be published
+PRIVATE_SKILLS_SOURCE="${DOTFILES_ROOT}/skills-private"
 
 # Colors (ANSI escape codes - work on both macOS and Linux)
 YELLOW='\033[1;33m'
@@ -128,6 +130,11 @@ install_skills() {
     # Use OpenCode's built-in customize-opencode skill instead of a local equivalent.
     echo -e "  Installing local repo skills from ${LOCAL_SKILLS_SOURCE}..."
     try_or_warn_quiet "Installing local skills" npx --yes skills add "$LOCAL_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode"
+
+    if compgen -G "${PRIVATE_SKILLS_SOURCE}/*/SKILL.md" >/dev/null; then
+        echo -e "  Installing private skills from ${PRIVATE_SKILLS_SOURCE}..."
+        try_or_warn_quiet "Installing private skills" npx --yes skills add "$PRIVATE_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode"
+    fi
 
     echo -e "  Installing nixpowers skills..."
     try_or_warn_quiet "Installing nixpowers skills" npx --yes skills add "https://github.com/DavidNix/nixpowers" -g -y -a "claude-code" -a "opencode"

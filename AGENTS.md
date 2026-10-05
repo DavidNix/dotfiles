@@ -52,4 +52,6 @@ Read these files directly for details.
 
 Custom skills live in `skills` and are installed with https://github.com/vercel-labs/skills. E.g. `npx skills add -g ./skills/` 
 
+Private skills (work-specific or otherwise not for publishing) live in `skills-private`, which is gitignored. `bin/agent-init` installs them when the folder has any. This repo is public, so never move a private skill into `skills`. Edit skills in this repo and re-run the install; the copies in `~/.agents/skills` get overwritten.
+
 When adding, removing, or updating skills, update `bin/agent-init` to match.
