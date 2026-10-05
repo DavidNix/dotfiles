@@ -8,6 +8,10 @@ Usage: oc [--without-sandbox] [--ds] [--builder MODEL] [--] [OPENCODE_ARGS...]
 
 Run OpenCode V2 with filesystem writes sandboxed by default.
 
+Work machines (whoami or $USER contains "ondo") lack the local nixlab models, so
+they use openai/gpt-6.1-sol-fast for title, summary, builder, frontend-builder,
+explore and general. --builder still overrides the subagent models.
+
 OPTIONS:
     -h, --help       Show this help message
     --without-sandbox  Run OpenCode directly without the macOS sandbox
@@ -57,6 +61,11 @@ main() {
         exit 0
     fi
 
+    if [[ "$(whoami)" == *ondo* || "${USER:-}" == *ondo* ]]; then
+        export OC_ORCH=openai/gpt-6.1-sol-fast
+        export OC_SMALL=openai/gpt-6.1-sol-fast
+    fi
+
     local without_sandbox=false model_pattern='^[^/#]+/[^#]*[^/#](#[^#]+)?$'
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -91,7 +100,7 @@ main() {
     if [[ "$without_sandbox" == true ]]; then
         # The shared service ignores this process's model overrides, and its
         # plugins would report to whichever Herdr pane started it.
-        if [[ -n "${OC_ORCH:-}${OC_PRIMARY:-}" || "${HERDR_ENV:-}" == 1 ]]; then
+        if [[ -n "${OC_ORCH:-}${OC_PRIMARY:-}${OC_SMALL:-}" || "${HERDR_ENV:-}" == 1 ]]; then
             standalone_args "$@"
             exec "$opencode_bin" "${opencode_args[@]}"
         fi

@@ -3,7 +3,7 @@ import test from 'node:test';
 import builder from '../plugins/builder.js';
 
 async function override(agents, env) {
-  const previous = { OC_ORCH: process.env.OC_ORCH, OC_PRIMARY: process.env.OC_PRIMARY };
+  const previous = { OC_ORCH: process.env.OC_ORCH, OC_PRIMARY: process.env.OC_PRIMARY, OC_SMALL: process.env.OC_SMALL };
   try {
     for (const name of Object.keys(previous)) {
       if (env[name] === undefined) delete process.env[name];
@@ -28,9 +28,9 @@ async function override(agents, env) {
   }
 }
 
-const names = ['plan', 'build', 'prototype', 'builder', 'frontend-builder', 'explore', 'general', 'summary'];
+const names = ['plan', 'build', 'prototype', 'builder', 'frontend-builder', 'explore', 'general', 'title', 'summary'];
 const original = () => Object.fromEntries(names.map(name => [name, {
-  model: { providerID: 'openai', id: 'gpt-6.1-sol-fast', variant: 'low' },
+  model: { providerID: 'nixlab-large', id: 'nixlab/large1', variant: 'low' },
   permissions: [{ action: 'subagent', resource: '*', effect: 'deny' }],
 }]));
 
@@ -57,6 +57,14 @@ test('primary and builder overrides work together on the V2 agent catalog', asyn
   assert.equal(result.plan.model.id, 'gpt-6-astra-fast');
   assert.equal(result.builder.model.id, 'gpt-5.6-sol');
   assert.deepEqual(result.summary, original().summary);
+});
+
+test('small override changes only title and summary', async () => {
+  const expected = original();
+  for (const name of ['title', 'summary']) {
+    expected[name].model = { providerID: 'openai', id: 'gpt-6.1-sol-fast', variant: 'low' };
+  }
+  assert.deepEqual(await override(original(), { OC_SMALL: 'openai/gpt-6.1-sol-fast' }), expected);
 });
 
 test('inactive overrides leave agents unchanged', async () => {

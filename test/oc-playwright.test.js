@@ -110,6 +110,28 @@ test('--ds and --builder set separate model overrides in both launch modes and r
     assert.match(passthrough.stdout, /oc-arg-0=<--ds>/);
 });
 
+test('ondo user selects work models unless --builder overrides', () => {
+    for (const env of [{ USER: 'tester' }, { USER: 'tester', OC_TEST_WHOAMI: 'tester' }]) {
+        const result = runOc(['probe'], env);
+        assert.equal(result.status, 0, result.stderr);
+        assert.match(result.stdout, /oc-orch=unset/);
+        assert.match(result.stdout, /oc-small=unset/);
+    }
+    for (const env of [{ USER: 'david-ondo' }, { OC_TEST_WHOAMI: 'ondo' }]) {
+        for (const flags of [[], ['--without-sandbox']]) {
+            const result = runOc([...flags, 'probe'], env);
+            assert.equal(result.status, 0, result.stderr);
+            assert.match(result.stdout, /oc-orch=openai\/gpt-6\.1-sol-fast/);
+            assert.match(result.stdout, /oc-small=openai\/gpt-6\.1-sol-fast/);
+            assert.match(result.stdout, /oc-standalone=yes/);
+        }
+    }
+    const builder = runOc(['--builder', 'openai/gpt-5.6-sol', 'probe'], { OC_TEST_WHOAMI: 'ondo' });
+    assert.equal(builder.status, 0, builder.stderr);
+    assert.match(builder.stdout, /oc-orch=openai\/gpt-5\.6-sol/);
+    assert.match(builder.stdout, /oc-small=openai\/gpt-6\.1-sol-fast/);
+});
+
 before(() => {
     // Resolve symlinks (macOS /var -> /private/var) because oc realpaths the CLI it exports.
     const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'oc-pw-test.')));
@@ -132,6 +154,8 @@ before(() => {
     ].join('\n'));
 
     fs.writeFileSync(path.join(fakeBin, 'curl'), ['#!/bin/bash', 'exit 0', ''].join('\n'));
+    // Keep work-machine detection independent of the account running the tests.
+    fs.writeFileSync(path.join(fakeBin, 'whoami'), ['#!/bin/bash', 'printf \'%s\\n\' "${OC_TEST_WHOAMI:-tester}"', ''].join('\n'));
 
     fs.writeFileSync(realCli, [
         '#!/bin/bash',
@@ -197,6 +221,7 @@ before(() => {
         "printf 'oc-cdp=%s\\n' \"${PLAYWRIGHT_MCP_CDP_ENDPOINT:-unset}\"",
         "printf 'oc-orch=%s\\n' \"${OC_ORCH:-unset}\"",
         "printf 'oc-primary=%s\\n' \"${OC_PRIMARY:-unset}\"",
+        "printf 'oc-small=%s\\n' \"${OC_SMALL:-unset}\"",
         "printf 'oc-browser=%s\\n' \"${PLAYWRIGHT_MCP_BROWSER:-unset}\"",
         "printf 'oc-socketdir=%s\\n' \"${PWTEST_SOCKETS_DIR:-unset}\"",
         "printf 'oc-clibin=%s\\n' \"${OC_PLAYWRIGHT_CLI_BIN:-unset}\"",
@@ -217,7 +242,7 @@ before(() => {
     fs.writeFileSync(path.join(workDir, '.playwright', 'cli.config.json'), '{"testIdAttribute":"project-sentinel"}');
     fs.writeFileSync(path.join(workDir, 'explicit config.json'), '{"testIdAttribute":"explicit-sentinel"}');
 
-    for (const p of [path.join(fakeBin, 'curl'), realCli, path.join(fakeBin, 'opencode')]) {
+    for (const p of [path.join(fakeBin, 'curl'), path.join(fakeBin, 'whoami'), realCli, path.join(fakeBin, 'opencode')]) {
         fs.chmodSync(p, 0o755);
     }
 

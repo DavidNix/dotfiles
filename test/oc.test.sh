@@ -6,6 +6,9 @@ set -euo pipefail
 unset PWTEST_SOCKETS_DIR OC_PLAYWRIGHT_CLI_BIN PLAYWRIGHT_MCP_CDP_ENDPOINT PLAYWRIGHT_MCP_BROWSER
 unset OC_ORCH
 unset OC_PRIMARY
+unset OC_SMALL
+# Keep work-machine detection independent of the account running the tests.
+export USER=oc-test
 
 repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 gh_bin=$(command -v gh 2>/dev/null || true)
@@ -166,6 +169,7 @@ esac
 
 printf 'orch=%s\n' "${OC_ORCH:-unset}"
 printf 'primary=%s\n' "${OC_PRIMARY:-unset}"
+printf 'small=%s\n' "${OC_SMALL:-unset}"
 
 printf 'tmpdir=%s\n' "$TMPDIR"
 printf 'ansible-local-temp=%s\n' "${ANSIBLE_LOCAL_TEMP:-unset}"
@@ -253,7 +257,12 @@ else
     printf 'go-module-write=blocked\n'
 fi
 FAKE
-chmod +x "$fake_bin/curl" "$fake_bin/opencode" "$fake_bin/playwright-cli"
+cat >"$fake_bin/whoami" <<'FAKE'
+#!/bin/bash
+
+printf '%s\n' "${OC_SANDBOX_TEST_WHOAMI:-oc-test}"
+FAKE
+chmod +x "$fake_bin/curl" "$fake_bin/opencode" "$fake_bin/playwright-cli" "$fake_bin/whoami"
 
 assert_contains() {
     local file="$1"
@@ -288,6 +297,7 @@ assert_contains "$output_file" "arg-0=probe"
 assert_contains "$output_file" "arg-1=two words"
 assert_contains "$output_file" "config-content=present"
 assert_contains "$output_file" "orch=unset"
+assert_contains "$output_file" "small=unset"
 assert_contains "$output_file" "npm-cache=$home_dir/.cache/npm"
 assert_contains "$output_file" "playwright-sockets=$home_dir/Library/Caches/playwright-cli"
 sandbox_tmp=$(grep '^tmpdir=' "$output_file" | cut -d= -f2-)
@@ -380,6 +390,30 @@ assert_contains "$builder_output" "arg-count=1"
 assert_contains "$builder_output" "arg-0=probe"
 assert_contains "$builder_output" "config-content=present"
 assert_contains "$builder_output" "orch=openai/gpt-5.6-sol"
+
+work_output="$tmp_dir/work-output.log"
+failure_log="$work_output"
+(
+    cd "$work_dir"
+    PATH="$fake_bin:/usr/bin:/bin" \
+        HOME="$home_dir" \
+        XDG_CONFIG_HOME="$home_dir/.config" \
+        XDG_CACHE_HOME="$home_dir/.cache" \
+        XDG_DATA_HOME="$home_dir/.local/share" \
+        XDG_STATE_HOME="$home_dir/.local/state" \
+        GOMODCACHE="$go_mod_dir" \
+        OC_SANDBOX_TEST_CDP_AVAILABLE=true \
+        OC_SANDBOX_TEST_CONFIG_LINK="$home_dir/.config/opencode/config-link" \
+        OC_SANDBOX_TEST_CONFIG_SIBLING="$outside_dir/config-sibling.txt" \
+        OC_SANDBOX_TEST_OUTSIDE="$outside_dir/blocked.txt" \
+        OC_SANDBOX_TEST_WHOAMI=ondo \
+        "$repo_dir/bin/oc" probe >"$work_output" 2>&1
+)
+assert_contains "$work_output" "arg-count=1"
+assert_contains "$work_output" "arg-0=probe"
+assert_contains "$work_output" "orch=openai/gpt-6.1-sol-fast"
+assert_contains "$work_output" "small=openai/gpt-6.1-sol-fast"
+assert_contains "$work_output" "primary=unset"
 
 tls_output="$tmp_dir/tls-output.log"
 failure_log="$tls_output"

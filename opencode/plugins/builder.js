@@ -13,6 +13,7 @@ export default {
     const overrides = [
       [['plan', 'build', 'prototype'], process.env.OC_PRIMARY],
       [['builder', 'frontend-builder', 'explore', 'general'], process.env.OC_ORCH],
+      [['title', 'summary'], process.env.OC_SMALL],
     ].flatMap(([names, selection]) => {
       if (!selection) return [];
       const model = parseModel(selection);
