@@ -30,7 +30,7 @@ async function override(agents, env) {
 
 const names = ['plan', 'build', 'prototype', 'builder', 'frontend-builder', 'explore', 'general', 'summary'];
 const original = () => Object.fromEntries(names.map(name => [name, {
-  model: { providerID: 'nixlab-large', id: 'nixlab/large1', variant: 'low' },
+  model: { providerID: 'openai', id: 'gpt-6.1-sol-fast', variant: 'low' },
   permissions: [{ action: 'subagent', resource: '*', effect: 'deny' }],
 }]));
 
