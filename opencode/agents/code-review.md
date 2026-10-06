@@ -1,7 +1,6 @@
 ---
 description: Reviews code by invoking the code-review skill exactly as written.
 mode: subagent
-hidden: true
 model: openai/gpt-6.1-sol-fast#xhigh
 permissions:
   - { action: "*", resource: "*", effect: deny }
