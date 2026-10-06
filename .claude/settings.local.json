@@ -8,5 +8,6 @@
       "Bash(find:*)",
       "Bash(make bash-check:*)"
     ]
-  }
+  },
+  "spinnerTipsEnabled": false
 }
