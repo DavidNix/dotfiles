@@ -140,6 +140,9 @@ main() {
     sandbox_allow_dir "$data_dir"
     sandbox_allow_dir "$state_dir"
     sandbox_allow_dir "$HOME/.opencode"
+    # MCP OAuth providers cache their tokens here.
+    mkdir -p "$HOME/.mcp-auth"
+    sandbox_allow_dir "$HOME/.mcp-auth"
     # The shared V2 service would execute tools outside this process's sandbox.
     standalone_args "$@"
     sandbox_run "$opencode_bin" "${opencode_args[@]}"
