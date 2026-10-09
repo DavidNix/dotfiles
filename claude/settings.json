@@ -72,12 +72,17 @@
       }
     }
   },
+  "env": {
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
+    "DISABLE_TELEMETRY": "1"
+  },
+  "feedbackSurveyRate": 0,
   "feedbackDrafts": "off",
   "alwaysThinkingEnabled": true,
   "effortLevel": "xhigh",
   "modelSettings": {
     "claude-opus-5-5": {
-      "effortLevel": "low"
+      "effortLevel": "high"
     }
   },
   "promptSuggestionEnabled": false,
