@@ -1,7 +1,7 @@
 ---
 description: Preferred for all frontend work. Implements UI, styling, interactions, responsive behavior, and other frontend changes after the parent agent has planned the work.
 mode: subagent
-model: nixlab-large/nixlab/large1#low
+model: nixlab-large/nixlab/large1#high
 permissions:
   - { action: shell, resource: "*", effect: allow }
   - { action: shell, resource: "git push *", effect: deny }
