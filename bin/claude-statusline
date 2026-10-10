@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# Claude Code status line: context used, working directory, git branch and plan usage.
+#   ctx 12% 120k/1M  │  ~/src/dotfiles ⎇ master  │  5h 8% ↻4:50pm · 7d 38%
+# Claude Code pipes the session as JSON on stdin (statusLine in claude/settings.json).
+# Model and effort are drawn above the prompt by claude/mods/statusbar.
+
+set -euo pipefail
+
+# One value per line; "-" where there is no figure yet: context before the
+# session's first response, usage before then and for a window that has reset.
+{
+    read -r percent
+    read -r used
+    read -r size
+    read -r dir
+    read -r five_hour
+    read -r five_hour_reset
+    read -r seven_day
+} < <(jq -r '
+    .context_window as $c
+    | def usage($w): if $w == null or $w.resets_at < now then "-" else ($w.used_percentage | round) end;
+    ($c.used_percentage | if . == null then "-" else round end),
+    (if $c.used_percentage == null then "-" else ($c.total_input_tokens // 0) end),
+    ($c.context_window_size // 0),
+    (.workspace.current_dir // .cwd),
+    usage(.rate_limits.five_hour),
+    (if usage(.rate_limits.five_hour) == "-" then "-"
+     else .rate_limits.five_hour.resets_at | strflocaltime("%l:%M%p") | ltrimstr(" ") | ascii_downcase end),
+    usage(.rate_limits.seven_day)
+')
+
+tokens() {
+    local n=$1
+    if [[ $n == "-" ]]; then
+        printf '–'
+    elif ((n >= 1000000)); then
+        local tenths=$(((n + 50000) / 100000))
+        if ((tenths % 10 == 0)); then
+            printf '%dM' $((tenths / 10))
+        else
+            printf '%d.%dM' $((tenths / 10)) $((tenths % 10))
+        fi
+    elif ((n >= 1000)); then
+        printf '%dk' $(((n + 500) / 1000))
+    else
+        printf '%d' "$n"
+    fi
+}
+
+reset=$'\033[0m'
+dim=$'\033[2m'
+
+# A percentage, green under 50, yellow under 80, red from there; dim "–" when unknown.
+percent_text() {
+    local p=$1
+    if [[ $p == "-" ]]; then
+        printf '%s–%s' "$dim" "$reset"
+    elif ((p < 50)); then
+        printf '\033[32m%d%%%s' "$p" "$reset"
+    elif ((p < 80)); then
+        printf '\033[33m%d%%%s' "$p" "$reset"
+    else
+        printf '\033[31m%d%%%s' "$p" "$reset"
+    fi
+}
+
+branch=$(git --no-optional-locks -C "$dir" symbolic-ref --short -q HEAD 2>/dev/null ||
+    git --no-optional-locks -C "$dir" rev-parse --short HEAD 2>/dev/null || true)
+sep="${dim}  │  ${reset}"
+
+line="ctx $(percent_text "$percent")${dim} $(tokens "$used")/$(tokens "$size")${reset}"
+line+="${sep}"$'\033[34m'"${dir/#$HOME/\~}${reset}"
+if [[ -n $branch ]]; then
+    line+=$'\033[35m'" ⎇ ${branch}${reset}"
+fi
+if [[ $five_hour != "-" || $seven_day != "-" ]]; then
+    line+="${sep}5h $(percent_text "$five_hour")"
+    if [[ $five_hour_reset != "-" ]]; then
+        line+="${dim} ↻${five_hour_reset}${reset}"
+    fi
+    line+="${dim} · ${reset}7d $(percent_text "$seven_day")"
+fi
+printf '%s\n' "$line"

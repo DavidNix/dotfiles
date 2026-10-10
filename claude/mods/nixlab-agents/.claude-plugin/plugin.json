@@ -1,0 +1,33 @@
+{
+  "name": "nixlab-agents",
+  "version": "0.1.0",
+  "description": "Runs chosen subagent types (Explore, general-purpose) on the local nixlab model, falling back to Claude when it is unreachable",
+  "author": { "name": "David Nix" },
+  "userConfig": {
+    "baseUrl": {
+      "type": "string",
+      "title": "Base URL",
+      "description": "OpenAI-compatible endpoint serving the local model",
+      "default": "http://ai1-inference:8000/v1"
+    },
+    "model": {
+      "type": "string",
+      "title": "Model",
+      "description": "Model id the endpoint serves",
+      "default": "nixlab/large1"
+    },
+    "effort": {
+      "type": "string",
+      "title": "Reasoning effort",
+      "description": "reasoning_effort sent with each request",
+      "default": "low",
+      "options": ["low", "high", "max"]
+    },
+    "agents": {
+      "type": "string",
+      "title": "Agent types",
+      "description": "Comma-separated subagent types to run locally",
+      "default": "Explore,general-purpose"
+    }
+  }
+}

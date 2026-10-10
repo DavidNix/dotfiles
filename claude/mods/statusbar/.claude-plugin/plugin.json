@@ -1,0 +1,9 @@
+{
+  "name": "statusbar",
+  "version": "0.1.0",
+  "description": "Model and effort above the prompt; ctrl+t cycles effort for this session only",
+  "author": {
+    "name": "David Nix"
+  },
+  "types": "./types/index.d.ts"
+}

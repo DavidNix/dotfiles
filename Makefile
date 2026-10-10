@@ -5,7 +5,7 @@
 SHELL := /bin/zsh
 export PATH := /opt/homebrew/bin:/opt/homebrew/sbin:$(PATH)
 
-SHELL_SCRIPTS := bin/agent-init bin/chrome-cdp bin/oc bin/worktree bin/zed-toggle-test-file script/agent-sandbox.sh script/macos-defaults.sh test/oc.test.sh tmux-init.sh
+SHELL_SCRIPTS := bin/agent-init bin/chrome-cdp bin/claude-statusline bin/oc bin/worktree bin/zed-toggle-test-file script/agent-sandbox.sh script/macos-defaults.sh test/oc.test.sh tmux-init.sh
 PYTHON_SCRIPTS := bin/image-gen bin/image-edit
 
 default: help
@@ -49,6 +49,7 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	mkdir -p ~/.claude/commands ~/.claude/agents
 	ln -sf $$PWD/claude/settings.json ~/.claude/settings.json
 	ln -sf $$PWD/claude/settings.local.json ~/.claude/settings.local.json
+	ln -sf $$PWD/claude/keybindings.json ~/.claude/keybindings.json
 	ln -sf $$PWD/claude/agents/* ~/.claude/agents/
 
 .PHONY: defaults
@@ -159,7 +160,12 @@ python-check: ## Run Python lint, type, and syntax checks on scripts
 	@echo "python-check passed"
 
 .PHONY: vet
-vet: shellcheck python-check opencode-check ## Run all repo lint, type, and syntax checks
+vet: shellcheck python-check opencode-check mods-check ## Run all repo lint, type, and syntax checks
+
+.PHONY: mods-check
+mods-check: ## Validate and test Claude Code mods
+	@for mod in claude/mods/*/; do claude plugin validate "$$mod" >/dev/null && claude plugin test "$$mod" || exit; done
+	@echo "mods-check passed"
 
 .PHONY: opencode-check
 opencode-check: ## Run opencode plugin checks

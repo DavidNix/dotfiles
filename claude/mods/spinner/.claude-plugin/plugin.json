@@ -1,0 +1,6 @@
+{
+  "name": "spinner",
+  "version": "0.1.0",
+  "description": "Spinner says what the turn is doing (Thinking, Writing, Running tools) instead of a whimsical verb; turns close with \"Worked for\"",
+  "author": { "name": "David Nix" }
+}
