@@ -28,12 +28,19 @@ async function step($: Engine, model: string, agentId?: string) {
   return read.value
 }
 
-test('Explore and general-purpose steps run on Sonnet', async ($, on) => {
+test('Explore steps run on Sonnet and general-purpose steps on Opus', async ($, on) => {
   const models = world(on)
   await step($, 'claude-haiku-5-5', 'a1')
-  const result = await step($, 'claude-opus-5-5', 'a2')
-  expect(models).toEqual(['claude-sonnet-5-5', 'claude-sonnet-5-5'])
+  const result = await step($, 'claude-sonnet-5-5', 'a2')
+  expect(models).toEqual(['claude-sonnet-5-5', 'claude-opus-5-5'])
   expect(result.answer).toBe('done')
+})
+
+test('routes come from options', { options: { routes: ' Plan = claude-haiku-5-5 , Explore=' } }, async ($, on) => {
+  const models = world(on)
+  await step($, 'claude-opus-5-5', 'a1')
+  await step($, 'claude-opus-5-5', 'a3')
+  expect(models).toEqual(['claude-opus-5-5', 'claude-haiku-5-5'])
 })
 
 test('other agent types and the main loop keep their model', async ($, on) => {

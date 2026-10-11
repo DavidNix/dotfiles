@@ -1,15 +1,21 @@
 import type { EngineInterface, Register } from 'claude-code'
 
 export const register: Register = (on, options) => {
-  const model = String(options.model)
-  const routed = new Set(String(options.agents).split(',').map(s => s.trim()).filter(Boolean))
+  const routes = new Map(
+    String(options.routes)
+      .split(',')
+      .map(pair => pair.split('=').map(s => s.trim()))
+      .filter(([type, model]) => type && model)
+      .map(([type, model]) => [type, model] as const),
+  )
 
-  // Every step of a routed agent names the model, whatever the agent's
+  // Every step of a routed agent names its type's model, whatever the agent's
   // definition or the Agent call asked for. The engine drops effort for a
   // model that takes none.
   on('turn.step', async function* ($, e, next) {
     const type = e.agentId === undefined ? undefined : await typeOf($, e.agentId)
-    if (type === undefined || !routed.has(type)) {
+    const model = type === undefined ? undefined : routes.get(type)
+    if (model === undefined) {
       return yield* next(e)
     }
     return yield* next({ ...e, model })
