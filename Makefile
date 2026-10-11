@@ -33,6 +33,7 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	@# Link all the dotfiles
 	find $$PWD -name ".[^.]*" -type f -print0 | xargs -0tJ % ln -sf %  ~
 	mkdir -p ~/.config
+	rm -f ~/.config/ccstatusline
 	@# Link config subdirs/files, except herdr (managed separately below)
 	for f in $$PWD/.config/*; do \
 		[ "$$(basename "$$f")" = "herdr" ] && continue; \
