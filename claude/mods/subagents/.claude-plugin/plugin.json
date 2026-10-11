@@ -1,0 +1,22 @@
+{
+  "name": "subagents",
+  "version": "0.4.0",
+  "description": "Runs chosen subagent types (Explore, general-purpose) on Sonnet",
+  "author": {
+    "name": "David Nix"
+  },
+  "userConfig": {
+    "model": {
+      "type": "string",
+      "title": "Model",
+      "description": "Model id the chosen agent types run on",
+      "default": "claude-sonnet-5-5"
+    },
+    "agents": {
+      "type": "string",
+      "title": "Agent types",
+      "description": "Comma-separated subagent types to run on the model",
+      "default": "Explore,general-purpose"
+    }
+  }
+}

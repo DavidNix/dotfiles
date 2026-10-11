@@ -11,3 +11,7 @@ __pycache__
 
 # Private agent skills (work or personal); installed by bin/agent-init, never committed
 skills-private/
+
+# Claude Code mods: the engine lays its API types (and a tsconfig) beside each mod it loads
+claude/mods/*/.claude-plugin/types/
+claude/mods/*/tsconfig.json

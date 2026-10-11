@@ -1,4 +1,9 @@
 {
+  "env": {
+    "CLAUDE_CODE_PLUGIN_DIRS": "~/src/dotfiles/claude/mods/statusbar:~/src/dotfiles/claude/mods/subagents:~/src/dotfiles/claude/mods/spinner",
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
+    "DISABLE_TELEMETRY": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(find:*)",
@@ -48,7 +53,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "npx -y ccstatusline@latest",
+    "command": "~/.local/bin/claude-statusline",
     "padding": 0
   },
   "enabledPlugins": {
@@ -71,10 +76,6 @@
         "repo": "anthropics/claude-plugins-official"
       }
     }
-  },
-  "env": {
-    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
-    "DISABLE_TELEMETRY": "1"
   },
   "feedbackSurveyRate": 0,
   "feedbackDrafts": "off",
