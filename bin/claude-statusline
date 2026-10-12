@@ -2,13 +2,28 @@
 
 # Claude Code status line: context used, working directory, git branch and plan usage.
 #   ctx 12% 120k/1M  │  ~/src/dotfiles ⎇ master  │  5h 8% ↻4:50pm · 7d 38%
+# On a plan with a spend limit instead of 5-hour and 7-day windows:
+#   ctx 12% 120k/1M  │  ~/src/dotfiles ⎇ master  │  mo 44% $355/$800
 # Claude Code pipes the session as JSON on stdin (statusLine in claude/settings.json).
 # Model and effort are drawn above the prompt by claude/mods/statusbar.
 
 set -euo pipefail
 
+# Enterprise and Team plans spend against a limit and Claude Code doesn't pipe
+# it here unless a Claude apps gateway sets it. It does cache it, undocumented,
+# in ~/.claude.json when a session starts, so the figure can be hours old.
+cached=$(jq -c '
+    .cachedUsageUtilization as $u
+    | if $u.accountUuid != null and $u.accountUuid == .oauthAccount.accountUuid
+        and $u.utilization.five_hour == null and $u.utilization.seven_day == null
+        and $u.utilization.spend.enabled == true
+      then $u.utilization.spend + {fetched_at: ($u.fetchedAtMs / 1000)}
+      else null end
+' "$HOME/.claude.json" 2>/dev/null) || cached=null
+
 # One value per line; "-" where there is no figure yet: context before the
 # session's first response, usage before then and for a window that has reset.
+# Spend shows only without 5-hour and 7-day windows, and its age only past an hour.
 {
     read -r percent
     read -r used
@@ -17,17 +32,42 @@ set -euo pipefail
     read -r five_hour
     read -r five_hour_reset
     read -r seven_day
-} < <(jq -r '
+    read -r spend_period
+    read -r spend_percent
+    read -r spend_amounts
+    read -r spend_age
+} < <(jq -r --argjson cached "$cached" '
     .context_window as $c
     | def usage($w): if $w == null or $w.resets_at < now then "-" else ($w.used_percentage | round) end;
-    ($c.used_percentage | if . == null then "-" else round end),
+    def dollars($minor; $exponent): "$\($minor / pow(10; $exponent) | round)";
+    def period_name: {daily: "day", weekly: "wk", monthly: "mo"}[. // ""] // "spend";
+    def age($s): if $s < 3600 then "-" elif $s < 86400 then "\($s / 3600 | floor)h" else "\($s / 86400 | floor)d" end;
+    (if usage(.rate_limits.five_hour) != "-" or usage(.rate_limits.seven_day) != "-" then null
+     elif usage(.rate_limits.spend_limit) != "-" then
+        .rate_limits.spend_limit
+        | {period: (.period | period_name), percent: (.used_percentage | round),
+           amounts: (if .used_usd == null or .limit_usd == null then "-"
+                     else dollars(.used_usd; 0) + "/" + dollars(.limit_usd; 0) end),
+           age: "-"}
+     elif $cached != null then
+        $cached
+        | {period: "mo", percent: (if .percent == null then "-" else .percent | round end),
+           amounts: (if .limit == null then dollars(.used.amount_minor; .used.exponent)
+                     else dollars(.used.amount_minor; .used.exponent) + "/" + dollars(.limit.amount_minor; .limit.exponent) end),
+           age: age(now - .fetched_at)}
+     else null end) as $spend
+    | ($c.used_percentage | if . == null then "-" else round end),
     (if $c.used_percentage == null then "-" else ($c.total_input_tokens // 0) end),
     ($c.context_window_size // 0),
     (.workspace.current_dir // .cwd),
     usage(.rate_limits.five_hour),
     (if usage(.rate_limits.five_hour) == "-" then "-"
      else .rate_limits.five_hour.resets_at | strflocaltime("%l:%M%p") | ltrimstr(" ") | ascii_downcase end),
-    usage(.rate_limits.seven_day)
+    usage(.rate_limits.seven_day),
+    ($spend.period // "-"),
+    ($spend.percent // "-"),
+    ($spend.amounts // "-"),
+    ($spend.age // "-")
 ')
 
 tokens() {
@@ -80,5 +120,13 @@ if [[ $five_hour != "-" || $seven_day != "-" ]]; then
         line+="${dim} ↻${five_hour_reset}${reset}"
     fi
     line+="${dim} · ${reset}7d $(percent_text "$seven_day")"
+elif [[ $spend_period != "-" ]]; then
+    line+="${sep}${spend_period} $(percent_text "$spend_percent")"
+    if [[ $spend_amounts != "-" ]]; then
+        line+="${dim} ${spend_amounts}${reset}"
+    fi
+    if [[ $spend_age != "-" ]]; then
+        line+="${dim} · ${spend_age} old${reset}"
+    fi
 fi
 printf '%s\n' "$line"
