@@ -391,6 +391,28 @@ assert_contains "$builder_output" "arg-0=probe"
 assert_contains "$builder_output" "config-content=present"
 assert_contains "$builder_output" "orch=openai/gpt-5.6-sol"
 
+local_output="$tmp_dir/local-output.log"
+failure_log="$local_output"
+(
+    cd "$work_dir"
+    PATH="$fake_bin:/usr/bin:/bin" \
+        HOME="$home_dir" \
+        XDG_CONFIG_HOME="$home_dir/.config" \
+        XDG_CACHE_HOME="$home_dir/.cache" \
+        XDG_DATA_HOME="$home_dir/.local/share" \
+        XDG_STATE_HOME="$home_dir/.local/state" \
+        GOMODCACHE="$go_mod_dir" \
+        OC_SANDBOX_TEST_CDP_AVAILABLE=true \
+        OC_SANDBOX_TEST_CONFIG_LINK="$home_dir/.config/opencode/config-link" \
+        OC_SANDBOX_TEST_CONFIG_SIBLING="$outside_dir/config-sibling.txt" \
+        OC_SANDBOX_TEST_OUTSIDE="$outside_dir/blocked.txt" \
+        "$repo_dir/bin/oc" --local probe >"$local_output" 2>&1
+)
+assert_contains "$local_output" "arg-count=1"
+assert_contains "$local_output" "arg-0=probe"
+assert_contains "$local_output" "config-content=present"
+assert_contains "$local_output" "orch=nixlab-large/nixlab/large1#high"
+
 work_output="$tmp_dir/work-output.log"
 failure_log="$work_output"
 (

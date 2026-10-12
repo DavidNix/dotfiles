@@ -89,6 +89,18 @@ test('--builder rejects a model without a provider', () => {
     assert.match(variant.stdout, /oc-orch=openai\/gpt-5\.6-sol#high/);
 });
 
+test('--local switches the builder subagents to nixlab large 1 in both launch modes', () => {
+    for (const flags of [['--local'], ['--local', '--without-sandbox']]) {
+        const result = runOc([...flags, 'probe']);
+        assert.equal(result.status, 0, result.stderr);
+        assert.match(result.stdout, /oc-orch=nixlab-large\/nixlab\/large1#high/);
+        assert.match(result.stdout, /oc-argc=1/);
+    }
+    const overridden = runOc(['--builder', 'openai/gpt-5.6-sol', '--local', 'probe']);
+    assert.equal(overridden.status, 0, overridden.stderr);
+    assert.match(overridden.stdout, /oc-orch=nixlab-large\/nixlab\/large1#high/);
+});
+
 test('--ds and --builder set separate model overrides in both launch modes and respect --', () => {
     for (const flags of [['--ds'], ['--ds', '--without-sandbox'], ['--without-sandbox', '--ds']]) {
         const result = runOc([...flags, 'probe', 'two words']);
