@@ -47,11 +47,12 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	@if [ -L ~/.config/opencode/tui.jsonc ]; then rm ~/.config/opencode/tui.jsonc; fi
 	ln -sf $$PWD/opencode/* ~/.config/opencode
 	@#Claude Code
-	mkdir -p ~/.claude/commands ~/.claude/agents
+	mkdir -p ~/.claude/commands ~/.claude/agents ~/.claude/output-styles
 	ln -sf $$PWD/claude/settings.json ~/.claude/settings.json
 	ln -sf $$PWD/claude/settings.local.json ~/.claude/settings.local.json
 	ln -sf $$PWD/claude/keybindings.json ~/.claude/keybindings.json
 	ln -sf $$PWD/claude/agents/* ~/.claude/agents/
+	ln -sf $$PWD/claude/output-styles/* ~/.claude/output-styles/
 
 .PHONY: defaults
 defaults: ## Defaults is idempotent. Requires reboot. Not compatible with all macOS versions.

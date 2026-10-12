@@ -92,6 +92,7 @@
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
   "editorMode": "vim",
+  "outputStyle": "STE100",
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": false
 }
