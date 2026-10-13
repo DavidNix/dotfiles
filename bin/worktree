@@ -42,14 +42,14 @@ else
 fi
 
 if [[ -f .env ]]; then
-    cp .env "$worktree_path/"
+    install -m 600 .env "$worktree_path/.env"
     echo "Copied .env"
 else
     echo "Warning: .env not found, skipped"
 fi
 
 if [[ -f .envrc ]]; then
-    cp .envrc "$worktree_path/"
+    install -m 600 .envrc "$worktree_path/.envrc"
     echo "Copied .envrc"
 else
     echo "Warning: .envrc not found, skipped"
@@ -59,7 +59,7 @@ while IFS= read -r -d '' vault_file; do
     rel_path="${vault_file#./}"
     dest_dir="$worktree_path/$(dirname "$rel_path")"
     mkdir -p "$dest_dir"
-    cp "$vault_file" "$dest_dir/"
+    install -m 600 "$vault_file" "$dest_dir/$(basename "$rel_path")"
     echo "Copied $rel_path"
 done < <(find . -path ./.git -prune -o -name .vault-password -type f -print0 2>/dev/null)
 
