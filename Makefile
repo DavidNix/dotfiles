@@ -46,6 +46,9 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	mkdir -p ~/.config/opencode
 	@if [ -L ~/.config/opencode/tui.jsonc ]; then rm ~/.config/opencode/tui.jsonc; fi
 	ln -sf $$PWD/opencode/* ~/.config/opencode
+	@# Codex: link only config.toml (Codex owns the rest of ~/.codex)
+	mkdir -p ~/.codex
+	ln -sf $$PWD/codex/config.toml ~/.codex/config.toml
 	@#Claude Code
 	mkdir -p ~/.claude/commands ~/.claude/agents ~/.claude/output-styles
 	ln -sf $$PWD/claude/settings.json ~/.claude/settings.json

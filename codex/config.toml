@@ -1,0 +1,258 @@
+model = "gpt-6-astra"
+model_reasoning_effort = "xhigh"
+approvals_reviewer = "auto_review"
+notify = ["/Users/nix/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
+service_tier = "fast"
+
+[auto_review]
+extra_policy = """
+Allow db-reset to wipe and recreate this worktree's disposable local development database.
+NEVER approve running or triggering terraform apply, directly or indirectly, including through scripts, wrappers, or CI/CD.
+"""
+
+[projects."/Users/nix/src/jbk"]
+trust_level = "trusted"
+
+[projects."/Users/nix/src/your-next-domain"]
+trust_level = "trusted"
+
+[projects."/Users/nix/src/dotfiles"]
+trust_level = "trusted"
+
+[projects."/Users/nix/src/sweatcommunity"]
+trust_level = "trusted"
+
+[projects."/Users/nix/src/naturalpeptide"]
+trust_level = "trusted"
+
+[projects."/Users/nix/src/myfirstjob-web"]
+trust_level = "trusted"
+
+[projects."/Users/nix/src/customcrm"]
+trust_level = "trusted"
+
+[projects."/Users/nix/src/safeagent"]
+trust_level = "trusted"
+
+[projects."/Users/nix/src/nixlab"]
+trust_level = "trusted"
+
+[projects."/Users/nix/src/davidnixcom"]
+trust_level = "trusted"
+
+[projects."/Users/nix/src/speedscraper"]
+trust_level = "trusted"
+
+[projects."/Users/nix/src/craigdies"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-08-16/realtime-voice-chat"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-08-16/act-as-a-senior-staff-level"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-08-16/act-as-a-senior-staff-level-2"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-08-16/realtime-voice-chat-2"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-08-16/realtime-voice-chat-3"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-06/is-t"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-08/my-x20"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-09/how"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-10/in-t"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-10/in-the-context-of-x20"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-10/who-x20"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-10/sum"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-10/woul"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-11/is-t"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Library/CloudStorage/Dropbox/General_Reference/C/Codex"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-16/hc"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-16/i-m"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-17/how"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-18/how-x20"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-19/run"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-19/doe"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-20/is-x20"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-20/how-x20"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-20/ist-x20"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-20/how-x20-2"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-20/what"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-21/on-b"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-21/does"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-21/cre"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-21/how"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-22/what"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-22/ed"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-23/b"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-09-23/realtime-voice-chat"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-10-10/remix"]
+trust_level = "trusted"
+
+[projects."/Users/nix/Documents/Codex/2026-10-10/with"]
+trust_level = "trusted"
+
+[projects."/Users/nix/src/brighterbranding"]
+trust_level = "trusted"
+
+[notice.model_migrations]
+"gpt-5.3-codex" = "gpt-5.4"
+
+[tui]
+screen_reader_detection_done = true
+
+[tui.model_availability_nux]
+"gpt-5.5" = 4
+"gpt-5.6-sol" = 4
+gpt-6-astra = 4
+"gpt-6.1-sol" = 4
+
+[marketplaces.openai-bundled]
+source_type = "local"
+source = "/Users/nix/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.openai-primary-runtime]
+source_type = "local"
+source = "/Users/nix/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."computer-use@openai-bundled"]
+enabled = false
+
+[plugins."chrome@openai-bundled"]
+enabled = true
+
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."unified-computer-use@openai-bundled"]
+enabled = true
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[mcp_servers.ahrefs]
+url = "https://api.ahrefs.com/mcp/mcp"
+
+[mcp_servers.node_repl]
+command = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl"
+startup_timeout_sec = 120.0
+
+[mcp_servers.node_repl.env]
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+BROWSER_USE_CODEX_APP_VERSION = "26.908.70816"
+BROWSER_USE_TINYSKY_ENABLED = "1"
+CODEX_CLI_PATH = "/Applications/ChatGPT.app/Contents/Resources/codex"
+CODEX_HOME = "/Users/nix/.codex"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = "/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/Users/nix/.codex:/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/Users/nix/.codex/plugins/cache/openai-bundled/browser/26.908.70816/scripts/browser-service.mjs"}'
+
+[mcp_servers.dataforseo]
+url = "https://mcp.dataforseo.com/v3/mcp"
+
+[desktop]
+ambient-suggestions-enabled = false
+conversationDetailMode = "STEPS_PROSE"
+followUpQueueMode = "queue"
+dock-icon-preference = "codex-system"
+realtimeVoiceScreenContextEnabled = true
+
+[features]
+hooks = true
+js_repl = false
+
+[shell_environment_policy.set]
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "9230e2bd8b24b7ac7a0ba6774c64bf0d78ecdabbdd91d0ed627b02a587bae2df"
+
+[hooks.state]
+
+[hooks.state."/Users/nix/.codex/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:c5df6e880cbda83e7cc8f5f4aa358daeaaa175b51da8055b45a273c0899178c5"
+
+[apps.connector_openai_codex_document_control]
+enabled = false
