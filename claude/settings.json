@@ -77,13 +77,14 @@
       }
     }
   },
+  "outputStyle": "STE100",
   "feedbackSurveyRate": 0,
   "feedbackDrafts": "off",
   "alwaysThinkingEnabled": true,
   "effortLevel": "xhigh",
   "modelSettings": {
     "claude-opus-5-5": {
-      "effortLevel": "xhigh"
+      "effortLevel": "medium"
     }
   },
   "promptSuggestionEnabled": false,
@@ -92,7 +93,6 @@
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
   "editorMode": "vim",
-  "outputStyle": "STE100",
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": false
 }
