@@ -157,6 +157,9 @@ trust_level = "trusted"
 [projects."/Users/nix/src/brighterbranding"]
 trust_level = "trusted"
 
+[projects."/Users/nix/Documents/Codex/2026-10-13/i-hav"]
+trust_level = "trusted"
+
 [notice.model_migrations]
 "gpt-5.3-codex" = "gpt-5.4"
 
@@ -210,9 +213,6 @@ enabled = true
 [plugins."visualize@openai-bundled"]
 enabled = true
 
-[mcp_servers.ahrefs]
-url = "https://api.ahrefs.com/mcp/mcp"
-
 [mcp_servers.node_repl]
 command = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl"
 startup_timeout_sec = 120.0
@@ -231,9 +231,6 @@ NODE_REPL_NODE_MODULE_DIRS = "/Applications/ChatGPT.app/Contents/Resources/cua_n
 NODE_REPL_NODE_PATH = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
 NODE_REPL_TRUSTED_CODE_PATHS = "/Users/nix/.codex:/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
 NODE_REPL_TRUSTED_SERVICES = '{"browser":"/Users/nix/.codex/plugins/cache/openai-bundled/browser/26.908.70816/scripts/browser-service.mjs"}'
-
-[mcp_servers.dataforseo]
-url = "https://mcp.dataforseo.com/v3/mcp"
 
 [desktop]
 ambient-suggestions-enabled = false
