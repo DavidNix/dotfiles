@@ -15,7 +15,7 @@ explore and general. --builder and --local still override the subagent models.
 OPTIONS:
     -h, --help       Show this help message
     --without-sandbox  Run OpenCode directly without the macOS sandbox
-    --ds             Override the primary agent models (plan, build, prototype)
+    --ds             Override the primary agent models (plan, build)
                      to fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash
     --builder MODEL  Override the builder subagent models (builder, frontend-builder, explore, general)
                      to MODEL (provider/model[#variant])

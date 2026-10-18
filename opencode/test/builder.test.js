@@ -28,7 +28,7 @@ async function override(agents, env) {
   }
 }
 
-const names = ['plan', 'build', 'prototype', 'builder', 'frontend-builder', 'explore', 'general', 'title', 'summary'];
+const names = ['plan', 'build', 'builder', 'frontend-builder', 'explore', 'general', 'title', 'summary'];
 const original = () => Object.fromEntries(names.map(name => [name, {
   model: { providerID: 'nixlab-large', id: 'nixlab/large1', variant: 'low' },
   permissions: [{ action: 'subagent', resource: '*', effect: 'deny' }],
@@ -36,7 +36,7 @@ const original = () => Object.fromEntries(names.map(name => [name, {
 
 test('primary override changes only primary agents and preserves their variant', async () => {
   const expected = original();
-  for (const name of ['plan', 'build', 'prototype']) {
+  for (const name of ['plan', 'build']) {
     expected[name].model = { providerID: 'fireworks-ai', id: 'accounts/fireworks/models/deepseek-v4p1-flash', variant: 'low' };
   }
   assert.deepEqual(await override(original(), {
@@ -118,7 +118,7 @@ test('overrides catch config activation that precedes the event subscription', a
 test('invalid model selections are logged and skipped', async t => {
   const errors = t.mock.method(console, 'error', () => {});
   const expected = original();
-  for (const name of ['plan', 'build', 'prototype']) {
+  for (const name of ['plan', 'build']) {
     expected[name].model = { providerID: 'openai', id: 'gpt-6-astra-fast', variant: 'low' };
   }
   assert.deepEqual(await override(original(), { OC_ORCH: 'gpt-5.6-sol', OC_PRIMARY: 'openai/gpt-6-astra-fast' }), expected);
