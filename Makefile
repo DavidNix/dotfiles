@@ -46,9 +46,15 @@ relink: install-scripts ## Create new symbolic links for dotfiles in this dir to
 	mkdir -p ~/.config/opencode
 	@if [ -L ~/.config/opencode/tui.jsonc ]; then rm ~/.config/opencode/tui.jsonc; fi
 	ln -sf $$PWD/opencode/* ~/.config/opencode
-	@# Codex: link only config.toml (Codex owns the rest of ~/.codex)
-	mkdir -p ~/.codex
-	ln -sf $$PWD/codex/config.toml ~/.codex/config.toml
+	@# Codex: shared config goes in the system layer, which Codex reads but never writes.
+	@# ~/.codex/config.toml stays a real per-machine file that Codex owns.
+	@if [ -L ~/.codex/config.toml ]; then \
+		echo "~/.codex/config.toml is a symlink. Replace it with a real file of machine-specific settings, then re-run."; \
+		echo "Recover old entries with: git show c125134:codex/config.toml"; \
+		exit 1; \
+	fi
+	sudo mkdir -p /etc/codex
+	sudo ln -sf $$PWD/codex/config.toml /etc/codex/config.toml
 	@#Claude Code
 	mkdir -p ~/.claude/commands ~/.claude/agents ~/.claude/output-styles
 	ln -sf $$PWD/claude/settings.json ~/.claude/settings.json
