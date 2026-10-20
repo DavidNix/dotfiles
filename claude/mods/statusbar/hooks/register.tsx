@@ -30,10 +30,16 @@ export const register: Register = on => {
 
   // ctrl+t's level rides on each main-loop request rather than going through
   // /effort, which would save it as the default for new sessions. A model
-  // that takes no effort (e.effort absent) is sent none.
+  // that takes no effort (e.effort absent) is sent none. A session level that
+  // moved since the last step was set by /effort's picker, which runs with no
+  // args, and replaces ctrl+t's as a typed /effort does.
   on('turn.step', async function* ($, e, next) {
     if (e.agentId !== undefined) {
       return yield* next(e)
+    }
+    if (e.effort !== undefined) {
+      const effort = e.effort
+      await patch($, b => (b.base !== null && b.base !== effort ? { base: effort, override: null } : { base: effort }))
     }
     const override = (await read($, bar))?.override ?? null
     const step = override !== null && e.effort !== undefined ? { ...e, effort: override } : e
@@ -87,7 +93,7 @@ async function cycleEffort($: EngineInterface) {
 async function refresh($: EngineInterface, changes: Partial<Bar> = {}) {
   try {
     const model = await $.session.model()
-    await update($, bar, b => ({ effort: null, override: null, ...b, model, ...changes }))
+    await update($, bar, b => ({ effort: null, override: null, base: null, ...b, model, ...changes }))
   } catch (error) {
     $.ui.log(`statusbar: refresh failed: ${String(error)}`, { to: 'debug' })
   }

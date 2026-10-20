@@ -57,6 +57,17 @@ test('shows model and effort; ctrl+t overrides effort for the session only', asy
   // The override reaches main-loop requests only, and never a model without effort.
   expect(sent).toEqual(['max', 'xhigh', 'low', undefined])
 
+  // /effort's picker runs with no args and moves the session's level, which replaces the override.
+  await ui.press({ key: 'effort' })
+  expect(await ui.find({ text: 'medium' })).toBeDefined()
+  await step($, { effort: 'medium' })
+  expect(sent.at(-1)).toBe('medium')
+  await step($, { effort: 'high' })
+  expect(sent.at(-1)).toBe('high')
+  expect(await ui.find({ text: 'high' })).toBeDefined()
+  await step($, { effort: 'high' })
+  expect(sent.at(-1)).toBe('high')
+
   // A typed /effort is an explicit choice and replaces the override.
   await $.command.run({ command: 'effort', args: 'high', origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 120 } })
   expect(await ui.find({ text: 'high' })).toBeDefined()
