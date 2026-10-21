@@ -24,14 +24,14 @@ Orchestrate the requested work to completion: `$ARGUMENTS` (or the current reque
 
 ## Review and fix
 
-- Choose intermediate code-review checkpoints as useful. Reviewers report; implement fixes directly or delegate them.
+- Choose intermediate review checkpoints as useful. Reviewers report; implement fixes directly or delegate them.
 - For both code and security findings: pause implementation and dispatch before Critical fixes and ask for approval. Automatically resolve actionable High, Medium, and Low findings. Investigate questions; ask when evidence cannot resolve a necessary decision safely.
 - Treat major architecture, irreversible contract, or scope changes as Critical decisions. Fix blockers promptly; group other findings by root cause for hardening before completion.
 
 ## Required final gate
 
 1. Finish integration and confirm focused-check evidence for all direct and delegated work.
-2. Always dispatch final code-review and security-review subagents concurrently against the same pinned SHA, covering this run's changes. Supply requirements, scope, prior findings, and verification evidence; use their respective review skills. If the harness provides no such subagents, perform both reviews yourself with their respective skills. Intermediate reviews never replace these.
+2. Always dispatch final code and security review subagents concurrently against the same pinned SHA, covering this run's changes. Those review agents must invoke the related review skills (`code-review` and `security-review`). Supply requirements, scope, prior findings, and verification evidence. If the harness provides no review subagents, perform both reviews yourself using those skills. Intermediate reviews never replace these.
 3. Keep the tree stable until both return. Apply the finding policy above and implement fixes directly or delegate them. Verify affected behavior; request targeted re-review as needed, repeating affected final reviews after material architecture, security, or integration changes.
 4. After all implementation, reviews, and fixes, run a comment-pruning pass exactly once as the final editing pass over comments added or modified during this run. Use a comment-pruning subagent if the harness provides one; otherwise do it yourself. Remove redundant narration and shorten verbose comments while preserving useful rationale, tooling directives, TODO/FIXME markers, and license headers. Change only comments; preserve behavior. Commit any changes atomically.
 5. After the comment sweep, run full applicable verification yourself against the final tree. Fix failures directly or delegate them, then rerun full verification after fixes so the final run covers the delivered tree.
