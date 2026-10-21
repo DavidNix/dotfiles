@@ -4,23 +4,23 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: oc [--without-sandbox] [--ds] [--builder MODEL] [--local] [--] [OPENCODE_ARGS...]
+Usage: oc [--without-sandbox] [--ds] [--gpt] [--builder MODEL] [--] [OPENCODE_ARGS...]
 
 Run OpenCode V2 with filesystem writes sandboxed by default.
 
 Work machines (whoami or $USER contains "ondo") lack the local nixlab models, so
 they use openai/gpt-6.1-sol-fast for title, summary, builder, frontend-builder,
-explore and general. --builder and --local still override the subagent models.
+explore and general. --builder still overrides the subagent models.
 
 OPTIONS:
     -h, --help       Show this help message
     --without-sandbox  Run OpenCode directly without the macOS sandbox
     --ds             Override the primary agent models (plan, build)
                      to fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash
+    --gpt            Override the primary agent models (plan, build) to the latest
+                     OpenAI Astra model (openai/gpt-6-astra-fast)
     --builder MODEL  Override the builder subagent models (builder, frontend-builder, explore, general)
                      to MODEL (provider/model[#variant])
-    --local          Override the builder subagent models (builder, frontend-builder,
-                     explore, general) to nixlab-large/nixlab/large1#high
     --server URL     Requires --without-sandbox (tools run on the selected server)
     --               Pass all remaining arguments to OpenCode
 
@@ -30,8 +30,8 @@ EXAMPLES:
     oc
     oc run --model openai/gpt-6.1-sol-fast "Explain this repository"
     oc --ds
+    oc --gpt
     oc --builder openai/gpt-6-astra-fast
-    oc --local
     oc --without-sandbox --version
     oc -- --help
 EOF
@@ -80,15 +80,15 @@ main() {
                 export OC_PRIMARY=fireworks-ai/accounts/fireworks/models/deepseek-v4p1-flash
                 shift
                 ;;
+            --gpt)
+                export OC_PRIMARY=openai/gpt-6-astra-fast
+                shift
+                ;;
             --builder)
                 [[ $# -ge 2 ]] || die "--builder requires a MODEL argument"
                 [[ "$2" =~ $model_pattern ]] || die "--builder MODEL must be provider/model[#variant]: $2"
                 shift
                 export OC_ORCH="$1"
-                shift
-                ;;
-            --local)
-                export OC_ORCH=nixlab-large/nixlab/large1#high
                 shift
                 ;;
             --)
