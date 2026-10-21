@@ -32,8 +32,6 @@ Refuse to continue if:
 - The current branch IS the base branch.
 - No base branch can be found.
 
-Confirm the detected base and feature branch with the user before proceeding when either was not explicitly named in the request.
-
 ## Rebase onto the base
 
 ```bash
