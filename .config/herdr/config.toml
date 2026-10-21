@@ -11,5 +11,24 @@ focus_pane_down  = "ctrl+j"
 focus_pane_up    = "ctrl+k"
 focus_pane_right = "ctrl+l"
 
+# herdr-file-viewer plugin, installed by `make herdr-plugins`
+[[keys.command]]
+key = "prefix+f"
+type = "plugin_action"
+command = "herdr-file-viewer.open-file-viewer"
+description = "open file viewer in split"
+
+[[keys.command]]
+key = "prefix+shift+f"
+type = "plugin_action"
+command = "herdr-file-viewer.open-file-viewer-tab"
+description = "open file viewer in tab"
+
+[[keys.command]]
+key = "prefix+d"
+type = "plugin_action"
+command = "herdr-file-viewer.open-file-viewer-at"
+description = "open file viewer at directory (split)"
+
 [experimental]
 pane_history = true

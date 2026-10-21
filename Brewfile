@@ -23,6 +23,7 @@ brew "fzf"
 brew "gemini-cli"
 brew "gh"
 brew "git"
+brew "git-delta" # diff renderer for herdr-file-viewer
 brew "git-extras"
 brew "git-lfs"
 brew "glab"
