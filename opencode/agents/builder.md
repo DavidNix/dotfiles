@@ -1,7 +1,6 @@
 ---
 description: Builds requested changes after the parent agent has planned the work.
 mode: subagent
-model: openai/gpt-6.1-sol#xhigh
 permissions:
   - { action: shell, resource: "*", effect: allow }
   - { action: shell, resource: "git push *", effect: deny }
