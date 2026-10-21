@@ -28,33 +28,23 @@ export const register: Register = on => {
     return started
   })
 
-  // ctrl+t's level rides on each main-loop request rather than going through
-  // /effort, which would save it as the default for new sessions. A model
-  // that takes no effort (e.effort absent) is sent none. A session level that
-  // moved since the last step was set by /effort's picker, which runs with no
-  // args, and replaces ctrl+t's as a typed /effort does.
+  // The level each main-loop request carries is the session's own, whatever
+  // set it: ctrl+t, a typed /effort, or /effort's picker, which runs with no
+  // args. A model that takes no effort (e.effort absent) shows none.
   on('turn.step', async function* ($, e, next) {
-    if (e.agentId !== undefined) {
-      return yield* next(e)
+    const response = yield* next(e)
+    if (e.agentId === undefined) {
+      await refresh($, { effort: e.effort === undefined ? null : String(e.effort) })
     }
-    if (e.effort !== undefined) {
-      const effort = e.effort
-      await patch($, b => (b.base !== null && b.base !== effort ? { base: effort, override: null } : { base: effort }))
-    }
-    const override = (await read($, bar))?.override ?? null
-    const step = override !== null && e.effort !== undefined ? { ...e, effort: override } : e
-    const response = yield* next(step)
-    await refresh($, { effort: step.effort === undefined ? null : String(step.effort) })
     return response
   })
 
-  // /effort, /model and the rest. A typed /effort is an explicit choice, so it
-  // replaces ctrl+t's.
+  // /effort, /model and the rest.
   on('command.run', async ($, e, next) => {
     const ran = await next(e)
     const level = e.args.trim()
     if (e.command === 'effort' && (LEVELS.some(l => l === level) || level === 'auto')) {
-      await patch($, () => ({ effort: level, override: null }))
+      await patch($, () => ({ effort: level }))
     }
     await refresh($)
     return ran
@@ -67,33 +57,44 @@ export const register: Register = on => {
     }
 
     const { Box, Button, Text } = $.ui.resolve(e)
-    const effort = b.override ?? b.effort
 
     return (
       <Box width={e.props.bodyColumns} justifyContent="flex-end">
         <Text bold>{modelName(b.model)}</Text>
         <Text dimColor>{' · '}</Text>
         <Button key="effort" plain action={CYCLE_ACTION} onPress={() => cycleEffort($)}>
-          <Text color={(effort && EFFORT_COLOR[effort]) || 'subtle'}>{effort ?? 'effort'}</Text>
+          <Text color={(b.effort && EFFORT_COLOR[b.effort]) || 'subtle'}>{b.effort ?? 'effort'}</Text>
         </Button>
       </Box>
     )
   })
 }
 
-// Session only: the override lives in $.state, which ends with the session.
+// Through /effort, so Claude Code's own effort display follows. /effort also
+// saves the level as the default for new sessions, so the user settings file
+// is put back as it was: ctrl+t is for this session only.
 async function cycleEffort($: EngineInterface) {
-  const b = await read($, bar)
-  const current = b?.override ?? b?.effort
+  const current = (await read($, bar))?.effort
   const from = LEVELS.findIndex(l => l === current)
   const level = LEVELS[(from + 1) % LEVELS.length] ?? 'high'
-  await patch($, () => ({ override: level }))
+  const path = await userSettingsPath($)
+  const before = await $.fs.read(path).catch(() => null)
+  await $.command.run({ command: 'effort', args: level })
+  if (before !== null && (await $.fs.read(path).catch(() => null)) !== before) {
+    await $.fs.write(path, before)
+  }
+  await patch($, () => ({ effort: level }))
+}
+
+async function userSettingsPath($: EngineInterface): Promise<string> {
+  const dir = (await $.env.get('CLAUDE_CONFIG_DIR')) ?? `${await $.env.get('HOME')}/.claude`
+  return `${dir}/settings.json`
 }
 
 async function refresh($: EngineInterface, changes: Partial<Bar> = {}) {
   try {
     const model = await $.session.model()
-    await update($, bar, b => ({ effort: null, override: null, base: null, ...b, model, ...changes }))
+    await update($, bar, b => ({ effort: null, ...b, model, ...changes }))
   } catch (error) {
     $.ui.log(`statusbar: refresh failed: ${String(error)}`, { to: 'debug' })
   }
