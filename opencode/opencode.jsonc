@@ -69,7 +69,6 @@
       "permissions": [{ "action": "subagent", "resource": "*", "effect": "deny" }],
     },
     "general": {
-      "model": "nixlab-large/nixlab/large1#low",
       "permissions": [{ "action": "subagent", "resource": "*", "effect": "deny" }],
     },
     "summary": {
