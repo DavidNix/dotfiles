@@ -219,6 +219,7 @@ add_marketplaces() {
     echo ""
     echo "Adding marketplaces..."
     add_marketplace "claude-plugins-official" "anthropics/claude-plugins-official"
+    add_marketplace "openai-codex" "openai/codex-plugin-cc"
 }
 
 # Install plugins
@@ -235,6 +236,9 @@ install_plugins() {
     install_plugin "rust-analyzer-lsp@claude-plugins-official"
     install_plugin "swift-lsp@claude-plugins-official"
     install_plugin "typescript-lsp@claude-plugins-official"
+
+    # OpenAI Codex (code review and task delegation)
+    install_plugin "codex@openai-codex"
 }
 
 main() {
