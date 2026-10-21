@@ -5,7 +5,7 @@
 SHELL := /bin/zsh
 export PATH := /opt/homebrew/bin:/opt/homebrew/sbin:$(PATH)
 
-SHELL_SCRIPTS := bin/agent-init bin/chrome-cdp bin/claude-statusline bin/oc bin/worktree bin/zed-toggle-test-file script/agent-sandbox.sh script/macos-defaults.sh test/oc.test.sh tmux-init.sh
+SHELL_SCRIPTS := bin/agent-init bin/chrome-cdp bin/claude-statusline bin/oc bin/worktree bin/zed-toggle-test-file script/agent-sandbox.sh script/herdr-plugins.sh script/macos-defaults.sh test/oc.test.sh tmux-init.sh
 PYTHON_SCRIPTS := bin/image-gen bin/image-edit
 
 default: help
@@ -78,7 +78,7 @@ caffeinate: ## Keep the Mac awake for HOURS=<n> hours. Ctrl-C to stop early.
 	@caffeinate -dims -t $$(( $(HOURS) * 3600 ))
 
 .PHONY: setup
-setup: relink ~/.ssh xcode homebrew git pkgs superhuman krew agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac. Work Mac: GIT_EMAIL=you@work.com
+setup: relink ~/.ssh xcode homebrew git pkgs superhuman krew herdr-plugins agent opt-perms ## NOT idempotent. Install necessary tools and programs on a brand new Mac. Work Mac: GIT_EMAIL=you@work.com
 	source ~/.zshrc
 	@echo "✅ Complete!"
 
@@ -123,6 +123,10 @@ krew: ## Installs kubectl krew plugins
 	$(KREW) install ctx
 	$(KREW) install ns
 	$(KREW) install stern
+
+.PHONY: herdr-plugins
+herdr-plugins: ## Installs pinned herdr plugins
+	@$$PWD/script/herdr-plugins.sh
 
 .PHONY: superhuman
 superhuman:

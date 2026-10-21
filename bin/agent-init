@@ -175,6 +175,7 @@ install_skills() {
     try_or_warn_quiet "Installing Corey Haynes marketing skills" npx --yes skills add "coreyhaines31/marketingskills" -g -y -a "claude-code" -a "opencode"
 
     install_skill "herdrdev/herdr" "herdr"
+    install_skill "smarzban/herdr-file-viewer" "herdr-file-viewer"
 
     echo -e "${GREEN}Skills installed${NC}"
 }
