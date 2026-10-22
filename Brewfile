@@ -65,7 +65,7 @@ brew "terraform-ls"
 brew "tokei"
 brew "tree"
 brew "tree-sitter-cli"
-brew "typescript-language-server"
+brew "typescript" # TypeScript 7 includes the native JS/TS language server
 brew "uv"
 brew "vscode-langservers-extracted" # CSS, HTML, JSON/JSONC language servers
 brew "wget"
