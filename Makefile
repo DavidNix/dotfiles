@@ -115,7 +115,6 @@ pkgs: ## Installs command line tools
 	brew cleanup --verbose
 	@echo "Installing mise tools"
 	mise install
-	curl -LsSf https://astral.sh/uv/install.sh | sh
 
 KREW = mise exec -- kubectl krew
 .PHONY: krew
