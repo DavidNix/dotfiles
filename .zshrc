@@ -174,6 +174,8 @@ alias vi="nvim"
 alias vim="nvim"
 alias ls="lsd"
 alias opencode="oc"
+# CLI flag beats project settings that set defaultMode to plan
+alias claude="claude --permission-mode auto"
 
 # M1 Terminal Helpers
 alias arm="env /usr/bin/arch -arm64 /bin/zsh --login"
