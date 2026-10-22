@@ -4,7 +4,6 @@ cask "codex"
 cask "font-fira-code-nerd-font"
 
 # brew "air" This is NOT the golang filewatcher, but something related to R
-brew "angle-grinder"
 brew "ansible"
 brew "ansible-language-server"
 brew "atuin"
