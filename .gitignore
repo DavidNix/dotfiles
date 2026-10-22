@@ -9,6 +9,10 @@
 __pycache__
 .venv/
 
+# Neovim runtime logs
+/.nvimlog
+/nvim.log
+
 # Private agent skills (work or personal); installed by bin/agent-init, never committed
 skills-private/
 
