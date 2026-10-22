@@ -30,5 +30,8 @@ type = "plugin_action"
 command = "herdr-file-viewer.open-file-viewer-at"
 description = "open file viewer at directory (split)"
 
+[session]
+resume_agents_on_restore = true
+
 [experimental]
 pane_history = true

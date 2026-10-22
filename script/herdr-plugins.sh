@@ -5,6 +5,11 @@
 
 set -euo pipefail
 
+if ! command -v herdr >/dev/null 2>&1; then
+    echo "herdr not installed; skipping plugin install" >&2
+    exit 0
+fi
+
 # owner/repo@ref. Pin a release tag so a new upstream commit never installs by itself.
 PLUGINS=(
     "smarzban/herdr-file-viewer@v1.18.0"

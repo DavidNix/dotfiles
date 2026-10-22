@@ -28,7 +28,7 @@ install-scripts: ## Symlink custom scripts to ~/.local/bin
 	@echo "Scripts installed successfully"
 
 .PHONY: relink
-relink: install-scripts ## Create new symbolic links for dotfiles in this dir to your home dir.
+relink: install-scripts herdr-plugins ## Create new symbolic links for dotfiles in this dir to your home dir.
 	@echo "Generating links.."
 	@# Link all the dotfiles
 	find $$PWD -name ".[^.]*" -type f -print0 | xargs -0tJ % ln -sf %  ~
