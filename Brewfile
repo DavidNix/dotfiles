@@ -1,7 +1,6 @@
 # cask "claude-code" # The brew version of claude code does not get updates quickly, use their official install path
 cask "1password-cli"
 cask "codex"
-cask "docker-desktop"
 cask "font-fira-code-nerd-font"
 
 # brew "air" This is NOT the golang filewatcher, but something related to R
