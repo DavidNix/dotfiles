@@ -71,9 +71,12 @@
 [diff]
  # use (index, work tree, commit, object) instead of the standard a and b notation
 	mnemonicprefix = true
- # basic rename and copy detection
-	tool = vimdiff
-	
+  # Neovim 0.12's built-in file/directory review interface
+	tool = nvim_difftool
+
+[difftool "nvim_difftool"]
+	cmd = nvim -c \"packadd nvim.difftool\" -d \"$LOCAL\" \"$REMOTE\"
+
 [difftool "ksdiff"]
 	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
 
