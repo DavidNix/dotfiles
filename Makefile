@@ -112,7 +112,8 @@ pkgs: ## Installs command line tools
 	@echo "Installing command line tools"
 	arch -arm64 brew bundle
 	@echo "Cleaning up brew"
-	brew cleanup
+	brew cleanup --verbose
+	@echo "Installing mise tools"
 	mise install
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 
