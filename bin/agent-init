@@ -122,6 +122,31 @@ install_skill() {
     try_or_warn_quiet "install $skill" npx --yes skills add "$repo" --skill "$skill" -g -y -a "claude-code" -a "opencode"
 }
 
+# Rename an installed skill: its directory, its frontmatter name, and any
+# per-agent symlinks pointing at the old name.
+rename_installed_skill() {
+    local from="$1"
+    local to="$2"
+    local skills_dir="$HOME/.agents/skills"
+    if [ ! -d "$skills_dir/$from" ]; then
+        echo -e "  ${YELLOW}rename skipped: $from not installed${NC}"
+        return 0
+    fi
+    try_or_warn_quiet "rename $from to $to" mv "$skills_dir/$from" "$skills_dir/$to"
+    # Agents discover skills by the frontmatter name, so patch it too.
+    try_or_warn_quiet "rename $from frontmatter" \
+        sed -i '' "s/^name: $from\$/name: $to/" "$skills_dir/$to/SKILL.md"
+    # Repoint agent symlinks that reference the old name (relative links into
+    # ~/.agents/skills, as created by the skills CLI).
+    local link_dir
+    for link_dir in "$HOME/.claude/skills" "$HOME/.config/opencode/skills"; do
+        if [ -L "$link_dir/$from" ]; then
+            rm "$link_dir/$from"
+            ln -s "../../.agents/skills/$to" "$link_dir/$to"
+        fi
+    done
+}
+
 # Install skills via npx
 install_skills() {
     echo ""
@@ -141,6 +166,12 @@ install_skills() {
 
     echo -e "  Installing emilkowalski skills..."
     try_or_warn_quiet "Installing emilkowalski skills" npx --yes skills add "emilkowalski/skill" -g -y -a "claude-code" -a "opencode"
+    # Emil's repo also ships a skill named "prototype" that would clobber the
+    # local prototype skill (installed above); rename his copy, then re-install
+    # the local skills to restore anything else his install overwrote.
+    rename_installed_skill "prototype" "emil-prototype"
+    try_or_warn_quiet "Re-installing local skills" \
+        npx --yes skills add "$LOCAL_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode"
 
     # Stripe (payments, billing, invoicing, identity)
     echo -e "  Installing Stripe skills..."
