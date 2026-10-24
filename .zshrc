@@ -88,6 +88,11 @@ export EDITOR="$VISUAL"
 # See: https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
+# OpenAI CLI auth: pull the key from Keychain (item: openai-api-key, account: $USER).
+# A manually exported OPENAI_API_KEY wins. Add the key with:
+#   security add-generic-password -U -a "$USER" -s openai-api-key -w "YOUR_OPENAI_API_KEY"
+export OPENAI_API_KEY="${OPENAI_API_KEY:-$(security find-generic-password -a "$USER" -s openai-api-key -w 2>/dev/null)}"
+
 # ==============================================================================
 # PATH Modifications
 # ==============================================================================

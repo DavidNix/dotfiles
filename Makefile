@@ -6,7 +6,7 @@ SHELL := /bin/zsh
 export PATH := /opt/homebrew/bin:/opt/homebrew/sbin:$(PATH)
 
 SHELL_SCRIPTS := bin/agent-init bin/chrome-cdp bin/claude-statusline bin/oc bin/worktree bin/zed-toggle-test-file script/agent-sandbox.sh script/herdr-plugins.sh script/macos-defaults.sh test/oc.test.sh tmux-init.sh
-PYTHON_SCRIPTS := bin/image-gen bin/image-edit
+PYTHON_SCRIPTS :=
 
 default: help
 
@@ -169,9 +169,11 @@ shellcheck: ## Run shellcheck and shell syntax checks on scripts
 .PHONY: python-check
 python-check: ## Run Python lint, type, and syntax checks on scripts
 	@uv sync --locked --group dev
-	@uv run ruff check $(PYTHON_SCRIPTS)
-	@uv run ty check $(PYTHON_SCRIPTS)
-	@uv run python -m py_compile $(PYTHON_SCRIPTS)
+	@if [ -n "$(PYTHON_SCRIPTS)" ]; then \
+		uv run ruff check $(PYTHON_SCRIPTS); \
+		uv run ty check $(PYTHON_SCRIPTS); \
+		uv run python -m py_compile $(PYTHON_SCRIPTS); \
+	fi
 	@echo "python-check passed"
 
 .PHONY: vet
