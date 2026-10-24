@@ -1,4 +1,6 @@
 # cask "claude-code" # The brew version of claude code does not get updates quickly, use their official install path
+tap "openai/tools"
+
 cask "1password-cli"
 cask "codex"
 cask "font-fira-code-nerd-font"
@@ -47,6 +49,7 @@ brew "merman-cli"
 brew "mise" # asdf replacement
 brew "mole"
 brew "neovim"
+brew "openai/tools/openai"
 brew "playwright-cli"
 brew "pandoc"
 brew "poppler" # pdftotext
