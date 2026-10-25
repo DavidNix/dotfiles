@@ -208,6 +208,10 @@ install_skills() {
     install_skill "herdrdev/herdr" "herdr"
     install_skill "smarzban/herdr-file-viewer" "herdr-file-viewer"
 
+    # Video (Remotion)
+    echo -e "  Installing Remotion skills..."
+    try_or_warn_quiet "Installing Remotion skills" npx --yes skills add "remotion-dev/skills" -g -y -a "claude-code" -a "opencode"
+
     echo -e "${GREEN}Skills installed${NC}"
 }
 

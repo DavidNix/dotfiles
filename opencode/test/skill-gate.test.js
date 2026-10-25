@@ -6,6 +6,7 @@ import test from 'node:test';
 import skillGate, { hiddenSkillIDs } from '../plugins/skill-gate.js';
 
 const MARKETING = 'coreyhaines31/marketingskills';
+const REMOTION = 'remotion-dev/skills';
 
 const lock = {
   skills: {
@@ -13,6 +14,8 @@ const lock = {
     'Cold Email': { source: MARKETING, skillPath: 'skills/cold-email/SKILL.md' },
     copywriting: { source: MARKETING, skillPath: 'skills/copywriting/SKILL.md' },
     'root-skill': { source: MARKETING, skillPath: 'SKILL.md' },
+    'remotion-best-practices': { source: REMOTION, skillPath: 'skills/remotion-best-practices/SKILL.md' },
+    'remotion-create': { source: REMOTION, skillPath: 'skills/remotion-create/SKILL.md' },
     pdf: { source: 'anthropics/skills', skillPath: 'skills/pdf/SKILL.md' },
     'skill-creator': { source: 'anthropics/skills', skillPath: 'skills/skill-creator/SKILL.md' },
     'hook-writer': { source: 'DavidNix/nixpowers', skillPath: 'skills/hook-writer/SKILL.md' },
@@ -41,7 +44,7 @@ function withLock(t, contents, synced = []) {
 const LISTED = ['apple-design', 'ask-sonner', 'docx', 'frontend-slides', 'pdf', 'pptx', 'upgrade-stripe', 'write-swift', 'xlsx'];
 
 function catalog() {
-  return Object.fromEntries(['ab-testing', 'cold-email', 'copywriting', 'root-skill', 'hook-writer', 'skill-creator', 'morning', 'no-skill', ...LISTED]
+  return Object.fromEntries(['ab-testing', 'cold-email', 'copywriting', 'root-skill', 'hook-writer', 'skill-creator', 'morning', 'no-skill', 'remotion-best-practices', 'remotion-create', ...LISTED]
     .map(id => [id, { id, description: id }]));
 }
 
@@ -50,7 +53,7 @@ function apply(transform, skills) {
   return Object.keys(skills).filter(id => skills[id].autoinvoke === false).sort();
 }
 
-const HIDDEN = ['ab-testing', 'cold-email', 'hook-writer', 'root-skill', ...LISTED].sort();
+const HIDDEN = ['ab-testing', 'cold-email', 'hook-writer', 'root-skill', 'remotion-best-practices', 'remotion-create', ...LISTED].sort();
 
 test('hides listed skills and pack skills by directory ID except advertised ones', () => {
   assert.deepEqual([...hiddenSkillIDs(lock)].sort(), HIDDEN);

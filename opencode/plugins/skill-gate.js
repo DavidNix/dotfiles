@@ -7,7 +7,7 @@ import path from 'node:path';
 const HIDDEN_SKILLS = [
   'apple-design', 'ask-sonner', 'docx', 'frontend-slides', 'pdf', 'pptx', 'upgrade-stripe', 'write-swift', 'xlsx',
 ];
-const HIDDEN_SOURCES = ['DavidNix/nixpowers', 'coreyhaines31/marketingskills'];
+const HIDDEN_SOURCES = ['DavidNix/nixpowers', 'coreyhaines31/marketingskills', 'remotion-dev/skills'];
 // Exceptions to the hidden sources and synced claude.ai skills.
 const ADVERTISED = new Set(['copy-editing', 'copywriting', 'cro', 'marketing-psychology']);
 
