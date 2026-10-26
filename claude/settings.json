@@ -92,6 +92,7 @@
   "feedbackSurveyRate": 0,
   "feedbackDrafts": "off",
   "alwaysThinkingEnabled": true,
+  "autoMemoryEnabled": false,
   "effortLevel": "xhigh",
   "modelSettings": {
     "claude-opus-5-5": {
