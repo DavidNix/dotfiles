@@ -105,6 +105,10 @@
 	postBuffer = 524288000
 [safe]
 	directory = /opt/homebrew
+[hook "strip-claude-trailer"]
+	# Config hooks run next to each repo's own hooks, unlike core.hooksPath.
+	command = ~/.local/bin/git-strip-claude-trailer
+	event = commit-msg
 [include]
 	# Machine-specific overrides (untracked), e.g. a work email. Keep this last.
 	path = ~/.gitconfig.local

@@ -5,7 +5,7 @@
 SHELL := /bin/zsh
 export PATH := /opt/homebrew/bin:/opt/homebrew/sbin:$(PATH)
 
-SHELL_SCRIPTS := bin/agent-init bin/chrome-cdp bin/claude-statusline bin/oc bin/worktree bin/zed-toggle-test-file script/agent-sandbox.sh script/herdr-plugins.sh script/macos-defaults.sh test/oc.test.sh tmux-init.sh
+SHELL_SCRIPTS := bin/agent-init bin/chrome-cdp bin/claude-statusline bin/git-strip-claude-trailer bin/oc bin/worktree bin/zed-toggle-test-file script/agent-sandbox.sh script/herdr-plugins.sh script/macos-defaults.sh test/oc.test.sh tmux-init.sh
 PYTHON_SCRIPTS :=
 
 default: help

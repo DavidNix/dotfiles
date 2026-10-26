@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Git commit-msg hook (wired in .gitconfig): removes Claude co-author trailers
+# and "Generated with Claude Code" footers, then trims trailing blank lines.
+set -euo pipefail
+
+msg_file="$1"
+tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT
+
+awk '
+	tolower($0) ~ /^co-authored-by:.*(claude|anthropic\.com)/ { next }
+	tolower($0) ~ /generated with \[claude code\]/ { next }
+	{ lines[++n] = $0 }
+	END {
+		while (n > 0 && lines[n] ~ /^[[:space:]]*$/) n--
+		for (i = 1; i <= n; i++) print lines[i]
+	}
+' "$msg_file" >"$tmp"
+
+cat "$tmp" >"$msg_file"
