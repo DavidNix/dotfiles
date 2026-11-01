@@ -1,9 +1,11 @@
 # cask "claude-code" # The brew version of claude code does not get updates quickly, use their official install path
+tap "anomalyco/tap"
 tap "openai/tools"
 
 cask "1password-cli"
 cask "codex"
 cask "font-fira-code-nerd-font"
+cask "hex"
 
 # brew "air" This is NOT the golang filewatcher, but something related to R
 brew "ansible"
