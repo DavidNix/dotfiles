@@ -61,3 +61,7 @@ js_repl = false
 [apps.connector_openai_codex_document_control]
 enabled = false
 
+[mcp_servers.chrome-devtools]
+command = "npx"
+args = ["-y", "chrome-devtools-mcp@latest"]
+
