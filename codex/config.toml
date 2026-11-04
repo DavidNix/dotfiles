@@ -8,6 +8,9 @@ model_reasoning_effort = "xhigh"
 approvals_reviewer = "auto_review"
 service_tier = "fast"
 
+[tui]
+vim_mode_default = true
+
 [auto_review]
 extra_policy = """
 Allow db-reset to wipe and recreate this worktree's disposable local development database.
