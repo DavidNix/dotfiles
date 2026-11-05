@@ -31,6 +31,13 @@ Two modes depending on the task:
 - Behavior changes → Feature Mode
 - Bug fixes → Bug Fix Mode
 
+**Excluded from TDD (no approval needed):**
+- Diagnostic logging
+- Entry-point dependency wiring
+- User-facing CLI output; ask the user before adding output assertions if they seem important
+
+Keep business logic outside the entry-point layer and test it as described below.
+
 **Exceptions (ask your human partner):**
 - Throwaway prototypes
 - Generated code
@@ -347,6 +354,20 @@ expect(() => service.createUser('bad', 'name')).toThrow('Invalid email');
 
 **Why:** Private methods and internal types are implementation details. Testing them couples your tests to internal structure, making refactoring impossible. The public API is the contract — test that.
 
+### Keep Entry Points Thin
+
+Keep executable entry points and their helpers limited to constructing dependencies, registering commands, and delegating execution. This applies to Go's entire `package main`, including Cobra setup, Rust binary modules, and equivalent executable layers.
+
+Extract business logic into separate packages or library modules. Test it through exported functions or methods. If entry-point code needs behavioral tests, extract that behavior first.
+
+Use build checks to verify wiring's type correctness. Do not add unit tests solely to exercise wiring.
+
+### Test Outcomes, Not Output Text
+
+Do not assert diagnostic log messages. Test the behavior that causes them.
+
+Skip user-facing CLI output assertions by default. If they seem important, ask the user whether to add them.
+
 ## Common Rationalizations
 
 | Excuse | Reality |
@@ -391,7 +412,7 @@ expect(() => service.createUser('bad', 'name')).toThrow('Invalid email');
 
 Before marking work complete:
 
-- [ ] Every new function/method has a test
+- [ ] Every new public behavior has a test, subject to the exclusions above
 - [ ] Tests and a behavior-free compiling stub were written in one pass
 - [ ] Every new test was observed failing at a behavioral assertion
 - [ ] Real implementation began only after the correct red state
