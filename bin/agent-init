@@ -205,6 +205,9 @@ install_skills() {
     # install_skill "https://github.com/Leonxlnx/taste-skill" "stitch-design-taste"
     install_skill "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill" "ui-ux-pro-max"
 
+    # Security
+    install_skill "https://github.com/cloudflare/security-audit-skill" "security-audit"
+
     # Marketing
     echo -e "Installing Corey Haynes marketing skills..."
     try_or_warn_quiet "Installing Corey Haynes marketing skills" npx --yes skills add "coreyhaines31/marketingskills" -g -y -a "claude-code" -a "opencode"
