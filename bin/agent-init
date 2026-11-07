@@ -216,6 +216,9 @@ install_skills() {
     echo -e "  Installing Remotion skills..."
     try_or_warn_quiet "Installing Remotion skills" npx --yes skills add "remotion-dev/skills" -g -y -a "claude-code" -a "opencode"
 
+    # Typefully
+    try_or_warn_quiet "Installing typefully skills" npx --yes skills add "typefully/agent-skills" -g -y -a "claude-code" -a "opencode"
+
     echo -e "${GREEN}Skills installed${NC}"
 }
 
