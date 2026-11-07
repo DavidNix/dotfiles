@@ -188,6 +188,7 @@ install_skills() {
 
     # Writing
     install_skill "https://github.com/obra/the-elements-of-style" "writing-clearly-and-concisely"
+    try_or_warn_quiet "Installing blader humanizer skills" npx --yes skills add "blader/humanizer" -g -y -a "claude-code" -a "opencode"
 
     # Document
     install_skill "https://github.com/anthropics/skills" "pdf"
