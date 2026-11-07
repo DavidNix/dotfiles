@@ -117,9 +117,7 @@ install_skill() {
     local repo="$1"
     local skill="$2"
     echo -e "  Installing ${skill}..."
-    # To add codex support in the future: -a "codex". codex does not handle skills as well as claude code and
-    # I use codex more for code review vs. implementation
-    try_or_warn_quiet "install $skill" npx --yes skills add "$repo" --skill "$skill" -g -y -a "claude-code" -a "opencode"
+    try_or_warn_quiet "install $skill" npx --yes skills add "$repo" --skill "$skill" -g -y -a "claude-code" -a "opencode" -a "codex"
 }
 
 # Rename an installed skill: its directory, its frontmatter name, and any
@@ -143,7 +141,7 @@ rename_installed_skill() {
     # Repoint agent symlinks that reference the old name (relative links into
     # ~/.agents/skills, as created by the skills CLI).
     local link_dir
-    for link_dir in "$HOME/.claude/skills" "$HOME/.config/opencode/skills"; do
+    for link_dir in "$HOME/.claude/skills" "$HOME/.config/opencode/skills" "$HOME/.codex/skills"; do
         if [ -L "$link_dir/$from" ]; then
             rm "$link_dir/$from"
             # -n: destination may be a symlink to a directory (BSD ln would
@@ -160,28 +158,28 @@ install_skills() {
 
     # Use OpenCode's built-in customize-opencode skill instead of a local equivalent.
     echo -e "  Installing local repo skills from ${LOCAL_SKILLS_SOURCE}..."
-    try_or_warn_quiet "Installing local skills" npx --yes skills add "$LOCAL_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode"
+    try_or_warn_quiet "Installing local skills" npx --yes skills add "$LOCAL_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode" -a "codex"
 
     if compgen -G "${PRIVATE_SKILLS_SOURCE}/*/SKILL.md" >/dev/null; then
         echo -e "  Installing private skills from ${PRIVATE_SKILLS_SOURCE}..."
-        try_or_warn_quiet "Installing private skills" npx --yes skills add "$PRIVATE_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode"
+        try_or_warn_quiet "Installing private skills" npx --yes skills add "$PRIVATE_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode" -a "codex"
     fi
 
     echo -e "  Installing nixpowers skills..."
-    try_or_warn_quiet "Installing nixpowers skills" npx --yes skills add "https://github.com/DavidNix/nixpowers" -g -y -a "claude-code" -a "opencode"
+    try_or_warn_quiet "Installing nixpowers skills" npx --yes skills add "https://github.com/DavidNix/nixpowers" -g -y -a "claude-code" -a "opencode" -a "codex"
 
     echo -e "  Installing emilkowalski skills..."
-    try_or_warn_quiet "Installing emilkowalski skills" npx --yes skills add "emilkowalski/skill" -g -y -a "claude-code" -a "opencode"
+    try_or_warn_quiet "Installing emilkowalski skills" npx --yes skills add "emilkowalski/skill" -g -y -a "claude-code" -a "opencode" -a "codex"
     # Emil's repo also ships a skill named "prototype" that would clobber the
     # local prototype skill (installed above); rename his copy, then re-install
     # the local skills to restore anything else his install overwrote.
     rename_installed_skill "prototype" "emil-prototype"
     try_or_warn_quiet "Re-installing local skills" \
-        npx --yes skills add "$LOCAL_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode"
+        npx --yes skills add "$LOCAL_SKILLS_SOURCE" -g -y -a "claude-code" -a "opencode" -a "codex"
 
     # Stripe (payments, billing, invoicing, identity)
     echo -e "  Installing Stripe skills..."
-    try_or_warn_quiet "Installing Stripe skills" npx --yes skills add "https://docs.stripe.com" -g -y -a "claude-code" -a "opencode"
+    try_or_warn_quiet "Installing Stripe skills" npx --yes skills add "https://docs.stripe.com" -g -y -a "claude-code" -a "opencode" -a "codex"
 
     # Meta
     install_skill "https://github.com/anthropics/skills" "skill-creator"
@@ -207,17 +205,17 @@ install_skills() {
 
     # Marketing
     echo -e "Installing Corey Haynes marketing skills..."
-    try_or_warn_quiet "Installing Corey Haynes marketing skills" npx --yes skills add "coreyhaines31/marketingskills" -g -y -a "claude-code" -a "opencode"
+    try_or_warn_quiet "Installing Corey Haynes marketing skills" npx --yes skills add "coreyhaines31/marketingskills" -g -y -a "claude-code" -a "opencode" -a "codex"
 
     install_skill "herdrdev/herdr" "herdr"
     install_skill "smarzban/herdr-file-viewer" "herdr-file-viewer"
 
     # Video (Remotion)
     echo -e "  Installing Remotion skills..."
-    try_or_warn_quiet "Installing Remotion skills" npx --yes skills add "remotion-dev/skills" -g -y -a "claude-code" -a "opencode"
+    try_or_warn_quiet "Installing Remotion skills" npx --yes skills add "remotion-dev/skills" -g -y -a "claude-code" -a "opencode" -a "codex"
 
     # Typefully
-    try_or_warn_quiet "Installing typefully skills" npx --yes skills add "typefully/agent-skills" -g -y -a "claude-code" -a "opencode"
+    try_or_warn_quiet "Installing typefully skills" npx --yes skills add "typefully/agent-skills" -g -y -a "claude-code" -a "opencode" -a "codex"
 
     echo -e "${GREEN}Skills installed${NC}"
 }
