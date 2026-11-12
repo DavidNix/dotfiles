@@ -4,6 +4,10 @@
     "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
     "DISABLE_TELEMETRY": "1"
   },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Bash(find:*)",
@@ -15,8 +19,6 @@
       "Bash(git show:*)",
       "Bash(git diff:*)",
       "Bash(glab ci status:*)",
-      "Bash(glab ci status:*)",
-      "Bash(glab mr list:*)",
       "Bash(glab mr list:*)",
       "Bash(glab mr view:*)",
       "Bash(go build:*)",
@@ -37,10 +39,7 @@
     ],
     "defaultMode": "auto"
   },
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  },
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -92,7 +91,6 @@
   "feedbackSurveyRate": 0,
   "feedbackDrafts": "off",
   "alwaysThinkingEnabled": true,
-  "autoMemoryEnabled": false,
   "effortLevel": "xhigh",
   "modelSettings": {
     "claude-opus-5-5": {
@@ -102,6 +100,7 @@
   "promptSuggestionEnabled": false,
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
+  "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
   "editorMode": "vim",
