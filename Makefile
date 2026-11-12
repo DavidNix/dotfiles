@@ -56,11 +56,10 @@ relink: install-scripts herdr-plugins ## Create new symbolic links for dotfiles 
 	sudo mkdir -p /etc/codex
 	sudo ln -sf $$PWD/codex/config.toml /etc/codex/config.toml
 	@#Claude Code
-	mkdir -p ~/.claude/commands ~/.claude/agents ~/.claude/output-styles
+	mkdir -p ~/.claude/commands ~/.claude/output-styles
 	ln -sf $$PWD/claude/settings.json ~/.claude/settings.json
 	ln -sf $$PWD/claude/settings.local.json ~/.claude/settings.local.json
 	ln -sf $$PWD/claude/keybindings.json ~/.claude/keybindings.json
-	ln -sf $$PWD/claude/agents/* ~/.claude/agents/
 	ln -sf $$PWD/claude/output-styles/* ~/.claude/output-styles/
 
 .PHONY: defaults

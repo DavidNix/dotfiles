@@ -27,7 +27,7 @@ make bash-check FILE=bin/script # Validate a bash script
 | `Brewfile` | Homebrew packages |
 | `.zshrc` | Shell config (plugins, aliases, vi-mode) |
 | `.cursor/rules/` | Cursor editor rules |
-| `claude/` | Claude Code settings, keybindings, skills, agents |
+| `claude/` | Claude Code settings, keybindings, skills |
 | `claude/mods/` | Claude Code mods, loaded via `CLAUDE_CODE_PLUGIN_DIRS` in `claude/settings.json` |
 | `.config/zed/` | Zed editor config |
 | `.config/nvim/` | Neovim config (LazyVim) |
