@@ -7,7 +7,7 @@ description: Thorough, critical code review focused on correctness, business log
 
 Review the specified code thoroughly and critically. Prioritize finding real issues over being agreeable. Focus on functional correctness, business behavior, implementation, tests, and documentation.
 
-Perform the entire review yourself. Do NOT delegate to subagents or use the Task tool for discovery, analysis, verification, or any other part of the review.
+Perform the entire review yourself. Do NOT delegate to subagents or use the Task tool for discovery, analysis, verification, or any other part of the review. Do not run tests, builds, or linters. The caller handles verification.
 
 ### What to Review
 

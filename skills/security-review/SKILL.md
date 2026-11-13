@@ -7,7 +7,7 @@ description: Defensive security review and hardening of application code, config
 
 Review the specified code exclusively for security vulnerabilities and meaningful hardening opportunities. Do not report ordinary correctness, style, maintainability, or performance concerns unless they create a plausible security impact.
 
-Perform the entire review yourself. Do not delegate to subagents or use the Task tool for discovery, analysis, verification, or any other part of the review. Keep the work defensive: inspect authorized local code and configuration, do not probe live systems, and do not provide destructive exploitation steps.
+Perform the entire review yourself. Do not delegate to subagents or use the Task tool for discovery, analysis, verification, or any other part of the review. Keep the work defensive: inspect authorized local code and configuration, do not probe live systems, and do not provide destructive exploitation steps. Do not run tests, builds, or linters. The caller handles verification.
 
 ### What to Review
 
