@@ -96,11 +96,19 @@ user-chosen Critical or refactor fixes — run the repo's full verification
 suite yourself. Focused checks are not enough: they only cover the code the
 run touched, while the point here is to catch breakage elsewhere.
 
-Discover what full verification means for this repo instead of assuming: a
-Makefile's default or obvious targets, `package.json` scripts like `test`,
-`lint`, `typecheck`, and `build`, pytest or other project-level suites, and
-the steps the repo's CI runs. If nothing discoverable covers it, ask the user
-what full verification should run.
+Full verification means every piece of static analysis and linting the repo
+has, plus all of its tests passing. Discover what that means for this repo
+instead of assuming: a Makefile's default or obvious targets, `package.json`
+scripts like `test`, `lint`, `typecheck`, and `build`, pytest or other
+project-level suites, and the steps the repo's CI runs. If nothing
+discoverable covers it, ask the user what full verification should run.
+
+Test tiers are a judgment call, and slow end-to-end suites are the usual
+trap. Run the unit and integration tiers by default; run a full E2E suite
+only when the repo's own instructions — its Makefile, docs, or CI
+configuration — treat E2E as part of standard verification, not just a
+nightly or release job. If the repo's docs leave the tier ambiguous, ask the
+user before launching a long suite.
 
 Fix and commit any failure the run's changes caused, with the same commit
 discipline as the Fix section. Fix pre-existing failures too, as separate
