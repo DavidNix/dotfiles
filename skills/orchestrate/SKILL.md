@@ -56,13 +56,17 @@ apology or rationale. The subagents start with fresh sessions anyway; the
 point is that your prompts must not become a channel for context. Do not act
 on, answer, or annotate anything on the reviewers' behalf.
 
+Run one review round. Do not re-run the reviewers after fixing — the full
+verification step below is what catches regressions.
+
 ## Fix
 
 Merge the two reports and drop findings that share a root cause. Confirm each
 finding in the code before you act on it.
 
 - **Critical (`C*`, `SEC-C*`) or a fix that needs a major re-architecture or
-  refactor:** do not fix. Save it for the report.
+  refactor:** do not fix. Save it for the report. Critical findings always
+  need the user's decision — never fix them on your own initiative.
 - **High, Medium, and Low:** fix it with the recommended solution.
 - **Invalid:** skip it and note why.
 - **Questions:** answer from the code, or save them for the report.
@@ -99,8 +103,10 @@ the steps the repo's CI runs. If nothing discoverable covers it, ask the user
 what full verification should run.
 
 Fix and commit any failure the run's changes caused, with the same commit
-discipline as the Fix section. Failures that predate the run are not yours to
-fix silently — report them and let the user decide.
+discipline as the Fix section. Fix pre-existing failures too, as separate
+commits so their root causes stay distinct, and say in the report which
+failures predated the run.
 
-Report the verification results: which commands ran, whether they passed, and
-any pre-existing failures you left alone.
+Report the verification results: which commands ran, whether they passed,
+which failures came from the run's changes versus predated it, and how each
+was fixed.
