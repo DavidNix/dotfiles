@@ -1,21 +1,23 @@
 ---
 name: orchestrate
-description: Implement the plan in the current context, then hand off to a context-free code-review-fix subagent (security review always on unless explicitly declined). Use whenever the user asks to orchestrate, for build-with-review, "build then review", or wants implementation followed by an independent review. Use only when the user explicitly asks for it.
+description: Implement the plan in the current context, then hand off to context-free code-review and security-review subagents (security review always runs unless explicitly declined). Use whenever the user asks to orchestrate, for build-with-review, "build then review", or wants implementation followed by an independent review. Use only when the user explicitly asks for it.
 argument-hint: "[model[#effort]] [review scope]"
 ---
 
 # orchestrate
 
-Implement the plan already agreed in this context, then get it reviewed by a
-subagent that knows nothing about this conversation. The reviewer must judge
-the code on its own; passing plan summaries or rationale would bias the review.
+Implement the plan already agreed in this context, then get it reviewed by
+subagents that know nothing about this conversation. The reviewers must judge
+the code on their own; passing plan summaries or rationale would bias the
+review.
 
 ## Arguments
 
 The first argument, if present, is the reviewer model, optionally followed by
 an effort word (low, medium, high, xhigh, max) or written as
 `provider/model#variant`. Examples: `opus high`, `astra medium`,
-`openai/gpt-6-astra#high`. Everything after it is the review scope.
+`openai/gpt-6.1-sol#low`. Everything after it is the review scope. The same
+model and effort apply to both reviewers.
 
 If no model is specified, use the harness default:
 
@@ -23,36 +25,63 @@ If no model is specified, use the harness default:
 - Claude Code: `anthropic/claude-opus-5-5#high` (Opus, high effort)
 - OpenCode: `openai/gpt-6-astra#high` (Astra, high effort)
 - Unknown harness: ask the user which model and effort to use before
-  spawning the reviewer.
+  spawning the reviewers.
 
 ## Implement
 
 1. If there is no plan in the current context, ask for one. Do not invent work.
-2. Record the current HEAD SHA: `git rev-parse HEAD`. The reviewer will use it
-   to find what changed.
+2. Record the current HEAD SHA: `git rev-parse HEAD`. The reviewers will use
+   it to find what changed.
 3. Implement the plan. No re-planning, no scope creep. Run focused checks as
    you go and commit the work the way the repo expects.
 
 ## Review
 
-When implementation is done, spawn a subagent and pass it nothing but this:
+When implementation is done, spawn two subagents in the same turn so they run
+in parallel: one invokes the `code-review` skill, the other invokes the
+`security-review` skill. Both get the same scope: `changes since <HEAD SHA>`
+plus any user-supplied scope.
 
-- An instruction to invoke the `code-review-fix` skill.
-- The scope: `changes since <HEAD SHA>` plus any user-supplied scope.
+Each subagent prompt contains nothing but:
+
+- An instruction to invoke its skill (`code-review` or `security-review`).
+- The scope and the repository path.
 - The model and effort directive, in the form the harness supports. On
   OpenCode, set the subagent tool's `model` parameter to the
   `provider/model#variant` id and keep the directive out of the prompt. On
   Claude Code and Codex, state the model and effort in the prompt.
 
 Pass no conversation history, no plan summary, no list of changes, and no
-apology or rationale. The subagent starts with a fresh session anyway; the
-point is that your prompt must not become a channel for context. Do not act
-on, answer, or annotate anything on the reviewer's behalf.
+apology or rationale. The subagents start with fresh sessions anyway; the
+point is that your prompts must not become a channel for context. Do not act
+on, answer, or annotate anything on the reviewers' behalf.
+
+## Fix
+
+Merge the two reports and drop findings that share a root cause. Confirm each
+finding in the code before you act on it.
+
+- **Critical (`C*`, `SEC-C*`) or a fix that needs a major re-architecture or
+  refactor:** do not fix. Save it for the report.
+- **High, Medium, and Low:** fix it with the recommended solution.
+- **Invalid:** skip it and note why.
+- **Questions:** answer from the code, or save them for the report.
+
+Commit each fix atomically: one root cause, with its tests, after its focused
+checks pass. Stage paths by name and follow the repo's commit style. Never
+amend, skip hooks, force, or push. If a file had uncommitted changes before
+the run, leave its fix uncommitted.
+
+After all fixes, run focused checks over everything you changed. Fix and
+commit any failure that you caused.
 
 ## Report
 
-When the reviewer finishes, surface its report to the user as-is, including
-any Critical findings and open questions. Do not fix the findings yourself —
-the reviewer already committed its fixes; what reaches you is what it could
-not or should not act on alone. Stop after surfacing it unless the user asks
-for more.
+Surface both reviewers' findings, with duplicates merged. List: Critical and
+refactor findings with their possible solutions and your recommendation,
+fixes with their commit SHAs, uncommitted fixes, skipped findings, open
+questions, and check results.
+
+Then ask the user how to handle each Critical and refactor finding. Run
+focused checks on each chosen fix, then commit it the same way. The user
+decides if full verification is needed.
