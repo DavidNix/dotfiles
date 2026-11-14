@@ -1,12 +1,12 @@
 ---
 name: code-review-fix
-description: Review code with the code-review skill, plus the security-review skill when the first argument is `security`. Fix and commit non-Critical findings without asking, then ask the user about Critical findings at the end. Use only when the user explicitly asks for code-review-fix.
-argument-hint: "[security] [files, paths, or branch]"
+description: Review code with the code-review skill, always running the security-review skill unless the user explicitly asks not to. Fix and commit non-Critical findings without asking, then ask the user about Critical findings at the end. Use only when the user explicitly asks for code-review-fix.
+argument-hint: "[files, paths, or branch]"
 ---
 
 # code-review-fix
 
-If the first word of `$ARGUMENTS` is `security`, remove it and turn on the security review. The remaining arguments are the review scope.
+Run the security review by default. Skip it only if the user explicitly asks not to (e.g. "no security review"). The arguments are the review scope.
 
 ## Review
 
