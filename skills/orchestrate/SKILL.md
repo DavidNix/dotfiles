@@ -83,5 +83,24 @@ fixes with their commit SHAs, uncommitted fixes, skipped findings, open
 questions, and check results.
 
 Then ask the user how to handle each Critical and refactor finding. Run
-focused checks on each chosen fix, then commit it the same way. The user
-decides if full verification is needed.
+focused checks on each chosen fix, then commit it the same way.
+
+## Verify
+
+Once all fixing is complete — the automatic non-Critical fixes and any
+user-chosen Critical or refactor fixes — run the repo's full verification
+suite yourself. Focused checks are not enough: they only cover the code the
+run touched, while the point here is to catch breakage elsewhere.
+
+Discover what full verification means for this repo instead of assuming: a
+Makefile's default or obvious targets, `package.json` scripts like `test`,
+`lint`, `typecheck`, and `build`, pytest or other project-level suites, and
+the steps the repo's CI runs. If nothing discoverable covers it, ask the user
+what full verification should run.
+
+Fix and commit any failure the run's changes caused, with the same commit
+discipline as the Fix section. Failures that predate the run are not yours to
+fix silently — report them and let the user decide.
+
+Report the verification results: which commands ran, whether they passed, and
+any pre-existing failures you left alone.
