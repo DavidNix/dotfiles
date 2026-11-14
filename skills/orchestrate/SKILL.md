@@ -27,6 +27,24 @@ If no model is specified, use the harness default:
 - Unknown harness: ask the user which model and effort to use before
   spawning the reviewers.
 
+## Questions first
+
+Batch every question into one round before any orchestration starts, so the
+rest of the run proceeds without interruptions. Before implementing, resolve
+all of the following:
+
+- **No plan in context:** ask for one.
+- **Unknown harness:** ask for the reviewer model and effort.
+- **Verification scope:** discover the repo's full verification commands and
+  test tiers up front (see the Verify section). If what to run is ambiguous —
+  no discoverable suite, or an unclear E2E tier — settle it with the user
+  now, not mid-run.
+
+If something genuinely unforeseen appears later, decide from the repo's own
+conventions and the defaults in this skill, and note the call in the report.
+The one exception is Critical findings, which always go to the user at the
+end — that is part of the final report, not a mid-run interruption.
+
 ## Implement
 
 1. If there is no plan in the current context, ask for one. Do not invent work.
@@ -100,15 +118,14 @@ Full verification means every piece of static analysis and linting the repo
 has, plus all of its tests passing. Discover what that means for this repo
 instead of assuming: a Makefile's default or obvious targets, `package.json`
 scripts like `test`, `lint`, `typecheck`, and `build`, pytest or other
-project-level suites, and the steps the repo's CI runs. If nothing
-discoverable covers it, ask the user what full verification should run.
+project-level suites, and the steps the repo's CI runs.
 
 Test tiers are a judgment call, and slow end-to-end suites are the usual
 trap. Run the unit and integration tiers by default; run a full E2E suite
 only when the repo's own instructions — its Makefile, docs, or CI
 configuration — treat E2E as part of standard verification, not just a
-nightly or release job. If the repo's docs leave the tier ambiguous, ask the
-user before launching a long suite.
+nightly or release job. Any ambiguity about what to run was settled in the
+Questions-first round; follow what was agreed there.
 
 Fix and commit any failure the run's changes caused, with the same commit
 discipline as the Fix section. Fix pre-existing failures too, as separate
