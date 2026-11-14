@@ -1,40 +1,58 @@
 ---
 name: orchestrate
-description: Orchestrate multi-unit builds to completion by delegating to subagent builders at the orchestrator's discretion, with atomic commits and mandatory final code and security reviews. Use only when the user explicitly asks to orchestrate.
+description: Implement the plan in the current context, then hand off to a context-free code-review-fix subagent (security review always on unless explicitly declined). Use whenever the user asks to orchestrate, for build-with-review, "build then review", or wants implementation followed by an independent review. Use only when the user explicitly asks for it.
+argument-hint: "[model[#effort]] [review scope]"
 ---
 
-Orchestrate the requested work to completion.
+# orchestrate
 
-## Scope
+Implement the plan already agreed in this context, then get it reviewed by a
+subagent that knows nothing about this conversation. The reviewer must judge
+the code on its own; passing plan summaries or rationale would bias the review.
 
-- Use the user's request. Read referenced files/issues; use `gh-issues` for GitHub input.
-- Read repository instructions. Establish scope, acceptance criteria, design decisions, verification commands, starting SHA, and dirty-path baseline. Preserve unrelated work; ask before touching conflicting dirty paths.
-- Inherit the session's model/reasoning settings and each subagent's configured defaults. Any comment-pruning subagent must inherit the orchestrator's model and reasoning settings.
+## Arguments
 
-## Implement and delegate
+The first argument, if present, is the reviewer model, optionally followed by
+an effort word (low, medium, high, xhigh, max) or written as
+`provider/model#variant`. Examples: `opus high`, `astra medium`,
+`openai/gpt-6-astra#high`. Everything after it is the review scope.
 
-- Delegation is your call, not a requirement. Implement directly, delegate to implementation subagents (choose a frontend-focused one for frontend work), or mix both as the work dictates. Delegation suits narrowly scoped, independently verifiable units; direct work suits small or tightly coupled changes. You always own planning, coordination, evidence, and reviews.
-- If delegating, split work into independently verifiable outcomes with explicit dependencies and path ownership. No fixed phases or todo tool.
-- Keep a compact conversation ledger: unit, dependencies, owner/paths, status, the subagent's session or conversation identifier when delegated, commits/checks, and unresolved findings. Update at milestones; include next actions when pausing. Persist elsewhere only when requested.
-- All concurrent subagent work must be atomic and non-conflicting: each unit owns disjoint paths, touches no shared or generated files another unit writes, and runs its checks against stable inputs. If units cannot be made conflict-free, run them serially instead. For parallel work in a shared worktree, wait until writers finish, then make commits one at a time. Integrate isolated-worktree changes directly or delegate integration to a builder.
-- Use background execution and completion notifications for concurrent units, not polling. Resume builders in their existing session or conversation for related fixes; start fresh ones for unrelated work.
-- Give each builder requirements, resolved design, scope/exclusions, owned paths, baseline/current SHA, intervening changes, exact checks, and commit instructions. Require changed paths, check results, commit SHA, and blockers before marking complete.
-- Require `ai-tdd` for testable application changes; use relevant validation for documentation, configuration, infrastructure, and wiring. Whoever implements owns focused checks. Always make atomic commits: one verified, coherent change per commit, including fixes. These requirements apply to both direct and delegated work. Preserve honest test chronology.
-- Never stage unrelated changes, amend, skip hooks, force Git operations, or push without permission.
+If no model is specified, use the harness default:
 
-## Review and fix
+- Codex: `openai/gpt-6-astra#high` (Astra, high effort)
+- Claude Code: `anthropic/claude-opus-5-5#high` (Opus, high effort)
+- OpenCode: `openai/gpt-6-astra#high` (Astra, high effort)
+- Unknown harness: ask the user which model and effort to use before
+  spawning the reviewer.
 
-- Choose intermediate review checkpoints as useful. Reviewers report; implement fixes directly or delegate them.
-- For both code and security findings: pause implementation and dispatch before Critical fixes and ask for approval. Automatically resolve actionable High, Medium, and Low findings. Investigate questions; ask when evidence cannot resolve a necessary decision safely.
-- Treat major architecture, irreversible contract, or scope changes as Critical decisions. Fix blockers promptly; group other findings by root cause for hardening before completion.
+## Implement
 
-## Required final gate
+1. If there is no plan in the current context, ask for one. Do not invent work.
+2. Record the current HEAD SHA: `git rev-parse HEAD`. The reviewer will use it
+   to find what changed.
+3. Implement the plan. No re-planning, no scope creep. Run focused checks as
+   you go and commit the work the way the repo expects.
 
-1. Finish integration and confirm focused-check evidence for all direct and delegated work.
-2. Always dispatch final code and security review subagents concurrently against the same pinned SHA, covering this run's changes. Those review agents must invoke the related review skills (`code-review` and `security-review`). Supply requirements, scope, prior findings, and verification evidence. If the harness provides no review subagents, perform both reviews yourself using those skills. Intermediate reviews never replace these.
-3. Keep the tree stable until both return. Apply the finding policy above and implement fixes directly or delegate them. Verify affected behavior; request targeted re-review as needed, repeating affected final reviews after material architecture, security, or integration changes.
-4. After all implementation, reviews, and fixes, run a comment-pruning pass exactly once as the final editing pass over comments added or modified during this run. Use a comment-pruning subagent if the harness provides one; otherwise do it yourself. Remove redundant narration and shorten verbose comments while preserving useful rationale, tooling directives, TODO/FIXME markers, and license headers. Change only comments; preserve behavior. Commit any changes atomically.
-5. After the comment sweep, run full applicable verification yourself against the final tree. Fix failures directly or delegate them, then rerun full verification after fixes so the final run covers the delivered tree.
-6. Finish only when final full verification passes, both reviews and the comment sweep complete, and findings are verified fixed, explicitly accepted, or confirmed invalid. Report missing checks or required agents as blockers, never success.
+## Review
 
-Summarize delivery, verification, both final reviews, the comment sweep, and remaining risks or blockers. Preserve referenced files and issues unless changes were requested.
+When implementation is done, spawn a subagent and pass it nothing but this:
+
+- An instruction to invoke the `code-review-fix` skill.
+- The scope: `changes since <HEAD SHA>` plus any user-supplied scope.
+- The model and effort directive, in the form the harness supports. On
+  OpenCode, set the subagent tool's `model` parameter to the
+  `provider/model#variant` id and keep the directive out of the prompt. On
+  Claude Code and Codex, state the model and effort in the prompt.
+
+Pass no conversation history, no plan summary, no list of changes, and no
+apology or rationale. The subagent starts with a fresh session anyway; the
+point is that your prompt must not become a channel for context. Do not act
+on, answer, or annotate anything on the reviewer's behalf.
+
+## Report
+
+When the reviewer finishes, surface its report to the user as-is, including
+any Critical findings and open questions. Do not fix the findings yourself —
+the reviewer already committed its fixes; what reaches you is what it could
+not or should not act on alone. Stop after surfacing it unless the user asks
+for more.
