@@ -54,3 +54,4 @@ __debug_bin
 /.cursor/
 
 **/.claude/settings.local.json
+**/.claude/worktrees/
